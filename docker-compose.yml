@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  backend:
+    container_name: backend-fastapi
+    build: ./backend
+    env_file:
+      - .env
+    volumes:
+      - ./backend:/app #개발편의성: 수정 시 재시동
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    #command: /bin/bash -c "/app/pre-start.sh && uvicorn app.main:app --host 0.0.0.0 --port 80 --reload"
+    command:
+      - /bin/bash
+      - -c
+      - |
+        chmod +x ./src/pre-start.sh && ./src/pre-start.sh
+        fastapi dev ./src/main.py --host 0.0.0.0
+
+
+  db:
+    container_name: ${POSTGRES_SERVER}
+    image: postgres:16
+    #ports:
+    #  - "5432:5432"
+    env_file:
+      - .env
+    volumes:
+      - ./backend/volumes/${POSTGRES_SERVER}_volumes:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-q", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5 
+
+
+networks:
+  default:
+    name: kotact-network
+
+
+  
