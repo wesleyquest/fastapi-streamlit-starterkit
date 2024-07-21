@@ -1,0 +1,8 @@
+fastapi
+pydantic-settings
+alembic
+tenacity
+psycopg2-binary
+passlib
+python-jose
+emails
