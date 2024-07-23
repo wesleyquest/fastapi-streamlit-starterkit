@@ -2,14 +2,14 @@ version: '3.8'
 
 services:
   backend:
-    container_name: backend-fastapi
+    container_name: ${BACKEND_SERVER}
     build: ./backend
     env_file:
       - .env
     volumes:
-      - ./backend:/app #개발편의성: 수정 시 재시동
+      - ./backend:/app
     ports:
-      - "8000:8000"
+      - 8000:8000
     depends_on:
       - db
     #command: /bin/bash -c "/app/pre-start.sh && uvicorn app.main:app --host 0.0.0.0 --port 80 --reload"
@@ -20,6 +20,23 @@ services:
         chmod +x ./src/pre-start.sh && ./src/pre-start.sh
         fastapi dev ./src/main.py --host 0.0.0.0
 
+  frontend:
+    container_name: ${FRONTEND_SERVER}
+    build: ./frontend
+    env_file:
+      - .env
+    volumes:
+      - ./frontend:/app
+    ports:
+      - 8501:8501
+    depends_on:
+      - backend
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t
+    command:
+      - streamlit
+      - run
+      - home.py
 
   db:
     container_name: ${POSTGRES_SERVER}
