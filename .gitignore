@@ -2,3 +2,6 @@ __pycache__/
 old/
 env
 .env
+
+volumes/
+

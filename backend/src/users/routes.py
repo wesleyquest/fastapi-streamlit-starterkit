@@ -32,7 +32,7 @@ def get_users(
     current_user: models.User = Depends(deps.get_current_active_superuser),
 ) -> Any:
     """
-    Retrieve users.
+    Get users.
     """
     users = crud_user.get_multi(db, skip=skip, limit=limit)
     return users
@@ -73,11 +73,10 @@ def update_user_me(
     current_user: models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
-    update current user info.
+    Update current user info.
     """
     current_user_data = jsonable_encoder(current_user)
     user_in = schemas.UserUpdate(**current_user_data)
-    print(user_in) #print
     if password is not None:
         user_in.password = password
     if full_name is not None:
@@ -88,5 +87,80 @@ def update_user_me(
     return user
 
 
+@router.get("/me", response_model=schemas.User)
+def get_user_me(
+    db: Session = Depends(deps.get_db),
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Get current user.
+    """
+    return current_user
 
+@router.post("/signup", response_model=schemas.User)
+def create_user_open_signup(
+    *,
+    db: Session = Depends(deps.get_db),
+    settings: Annotated[config.Settings, Depends(get_settings)],
+    email: EmailStr = Body(...),
+    password: str = Body(...),
+    full_name: str = Body(None),
+) -> Any:
+    """
+    Create new user without the need to be logged in.
+    """
+    if not settings.USERS_OPEN_REGISTRATION:
+        raise HTTPException(
+            status_code=403,
+            detail="new user is forbidden to sign up" #"Open user registration is forbidden on this server" 
+        )
+    
+    user = crud_user.get_by_email(db, email=email)
+    if user:
+        raise HTTPException(
+            status_code=400,
+            detail="The user with this username(email address) already exists"
+        )
+    
+    user_in = schemas.UserCreate(password=password, email=email, full_name=full_name)
+    user = crud_user.create(db, obj_in=user_in)
+    return user
+
+@router.get("/{user_id}", response_model=schemas.User)
+def get_user_by_id(
+    user_id: int,
+    current_user: models.User = Depends(deps.get_current_active_user),
+    db: Session = Depends(deps.get_db),
+) -> Any:
+    """
+    Get a user by id.
+    """
+    user = crud_user.get(db, id=user_id)
+    if user == current_user:
+        return user
+    if not crud_user.is_superuser(current_user):
+        raise HTTPException(
+            status_code=400, detail="The user doesn't have enough privileges"
+        )
+    return user
+
+@router.put("/{user_id}", response_model=schemas.User)
+def update_user_by_id(
+    *,
+    db: Session = Depends(deps.get_db),
+    user_id: int,
+    user_in: schemas.UserUpdate,
+    current_user: models.User = Depends(deps.get_current_active_superuser),
+) -> Any:
+    """
+    Update a user by id.
+    """
+    user = crud_user.get(db, id=user_id)
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="The user with this username does not exist in the system",
+        )
+    user = crud_user.update(db, db_obj=user, obj_in=user_in)
+    return user
 

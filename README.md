@@ -9,3 +9,9 @@ fastapi
 #frontend
 streamlit
 
+#start
+##create .env
+
+##docker compose start
+docker compose up --build
+

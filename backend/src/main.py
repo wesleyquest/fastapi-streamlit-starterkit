@@ -34,7 +34,7 @@ async def info(settings: Annotated[config.Settings, Depends(get_settings)]):
 @app.on_event("startup")
 def on_startup():
 
-    print("Hello World")
+    print("Hello FastAPI")
 
 
 #middleware
