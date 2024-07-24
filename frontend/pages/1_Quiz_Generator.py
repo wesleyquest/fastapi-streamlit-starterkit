@@ -31,6 +31,10 @@ if "auth_status" not in st.session_state:
 if "key_status" not in st.session_state:
     st.session_state["key_status"] = None
 
+if st.session_state["auth_status"]==True:
+    from modules.auth.api_auth import get_user_info
+    st.session_state["user_info"] = get_user_info(token_type=st.session_state["token_type"], access_token=st.session_state["access_token"])
+
 
 @st.experimental_dialog(" ", width="small")
 def open_login_modal():
@@ -55,8 +59,16 @@ def open_login_modal():
 def open_logout_modal():
     st.markdown("로그아웃 하시겠습니까 ?")
 
+    email = st.session_state["user_info"]["email"]
+    nickname = st.session_state["user_info"]["full_name"]
+
+    st.info(f"email : {email}  \n nickname : {nickname}")
+
+
+
     if st.button("로그아웃", type="primary", use_container_width=True, key="modal_log_out_button"):
         st.session_state["auth_status"] = None
+        st.session_state["key_status"] = None
         st.rerun()
 
 @st.experimental_dialog(" ", width="small")
@@ -70,53 +82,48 @@ def open_openaiapikey_modal():
         st.rerun()
 
 
-
+# sidebar
 with st.sidebar:
+    #st.info("    &nbsp;<br /> &nbsp;&nbsp;&nbsp;   \n ㅇㄹ")
+    status_col_1, status_col_2 = st.columns(2)
+    with status_col_1:
+        if not st.session_state["auth_status"]==True:
+            st.markdown("🔴 &nbsp;&nbsp; LOG IN  \n &nbsp;&nbsp;")
+        else :
+            nickname = st.session_state["user_info"]["full_name"]
+            st.markdown(f"🟢 &nbsp;&nbsp; LOG IN  \n ( {nickname} )")
+    with status_col_2:
+        if not st.session_state["key_status"]==True:
+            st.markdown("🔴 &nbsp;&nbsp; API KEY  \n &nbsp;&nbsp;")
+        else:
+            from modules.security.encryption import str_to_asterisk
+            openai_api_key_enc = str_to_asterisk(st.session_state["openai_api_key"])
+            st.markdown(f"🟢 &nbsp;&nbsp; API KEY  \n ( {openai_api_key_enc} )")
 
-    login_placeholder = st.empty()
+    login_placeholder = st.container()
+    #logout_placeholder = st.empty()
+    key_placeholder = st.container()
     
+    if not st.session_state["auth_status"]==True:
+        if login_placeholder.button("로그인 (Log in)", type="primary", use_container_width=True, key="log_in_button"):
+            open_login_modal()
 
-    if login_placeholder.button("로그인 (Log in)", type="primary", use_container_width=True, key="log_in_button"):
-        open_login_modal()
-    
-    if st.session_state["auth_status"] == True:
-        from modules.auth.api_auth import get_user_info
-        login_placeholder.empty()
-        if st.button("로그아웃 (Log out)", type="secondary", use_container_width=True, key="log_out_button"):
-            open_logout_modal()
-        user_info = get_user_info(token_type=st.session_state["token_type"], access_token=st.session_state["access_token"])
-        full_name = user_info["full_name"]
-        st.info("로그인 성공 !")
-        st.info(f"안녕하세요 {full_name}님 !")
-        st.info(f"OpenAI API KEY를 입력하세요", icon = "👇")
-    elif st.session_state["auth_status"] == False:
-        #st.error("Incorrect username or password")
-        st.error(":red[로그인 실패 !]")
-        st.error(":red[사용자명 또는 비밀번호가 잘못 됐어요]")
-    else:
-        st.markdown("")
-
-    if st.session_state["auth_status"]==True:
-
-        key_placeholder = st.empty()
-
+    if not st.session_state["key_status"]==True:
         if key_placeholder.button("OpenAI API KEY 입력", type="primary", use_container_width=True, key="openai_api_key_button"):
             open_openaiapikey_modal()
-
-        if st.session_state["key_status"] == True:
-            if key_placeholder.button("OpenAI API KEY 수정", type="secondary", use_container_width=True, key="openai_api_key_2_button"):
-                open_openaiapikey_modal()
-
+    else:
+        if key_placeholder.button("OpenAI API KEY 수정", type="secondary", use_container_width=True, key="openai_api_key_2_button"):
+            open_openaiapikey_modal()
 
 
 
-
-
-
-
-#main
+# main
+st.markdown(" ")
+login_info_placeholder=st.container()
+key_info_placeholder=st.container()
 st.title("🚀 Kotact Quiz Generator", anchor=False)
 st.caption("version 0.1")
+
 
 @st.experimental_dialog("Settings", width="large")
 def open_settings_modal():
@@ -170,38 +177,52 @@ def reset_conversation():
   ##st.session_state.chat_history = None
 
 
+
+#message
 if st.session_state["auth_status"]==True:
+    if login_placeholder.button("로그아웃 (Log out)", type="secondary", use_container_width=True, key="log_out_button"):
+        open_logout_modal()
 
-    if st.session_state["key_status"]==True:
-
-        with st.container():
-            col_1, col_2 = st.columns(2)
-            with col_1:
-                if st.button("퀴즈 생성", type="primary", use_container_width=True):
-                    open_settings_modal()
-
-            with col_2:
-                st.button('퀴즈 삭제', on_click=reset_conversation, use_container_width=True)
-
-        #빈칸
-        with st.container():
-            st.markdown(" ")
-
-
-        if "quiz_messages" not in st.session_state:
-            st.session_state["quiz_messages"] = [{"role": "assistant", "content": "안녕하세요! 코택트 퀴즈 생성기입니다.  \n '퀴즈 생성' 버튼을 클릭하여 퀴즈를 생성해 주세요!"}]
-
-        if st.session_state.quiz_messages:
-            #반대 순서로 보기('reversed')
-            for msg in reversed(st.session_state.quiz_messages):
-                st.chat_message(msg["role"]).write(msg["content"])
-
-    else:
-        st.info("좌측 사이드바를 통해 OpenAI API KEY를 입력해 주세요")
+elif st.session_state["auth_status"] == False:
+    login_info_placeholder.error("🔴 :red[로그인 실패 !  사용자명 또는 비밀번호가 잘못 됐어요]")
 
 else:
-    st.info("좌측 사이드바를 통해 로그인을 진행해 주세요")
+    login_info_placeholder.info("👈 로그인을 진행해 주세요")
 
+
+if not st.session_state["key_status"]==True:
+    key_info_placeholder.info(f"👈 OpenAI API KEY를 입력하세요")
+
+
+
+
+#quiz generator
+if (st.session_state["auth_status"]==True) & (st.session_state["key_status"]==True):
+
+    nickname = st.session_state["user_info"]["full_name"]
+
+    
+    with st.container():
+        col_1, col_2 = st.columns(2)
+        with col_1:
+            if st.button("퀴즈 생성", type="primary", use_container_width=True):
+                open_settings_modal()
+
+        with col_2:
+            st.button('퀴즈 삭제', on_click=reset_conversation, use_container_width=True)
+
+    #빈칸
+    with st.container():
+        st.markdown(" ")
+
+
+    if "quiz_messages" not in st.session_state:
+        st.session_state["quiz_messages"] = [{"role": "assistant", "content": f"안녕하세요 {nickname} 님 !  \n '퀴즈 생성' 버튼을 클릭하여 퀴즈를 생성해 주세요!"}]
+
+    if st.session_state.quiz_messages:
+        #반대 순서로 보기('reversed')
+        for msg in reversed(st.session_state.quiz_messages):
+            st.chat_message(msg["role"]).write(msg["content"])
 
 
 
