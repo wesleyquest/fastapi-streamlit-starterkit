@@ -1,31 +1,16 @@
-from openai import OpenAI
 import streamlit as st
+from st_pages import add_indentation
+from modules.custom.style import style_global
+from modules.custom.style import set_page_config_sidebar_expanded
+from modules.custom.style import show_pages_auth_true, show_pages_auth_false
+from openai import OpenAI
 import time
 
-st.markdown("""
-    <style>
-    div.stButton {text-align:center}
-    </style>""", unsafe_allow_html=True)
+set_page_config_sidebar_expanded()
+show_pages_auth_true()
+style_global()
 
-st.markdown("""
-    <style>
-    div.stSpinner > div {
-    text-align:center;
-    align-items: center;
-    justify-content: center;
-    }
-    </style>""", unsafe_allow_html=True)
-
-st.markdown("""
-    <style>
-    .main > .block-container {
-        padding-top: 0rem;
-        padding-bottom: 0rem;
-        padding-left: 5rem;
-        padding-right: 5rem;
-    }
-    </style>""", unsafe_allow_html=True)
-
+#var
 if "auth_status" not in st.session_state:
     st.session_state["auth_status"] = None
 if "key_status" not in st.session_state:
@@ -62,7 +47,7 @@ def open_logout_modal():
     email = st.session_state["user_info"]["email"]
     nickname = st.session_state["user_info"]["full_name"]
 
-    st.info(f"email : {email}  \n nickname : {nickname}")
+    st.info(f"Username (Email) : {email}  \n nickname : {nickname}")
 
 
 
@@ -85,27 +70,13 @@ def open_openaiapikey_modal():
 # sidebar
 with st.sidebar:
     #st.info("    &nbsp;<br /> &nbsp;&nbsp;&nbsp;   \n ㅇㄹ")
-    status_col_1, status_col_2 = st.columns(2)
-    with status_col_1:
-        if not st.session_state["auth_status"]==True:
-            st.markdown("🔴 &nbsp;&nbsp; LOG IN  \n &nbsp;&nbsp;")
-        else :
-            nickname = st.session_state["user_info"]["full_name"]
-            st.markdown(f"🟢 &nbsp;&nbsp; LOG IN  \n ( {nickname} )")
-    with status_col_2:
-        if not st.session_state["key_status"]==True:
-            st.markdown("🔴 &nbsp;&nbsp; API KEY  \n &nbsp;&nbsp;")
-        else:
-            from modules.security.encryption import str_to_asterisk
-            openai_api_key_enc = str_to_asterisk(st.session_state["openai_api_key"])
-            st.markdown(f"🟢 &nbsp;&nbsp; API KEY  \n ( {openai_api_key_enc} )")
 
     login_placeholder = st.container()
     #logout_placeholder = st.empty()
     key_placeholder = st.container()
     
     if not st.session_state["auth_status"]==True:
-        if login_placeholder.button("로그인 (Log in)", type="primary", use_container_width=True, key="log_in_button"):
+        if login_placeholder.button("로그인 (LOG IN)", type="primary", use_container_width=True, key="log_in_button"):
             open_login_modal()
 
     if not st.session_state["key_status"]==True:
@@ -117,8 +88,26 @@ with st.sidebar:
 
 
 
-# main
+#info
 st.markdown(" ")
+status_col_1, status_col_2 = st.columns(2)
+with status_col_1:
+    if not st.session_state["auth_status"]==True:
+        st.info("🔴 &nbsp;&nbsp; LOG IN  \n &nbsp;&nbsp;")
+    else :
+        nickname = st.session_state["user_info"]["full_name"]
+        st.info(f"🟢 &nbsp;&nbsp; LOG IN  : ( {nickname} )")
+with status_col_2:
+    if not st.session_state["key_status"]==True:
+        st.info("🔴 &nbsp;&nbsp; API KEY  \n &nbsp;&nbsp;")
+    else:
+        from modules.security.encryption import str_to_asterisk
+        openai_api_key_enc = str_to_asterisk(st.session_state["openai_api_key"])
+        st.info(f"🟢 &nbsp;&nbsp; API KEY  : ( {openai_api_key_enc} )")
+
+
+
+# main
 login_info_placeholder=st.container()
 key_info_placeholder=st.container()
 st.title("🚀 Kotact Quiz Generator", anchor=False)
@@ -180,18 +169,21 @@ def reset_conversation():
 
 #message
 if st.session_state["auth_status"]==True:
-    if login_placeholder.button("로그아웃 (Log out)", type="secondary", use_container_width=True, key="log_out_button"):
+    if login_placeholder.button("로그아웃 (LOG OUT)", type="secondary", use_container_width=True, key="log_out_button"):
         open_logout_modal()
 
 elif st.session_state["auth_status"] == False:
-    login_info_placeholder.error("🔴 :red[로그인 실패 !  사용자명 또는 비밀번호가 잘못 됐어요]")
+    #login_info_placeholder.error("🔴 :red[로그인 실패 !  사용자명 또는 비밀번호가 잘못 됐어요]")
+    login_info_placeholder.code("""🔴 로그인 실패 ! 사용자명과 비밀번호를 확인해 주세요""")
 
 else:
-    login_info_placeholder.info("👈 로그인을 진행해 주세요")
+    #login_info_placeholder.info("👈 로그인을 진행해 주세요")
+    login_info_placeholder.code("""👈 로그인을 진행해 주세요""")
 
 
 if not st.session_state["key_status"]==True:
-    key_info_placeholder.info(f"👈 OpenAI API KEY를 입력하세요")
+    #key_info_placeholder.info(f"👈 OpenAI API KEY를 입력하세요")
+    key_info_placeholder.code("""👈 OpenAI API KEY를 입력하세요""")
 
 
 

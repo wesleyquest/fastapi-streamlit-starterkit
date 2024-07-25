@@ -1,3 +1,4 @@
 streamlit
+st-pages
 python-dotenv
 openai
