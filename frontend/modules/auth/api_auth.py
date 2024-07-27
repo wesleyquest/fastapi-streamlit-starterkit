@@ -8,12 +8,13 @@ BACKEND_SERVER = os.getenv("BACKEND_SERVER")
 
 def validate_token(token_type, access_token):
     response = requests.post(
-        url=f"http://{BACKEND_SERVER}:8000/api/v1/login/test-token",
+        url=f"http://{BACKEND_SERVER}:8000/api/v1/auth/login/test-token",
         headers = {'Authorization': f'{token_type} {access_token}'},
         timeout=5
     )
 
     data = response.json()
+    print(data)
 
     if "email" in data.keys():
         data["status"] = True
@@ -57,11 +58,13 @@ def get_access_token(email, password):
     data = response.json()
 
     if not "access_token" in data.keys():
+        data["status"] = False
         data["access_token"] = None
         data["token_type"] = None
         data["detail"] = data["detail"]
 
     else:
+        data["status"] = True
         data["detail"] = "login success"
 
     return data
@@ -100,6 +103,7 @@ def update_my_profile(token_type, access_token, email, username, password):
     )
 
     data = response.json()
+    print(data)
 
     if "email" in data.keys():
         data["status"] = True
