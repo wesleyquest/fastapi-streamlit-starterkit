@@ -119,7 +119,7 @@ def create_user_open_signup(
     if user:
         raise HTTPException(
             status_code=400,
-            detail="The user with this username(email address) already exists"
+            detail="The user with this email address already exists"
         )
     
     user_in = schemas.UserCreate(password=password, email=email, full_name=full_name)

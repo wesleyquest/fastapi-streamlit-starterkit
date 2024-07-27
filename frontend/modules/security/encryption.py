@@ -1,9 +1,9 @@
 
 def str_to_asterisk(string):
     if len(string) <= 4:
-        string = "****"
+        string = "*"*len(string)
     else:
-        string = "****" + string[-4:]
+        string = "*"*(len(string)-4) + string[-4:]
 
     return string
 
