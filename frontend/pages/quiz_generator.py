@@ -1,5 +1,4 @@
 import streamlit as st
-from st_pages import add_indentation
 from openai import OpenAI
 import time
 
@@ -16,16 +15,10 @@ if "token_status" not in st.session_state:
     st.session_state["token_status"] = None
 if "user_info" not in st.session_state:
     st.session_state["user_info"] = None
-
-#settings
-#page
-set_page_config(st.session_state["auth_status"])
-#sidebar
-make_sidebar(st.session_state["auth_status"], st.session_state["user_info"])
-#style
-style_global()
-
-
+if "key_status" not in st.session_state:
+    st.session_state["key_status"] = None
+if st.session_state["auth_status"]==True:
+    st.session_state["user_info"] = get_user_info(token_type=st.session_state["token_type"], access_token=st.session_state["access_token"])
 #redirect
 if not st.session_state["auth_status"]==True:
     st.session_state = {}
@@ -35,16 +28,16 @@ if not st.session_state["token_status"]==True:
     st.session_state = {}
     st.switch_page("main.py")
 
-#var
-if "key_status" not in st.session_state:
-    st.session_state["key_status"] = None
-if st.session_state["auth_status"]==True:
-    st.session_state["user_info"] = get_user_info(token_type=st.session_state["token_type"], access_token=st.session_state["access_token"])
-
-
+#settings
+#page
+set_page_config(st.session_state["auth_status"])
+#sidebar
+make_sidebar(st.session_state["auth_status"], st.session_state["user_info"])
+#style
+style_global()
 
 #modal
-@st.experimental_dialog(" ", width="small")
+@st.dialog(" ", width="small")
 def open_openaiapikey_modal(old_key=None):
     if old_key:
         value = old_key
@@ -84,7 +77,7 @@ st.markdown("")
 st.subheader("🚀 Kotact Quiz Generator", anchor=False)
 st.markdown("")
 
-@st.experimental_dialog(" ", width="large")
+@st.dialog(" ", width="large")
 def open_settings_modal():
     st.markdown("")
     with st.form("quiz_generator_form"):
@@ -160,7 +153,7 @@ if st.session_state["key_status"]==True:
     openai_api_key_enc = str_to_asterisk(st.session_state["openai_api_key"])
     st.toast(f"🟢 KEY : {openai_api_key_enc}")
 
-    username = st.session_state["user_info"]["full_name"]
+    username = st.session_state["user_info"]["username"]
 
     with st.container():
         col_1, col_2 = st.columns(2)

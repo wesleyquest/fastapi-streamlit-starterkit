@@ -38,7 +38,7 @@ def init_db(db: Session) -> None:
 
     else:
         logger.warning(
-            "Skipping creating speruser. Userwith email "
+            "Skipping creating speruser. User with email "
             f"{settings.FIRST_SUPERUSER} already exists. "
         )
 

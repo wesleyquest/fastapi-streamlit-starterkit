@@ -45,7 +45,7 @@ def make_sidebar(auth_status, user_info):
         #st.markdown("")
         if auth_status == True:
             st.markdown("<div style='text-align: center;'> 🟢 </div>", unsafe_allow_html=True)
-            st.markdown(f"""<div style='text-align: center;'> {user_info["full_name"]} </div>""", unsafe_allow_html=True)
+            st.markdown(f"""<div style='text-align: center;'> {user_info["username"]} </div>""", unsafe_allow_html=True)
             st.markdown(f"""<div style='text-align: center; color: grey;'> {user_info["email"]} </div>""", unsafe_allow_html=True)
             
             st.markdown("")
