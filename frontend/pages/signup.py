@@ -2,14 +2,24 @@ import streamlit as st
 from time import sleep
 
 from modules.settings.style import style_global
-from modules.settings.page import set_page_config_sidebar_collapsed, make_sidebar
+from modules.settings.page import set_page_config, make_sidebar
+
+#var
+if "auth_status" not in st.session_state:
+    st.session_state["auth_status"] = None
+if "token_status" not in st.session_state:
+    st.session_state["token_status"] = None
+if "user_info" not in st.session_state:
+    st.session_state["user_info"] = None
 
 #settings
 #page
-set_page_config_sidebar_collapsed()
-make_sidebar()
+set_page_config(st.session_state["auth_status"])
+#sidebar
+make_sidebar(st.session_state["auth_status"], st.session_state["user_info"])
 #style
 style_global()
+
 
 
 #main

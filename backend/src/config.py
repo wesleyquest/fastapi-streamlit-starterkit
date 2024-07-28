@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     APP_NAME: str = "kotact_api"
     API_V1_STR: str = "/api/v1"
     ACCESS_TOKEN_SECRET: str #secrets.token_urlsafe(32)
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 10 #minutes * hours * days // 60 * 24 * 8
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 #minutes * hours * days // 60 * 24 * 8
     SERVER_HOST: AnyHttpUrl
     # BACKEND_CORS_ORIGINS is a JSON-formatted list of origins
     # e.g: '["http://localhost", "http://localhost:4200", "http://localhost:3000", \

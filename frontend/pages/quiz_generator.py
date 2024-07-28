@@ -3,18 +3,28 @@ from st_pages import add_indentation
 from openai import OpenAI
 import time
 
-from modules.settings.page import set_page_config_sidebar_expanded, make_sidebar
+from modules.settings.page import set_page_config, make_sidebar
 from modules.settings.style import style_global
 from modules.auth.api_auth import validate_token, get_user_info
 from modules.security.encryption import str_to_asterisk
 from modules.validation.key_validation import validate_openai_api_key
 
+#var
+if "auth_status" not in st.session_state:
+    st.session_state["auth_status"] = None
+if "token_status" not in st.session_state:
+    st.session_state["token_status"] = None
+if "user_info" not in st.session_state:
+    st.session_state["user_info"] = None
+
 #settings
 #page
-set_page_config_sidebar_expanded()
-make_sidebar()
+set_page_config(st.session_state["auth_status"])
+#sidebar
+make_sidebar(st.session_state["auth_status"], st.session_state["user_info"])
 #style
 style_global()
+
 
 #redirect
 if not st.session_state["auth_status"]==True:
@@ -56,10 +66,9 @@ def open_openaiapikey_modal(old_key=None):
     with col2:
         if st.button("닫기", type="secondary", use_container_width=True):
             st.rerun()
-"""
-#sidebar
+
 with st.sidebar:
-    login_placeholder = st.container()
+    st.markdown("""<div style="height:0.5px;border:none;color:#D3D3D3;background-color:#D3D3D3;" /> """, unsafe_allow_html=True)
     key_placeholder = st.container()
 
     if not st.session_state["key_status"]==True:
@@ -68,59 +77,78 @@ with st.sidebar:
     else:
         if key_placeholder.button("OpenAI API KEY 수정", type="secondary", use_container_width=True, key="openai_api_key_2_button"):
             open_openaiapikey_modal(old_key=st.session_state["openai_api_key"])
-"""
+
+
 # main
-login_info_placeholder=st.container()
-key_info_placeholder=st.container()
+st.markdown("")
 st.subheader("🚀 Kotact Quiz Generator", anchor=False)
-st.caption("version 0.1")
-st.markdown(" ")
+st.markdown("")
 
-@st.experimental_dialog("Settings", width="large")
+@st.experimental_dialog(" ", width="large")
 def open_settings_modal():
-    #quiz document
-    st.markdown(":blue-background[**1. 퀴즈 생성용 문서를 입력하세요 (Input document)**]")
-    with st.container():
-        st.text_area(" ",label_visibility="collapsed")
-    #quiz content
-    st.markdown(":blue-background[**2. 퀴즈 콘텐츠를 선택하세요 (Select quiz content)**]")
-    with st.container():
-        col_1, col_2, col_3, col_4 = st.columns(4)
-        with col_1: 
-            #Vocabulary Focused Quiz: 단어 중심
-            tog_vocabulary_focused_quiz = st.toggle("단어 중심", value=True)
-        with col_2: 
-            #Sentence Example Based Quiz: 문장 기반
-            tog_sentence_example_based_quiz = st.toggle("문장 기반", value=True)
-        with col_3:
-            #Cultural Information Quiz: 문화 정보
-            tog_cultural_information_quiz = st.toggle("문화 정보", value=True)
-        with col_4:
-            #Word Order Quiz: 단어 순서
-            tog_word_order_quiz = st.toggle("단어 순서", value=True)
-    #quiz type
-    st.markdown(":blue-background[**3. 퀴즈 타입을 선택하세요 (Select quiz type)**]")
-    with st.container():
-        col_1, col_2, col_3, col_4 = st.columns(4)
-        with col_1:
-            #Multiple Choice: 객관식
-            on_1 = st.toggle("객관식", value=True)
-        with col_2:
-            #True Or False: 참거짓
-            on_2 = st.toggle("참/거짓", value=True)
-        with col_3:
-            #Fill In The Blank: 빈칸채우기
-            on_3 = st.toggle("빈칸 채우기", value=True)
-        with col_4:
-            st.write("")
-    if st.button("생성 시작", type="primary", use_container_width=True):
-        #st.session_state.vote = {"item": item, "reason": reason}
+    st.markdown("")
+    with st.form("quiz_generator_form"):
+        st.markdown("퀴즈를 생성할 문서를 입력하세요")
+        document = st.text_area(" ",label_visibility="collapsed")
+        
+        #quiz content
+        with st.container():
+            st.markdown("퀴즈 콘텐츠를 선택하세요")
+            col_1, col_2, col_3, col_4 = st.columns(4)
+            with col_1: 
+                #Vocabulary Focused Quiz: 단어 중심
+                tog_content_vocabulary_focused_quiz = st.toggle("단어 중심", value=True)
+            with col_2: 
+                #Sentence Example Based Quiz: 문장 기반
+                tog_content_sentence_example_based_quiz = st.toggle("문장 기반", value=True)
+            with col_3:
+                #Cultural Information Quiz: 문화 정보
+                tog_content_cultural_information_quiz = st.toggle("문화 정보", value=True)
+            with col_4:
+                #Word Order Quiz: 단어 순서
+                tog_content_word_order_quiz = st.toggle("단어 순서", value=True)  
 
-        #st.session_state["quiz_messages"] = [{"role": "assistant", "content": "this is quiz"}]
-        with st.spinner("..."):
-            time.sleep(1)
-            st.session_state["quiz_messages"].append({"role": "assistant", "content": "아래와 같이 퀴즈를 생성했어요."})
-            st.rerun()
+            #quiz type
+            with st.container():
+                st.markdown("퀴즈 타입을 선택하세요")
+                col_1, col_2, col_3, col_4 = st.columns(4)
+                with col_1:
+                    #Multiple Choice: 객관식
+                    tog_type_multiple_choice = st.toggle("객관식", value=True)
+                with col_2:
+                    #True Or False: 참거짓
+                    tog_type_true_or_false = st.toggle("참/거짓", value=True)
+                with col_3:
+                    #Fill In The Blank: 빈칸채우기
+                    tog_type_fill_in_the_blank = st.toggle("빈칸 채우기", value=True)
+                with col_4:
+                    st.markdown("")   
+
+            #quiz number
+            with st.container():
+                st.markdown("퀴즈 개수를 선택하세요")
+                number = st.slider(" ", 0, 10, 3,label_visibility="collapsed")
+
+            submitted = st.form_submit_button("생성 시작", type="primary", use_container_width=True)
+            if submitted:
+                
+                print(document)
+                print("---")
+                print(tog_content_vocabulary_focused_quiz)
+                print(tog_content_sentence_example_based_quiz)
+                print(tog_content_cultural_information_quiz)
+                print(tog_content_word_order_quiz)
+                print("---")
+                print(tog_type_multiple_choice)
+                print(tog_type_true_or_false)
+                print(tog_type_fill_in_the_blank)
+                print("---")
+                print(number)
+                with st.spinner('퀴즈를 생성 중입니다. 잠시만 기다려 주세요...'):
+                    time.sleep(2)
+                    st.session_state["quiz_messages"].append({"role": "assistant", "content": "아래와 같이 퀴즈를 생성했어요."})
+                    st.rerun()
+
 
 def reset_conversation():
   #message 초기화
