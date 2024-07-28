@@ -24,9 +24,11 @@ make_sidebar(st.session_state["auth_status"], st.session_state["user_info"])
 #style
 style_global()
 
-
-st.markdown(" ")
-st.markdown("<h3 style='text-align: center;'>Log in to Dashboard</h3>", unsafe_allow_html=True)
+st.markdown("")
+st.markdown("<div style='text-align:center;font-size:30px;'><b>Log in to Dashboard</b></div>", unsafe_allow_html=True)
+st.markdown("")
+st.markdown("<div style='text-align:center;font-size:20px;'><b>스타터킷 대시보드 로그인</b></div>", unsafe_allow_html=True)
+st.markdown("")
 login_info_placeholder = st.container()
 with st.form("login_form"):
     st.markdown(" ")
@@ -35,7 +37,7 @@ with st.form("login_form"):
     st.markdown(" ")
     password = st.text_input("비밀번호 (Password)", placeholder="Password", type="password")
     password_valid_placeholder = st.container()
-    st.markdown(" ")
+    st.markdown("")
     submitted = st.form_submit_button("로그인", type="primary", use_container_width=True)
     if submitted:
 
@@ -70,7 +72,8 @@ with st.form("login_form"):
 if st.button("회원가입", use_container_width=True):
     st.switch_page("pages/signup.py")
 
-
+if st.button("비밀번호 재설정", use_container_width=True):
+    st.switch_page("pages/forgot_password.py")
 
 
 
