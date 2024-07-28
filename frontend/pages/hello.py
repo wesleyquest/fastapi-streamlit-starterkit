@@ -2,18 +2,16 @@ import streamlit as st
 from time import sleep
 
 from modules.settings.style import style_global
-from modules.settings.page import set_page_config_sidebar_expanded, make_sidebar
+from modules.settings.page import set_page_config, make_sidebar
 from modules.auth.api_auth import validate_token
 
-#settings
-#page
-set_page_config_sidebar_expanded()
-#style
-style_global()
-#sidebar
-make_sidebar()
-
-
+#var
+if "auth_status" not in st.session_state:
+    st.session_state["auth_status"] = None
+if "token_status" not in st.session_state:
+    st.session_state["token_status"] = None
+if "user_info" not in st.session_state:
+    st.session_state["user_info"] = None
 
 #redirect
 if not st.session_state["auth_status"]==True:
@@ -24,22 +22,18 @@ if not st.session_state["token_status"]==True:
     st.session_state = {}
     st.switch_page("main.py")
 
-"""
+
+
+#page settings
+#page
+set_page_config(st.session_state["auth_status"])
 #sidebar
-with st.sidebar:
-    if st.button("로그아웃", use_container_width=False):
-        st.session_state = {}
-        st.switch_page("main.py")
-"""
+make_sidebar(st.session_state["auth_status"], st.session_state["user_info"])
+#style
+style_global()
+
 #main
-if st.session_state["auth_status"] == True and st.session_state["token_status"] == True:
-    st.subheader("👋 Hello", anchor=False)
-    st.markdown(" ")
+st.markdown("")
+st.subheader("👋 Hello", anchor=False)
 
-
-
-
-
-else:
-    st.switch_page("main.py")
 

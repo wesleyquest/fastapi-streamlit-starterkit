@@ -2,23 +2,27 @@ import streamlit as st
 from time import sleep
 
 from modules.settings.style import style_global
-from modules.settings.page import set_page_config_sidebar_collapsed
+from modules.settings.page import set_page_config
 from modules.settings.page import make_sidebar
+from modules.auth.api_auth import get_access_token, get_user_info
+from modules.validation.form_validation import (
+    validate_email, validate_password)
 
 #var
 if "auth_status" not in st.session_state:
     st.session_state["auth_status"] = None
 if "token_status" not in st.session_state:
     st.session_state["token_status"] = None
+if "user_info" not in st.session_state:
+    st.session_state["user_info"] = None
 
 #settings
 #page
-set_page_config_sidebar_collapsed()
+set_page_config(st.session_state["auth_status"])
+#sidebar
+make_sidebar(st.session_state["auth_status"], st.session_state["user_info"])
 #style
 style_global()
-#sidebar
-make_sidebar()
-
 
 
 st.markdown(" ")
@@ -36,8 +40,6 @@ with st.form("login_form"):
     if submitted:
 
         #form validate
-        from modules.validation.form_validation import (
-            validate_email, validate_password)
         valid = False
         if validate_email(email):
             if validate_password(password):
@@ -49,7 +51,6 @@ with st.form("login_form"):
 
 
         if valid==True:
-            from modules.auth.api_auth import get_access_token
             data = get_access_token(email=email, password=password)
             
             if data["access_token"]:
@@ -57,7 +58,8 @@ with st.form("login_form"):
                 st.session_state["token_status"] = True
                 st.session_state["access_token"] = data["access_token"]
                 st.session_state["token_type"] = data["token_type"]
-                login_info_placeholder.info("로그인 성공 ! 홈페이지로 이동합니다")
+                st.session_state["user_info"] = get_user_info(token_type=st.session_state["token_type"], access_token=st.session_state["access_token"])
+                #login_info_placeholder.info("로그인 성공 ! 홈페이지로 이동합니다")
                 #show_pages_auth_true()
                 #sleep(0.5)
                 st.switch_page("pages/hello.py")
