@@ -71,7 +71,8 @@ def recover_password(email: str, db: Session = Depends(deps.get_db)) -> Any:
     utils.send_reset_password_email(
         email_to=user.email, email=email, token=password_reset_token
     )
-    return {"msg": "Password recovery email sent"}
+    #return {"msg": "Password recovery email sent"}
+    return {"detail": "Password recovery email sent"}
 
 
 @router.post("/reset-password", response_model=auth_schemas.Msg)
@@ -98,7 +99,8 @@ def reset_password(
     user.hashed_password = hashed_password
     db.add(user)
     db.commit()
-    return {"msg": "Password updated successfully"}
+    #return {"msg": "Password updated successfully"}
+    return {"detail": "Password updated successfully"}
 
 
 

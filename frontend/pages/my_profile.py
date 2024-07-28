@@ -1,10 +1,9 @@
 import streamlit as st
-from st_pages import Page, show_pages, add_page_title, hide_pages, Section, add_indentation
 from time import sleep
 
 from modules.settings.page import set_page_config, make_sidebar
 from modules.settings.style import style_global
-from modules.auth.api_auth import get_access_token, validate_token, update_my_profile
+from modules.auth.api_auth import get_access_token, validate_token, update_my_profile, get_user_info
 from modules.validation.form_validation import validate_username, validate_password
 
 #var
@@ -14,15 +13,10 @@ if "token_status" not in st.session_state:
     st.session_state["token_status"] = None
 if "user_info" not in st.session_state:
     st.session_state["user_info"] = None
-
-#settings
-#page
-set_page_config(st.session_state["auth_status"])
-#sidebar
-make_sidebar(st.session_state["auth_status"], st.session_state["user_info"])
-#style
-style_global()
-
+if "key_status" not in st.session_state:
+    st.session_state["key_status"] = None
+if st.session_state["auth_status"]==True:
+    st.session_state["user_info"] = get_user_info(token_type=st.session_state["token_type"], access_token=st.session_state["access_token"])
 #redirect
 if not st.session_state["auth_status"]==True:
     st.session_state = {}
@@ -31,9 +25,17 @@ st.session_state["token_status"] = validate_token(token_type=st.session_state["t
 if not st.session_state["token_status"]==True:
     st.session_state = {}
     st.switch_page("main.py")
+
+#settings
+#page
+set_page_config(st.session_state["auth_status"])
+#sidebar
+make_sidebar(st.session_state["auth_status"], st.session_state["user_info"])
+#style
+style_global()
         
 #modal
-@st.experimental_dialog(" ", width="small")
+@st.dialog(" ", width="small")
 def open_change_myprofile_modal(token_type, access_token, email, username, password):
     st.markdown("My Profile 정보를 변경하시겠습니까?")
 
@@ -64,7 +66,7 @@ st.markdown("")
 tab1, tab2 = st.tabs(["프로필 보기", "프로필 변경"])
 with tab1:
     email = st.session_state["user_info"]["email"]
-    username = st.session_state["user_info"]["full_name"]
+    username = st.session_state["user_info"]["username"]
     st.markdown(f"이메일  \n :gray-background[{email}]")
     st.markdown(f"사용자명  \n :gray-background[{username}]")
 
@@ -74,7 +76,7 @@ with tab2:
     with st.form("my_profile_form"):
         email = st.text_input("이메일", value=st.session_state["user_info"]["email"], disabled=True)
         st.markdown(" ")
-        username = st.text_input("사용자명", value=st.session_state["user_info"]["full_name"], max_chars=30)
+        username = st.text_input("사용자명", value=st.session_state["user_info"]["username"], max_chars=30)
         username_valid_placeholder = st.container()
         st.markdown(" ")
         st.markdown(" ")

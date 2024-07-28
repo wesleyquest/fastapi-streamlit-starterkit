@@ -10,7 +10,7 @@ from src.auth.utils import get_password_hash, verify_password
 
 class User(Base):
     id = Column(Integer, primary_key=True, index=True)
-    full_name = Column(String, index=True)
+    username = Column(String, index=True)
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
     is_active = Column(Boolean(), default=True)
@@ -24,7 +24,7 @@ class CRUDUser(CRUDBase[User, UserCreate, UserUpdate]):
         db_obj = User(
             email=obj_in.email,
             hashed_password=get_password_hash(obj_in.password),
-            full_name=obj_in.full_name,
+            username=obj_in.username,
             is_superuser=obj_in.is_superuser,
         )
         db.add(db_obj)

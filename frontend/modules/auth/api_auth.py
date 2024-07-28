@@ -5,10 +5,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 BACKEND_SERVER = os.getenv("BACKEND_SERVER")
+BACKEND_SERVER_PORT = os.getenv("BACKEND_SERVER_PORT")
 
 def validate_token(token_type, access_token):
     response = requests.post(
-        url=f"http://{BACKEND_SERVER}:8000/api/v1/auth/login/test-token",
+        url=f"http://{BACKEND_SERVER}:{BACKEND_SERVER_PORT}/api/v1/auth/login/test-token",
         headers = {'Authorization': f'{token_type} {access_token}'},
         timeout=5
     )
@@ -28,7 +29,7 @@ def get_user_info(token_type, access_token):
     """
     response = requests.request(
         method="get",
-        url = f"http://{BACKEND_SERVER}:8000/api/v1/users/me",
+        url = f"http://{BACKEND_SERVER}:{BACKEND_SERVER_PORT}/api/v1/users/me",
         headers = {'Authorization': f'{token_type} {access_token}'},
         timeout=5
     )
@@ -50,7 +51,7 @@ def get_access_token(email, password):
 
     response = requests.request(
         method="post",
-        url= f"http://{BACKEND_SERVER}:8000/api/v1/auth/login/access-token",
+        url= f"http://{BACKEND_SERVER}:{BACKEND_SERVER_PORT}/api/v1/auth/login/access-token",
         data={"username": email, "password": password},
         timeout=5
     )
@@ -73,11 +74,11 @@ def get_access_token(email, password):
 def create_user(email, username, password):
 
     response = requests.post(
-        url=f"http://{BACKEND_SERVER}:8000/api/v1/users/signup",
+        url=f"http://{BACKEND_SERVER}:{BACKEND_SERVER_PORT}/api/v1/users/signup",
         json={
             "email": email,
             "password": password,
-            "full_name": username},
+            "username": username},
         timeout=5
     )
 
@@ -93,12 +94,12 @@ def create_user(email, username, password):
 def update_my_profile(token_type, access_token, email, username, password):
 
     response = requests.put(
-        url=f"http://{BACKEND_SERVER}:8000/api/v1/users/me",
+        url=f"http://{BACKEND_SERVER}:{BACKEND_SERVER_PORT}/api/v1/users/me",
         headers = {'Authorization': f'{token_type} {access_token}'},
         json={
             "email": email,
             "password": password,
-            "full_name": username},
+            "username": username},
         timeout=5
     )
 
@@ -112,4 +113,5 @@ def update_my_profile(token_type, access_token, email, username, password):
     return data
 
 
-
+def send_forgot_password_email(email):
+    return None

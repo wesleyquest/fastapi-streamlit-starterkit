@@ -10,9 +10,9 @@ from pydantic import (AnyHttpUrl, AnyUrl, EmailStr, HttpUrl, PostgresDsn,
 
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "kotact dashboard"
-    APP_NAME: str = "kotact_api"
-    API_V1_STR: str = "/api/v1"
+    PROJECT_NAME: str
+    API_NAME: str
+    API_V1_STR: str
     ACCESS_TOKEN_SECRET: str #secrets.token_urlsafe(32)
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 #minutes * hours * days // 60 * 24 * 8
     SERVER_HOST: AnyHttpUrl
