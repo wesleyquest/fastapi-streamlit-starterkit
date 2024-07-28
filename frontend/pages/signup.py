@@ -23,8 +23,11 @@ style_global()
 
 
 #main
-st.markdown(" ")
-st.markdown("<h3 style='text-align: center;'>Sign up to Dashboard</h3>", unsafe_allow_html=True)
+st.markdown("")
+st.markdown("<div style='text-align:center;font-size:30px;'><b>Sign up to Dashboard</b></div>", unsafe_allow_html=True)
+st.markdown("")
+st.markdown("<div style='text-align:center;font-size:20px;'><b>스타터킷 대시보드 회원가입</b></div>", unsafe_allow_html=True)
+st.markdown("")
 signup_info_placeholder = st.container()
 with st.form("signup_form"):
     st.markdown(" ")
