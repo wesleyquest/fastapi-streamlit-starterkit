@@ -72,7 +72,7 @@ with st.form("login_form"):
 if st.button("회원가입", use_container_width=True):
     st.switch_page("pages/signup.py")
 
-if st.button("비밀번호 재설정", use_container_width=True):
+if st.button("비밀번호를 잊어버리셨나요?", use_container_width=True):
     st.switch_page("pages/forgot_password.py")
 
 

@@ -114,4 +114,38 @@ def update_my_profile(token_type, access_token, email, username, password):
 
 
 def send_forgot_password_email(email):
-    return None
+    response = requests.post(
+        url=f"http://211.218.17.10:8000/api/v1/auth/password-recovery/{email}",
+        json="",
+        timeout=5
+    )
+
+    data = response.json()
+
+    if response.status_code == 200:
+        data["status"] = True
+    else:
+        data["status"] = False
+
+    return data
+
+def reset_password(reset_password_token, new_password):
+    response = requests.post(
+        url=f"http://211.218.17.10:8000/api/v1/auth/reset-password",
+        json={
+            "token": reset_password_token,
+            "new_password": new_password
+        },
+        timeout=5
+    )
+
+    data = response.json()
+
+    if response.status_code == 200:
+        data["status"] = True
+    else:
+        data["status"] = False
+
+    return data
+
+

@@ -90,6 +90,8 @@ def send_reset_password_email(email_to: str, email: str, token: str) -> None:
         template_str = f.read()
     server_host = settings.SERVER_HOST
     frontend_server_port = settings.FRONTEND_SERVER_PORT
+    #AnyHttpUrl에 끝에 "/" 제외하고 포트붙이기
+    server_host = str(server_host)[:-1]
     #link = f"{server_host}/reset-password?token={token}"
     link = f"{server_host}:{frontend_server_port}/reset_password?token={token}"
     send_email(

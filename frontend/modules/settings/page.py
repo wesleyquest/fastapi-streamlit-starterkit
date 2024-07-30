@@ -40,12 +40,14 @@ def get_current_page_name():
 def make_sidebar(auth_status, user_info):
     with st.sidebar:
         #st.markdown("<div style='text-align: center;'> 회사 로고 </div>", unsafe_allow_html=True)
-        st.markdown("**⚉ Kotact Dashboard**  \n version :gray-background[0.1]", unsafe_allow_html=True)
+        st.markdown("<div style='text-align:center;font-size:20px;'><b>📊 Kotact Dashboard</b></div>", unsafe_allow_html=True)
+        st.markdown("<div style='text-align:center;font-size:16px;color:grey;'>v0.7.0</div>", unsafe_allow_html=True)
+        st.markdown("")
         st.markdown("""<div style="height:0.5px;border:none;color:#D3D3D3;background-color:#D3D3D3;" /> """, unsafe_allow_html=True)
         #st.markdown("")
         if auth_status == True:
-            st.markdown("<div style='text-align: center;'> 🟢 </div>", unsafe_allow_html=True)
-            st.markdown(f"""<div style='text-align: center;'> {user_info["username"]} </div>""", unsafe_allow_html=True)
+            #st.markdown("<div style='text-align: center;'> 🐱 </div>", unsafe_allow_html=True)
+            st.markdown(f"""<div style='text-align: center;'>🐱 {user_info["username"]} </div>""", unsafe_allow_html=True)
             st.markdown(f"""<div style='text-align: center; color: grey;'> {user_info["email"]} </div>""", unsafe_allow_html=True)
             
             st.markdown("")
