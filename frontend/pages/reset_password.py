@@ -3,6 +3,21 @@ from time import sleep
 
 from modules.settings.style import style_global
 from modules.settings.page import set_page_config, make_sidebar
+from modules.auth.api_auth import reset_password
+
+#query_params
+if not st.query_params:
+    st.markdown("")
+    st.markdown("<div style='text-align:center;font-size:30px;'><b>Authentication failed</b></div>", unsafe_allow_html=True)
+    st.markdown("")
+    st.markdown("<div style='text-align:center;font-size:20px;'><b>인증이 실패했습니다</b></div>", unsafe_allow_html=True)
+    st.markdown("")
+    st.markdown("<div style='text-align:center;'>비밀번호 재설정을 다시 진행해 주세요</div>", unsafe_allow_html=True)
+    st.markdown("<div style='text-align:center;'>로그인 페이지로 이동합니다</div>", unsafe_allow_html=True)
+    sleep(3)
+    st.switch_page("main.py")
+else:
+    st.session_state["reset_password_token"] = st.query_params["token"]
 
 #var
 if "auth_status" not in st.session_state:
@@ -19,6 +34,25 @@ set_page_config(st.session_state["auth_status"])
 make_sidebar(st.session_state["auth_status"], st.session_state["user_info"])
 #style
 style_global()
+
+#modal
+@st.dialog(" ", width="small")
+def open_reset_password_modal(data):
+    if data["status"] == True:
+        st.markdown("")
+        st.markdown("""<div style='text-align:center;font-size:20px;'><b>비밀번호를 변경하였습니다</b></div>""", unsafe_allow_html=True)
+        st.markdown("")
+        st.markdown("<div style='text-align:center;'>로그인을 진행해 주세요</div>", unsafe_allow_html=True)
+    else:
+        st.markdown("")
+        st.markdown(f"""<div style='text-align:center;font-size:20px;'><b>인증이 실패했습니다</b></div>""", unsafe_allow_html=True)
+        st.markdown("")
+        st.markdown("<div style='text-align:center;'>비밀번호 재설정을 다시 진행해 주세요</div>", unsafe_allow_html=True)
+    st.markdown("")
+    st.markdown("")
+    if st.button("확인", type="secondary", use_container_width=True, key="modal_change_myprofile_button"):
+        st.switch_page("main.py")
+
 
 #main
 st.markdown("")
@@ -50,9 +84,8 @@ with st.form("reset_password_form"):
 
         #api
         if valid==True:
-                st.switch_page("main.py")
-        else:
-            st.switch_page("main.py")
+                data = reset_password(st.session_state["reset_password_token"], password)
+                open_reset_password_modal(data)
 
 if st.button("로그인 페이지로 돌아가기", use_container_width=True):
     st.switch_page("main.py")

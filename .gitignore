@@ -2,6 +2,6 @@ __pycache__/
 old/
 env
 .env
-
+alembic.ini
 volumes/
 

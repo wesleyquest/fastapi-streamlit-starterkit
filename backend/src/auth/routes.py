@@ -65,15 +65,15 @@ def recover_password(email: str, db: Session = Depends(deps.get_db)) -> Any:
     if not user:
         raise HTTPException(
             status_code=404,
-            detail="The user with this username does not exist in the system.",
+            #detail="The user with this email does not exist in the system.",
+            detail="가입한 이메일 정보가 없습니다"
         )
     password_reset_token = utils.generate_password_reset_token(email=email)
     utils.send_reset_password_email(
         email_to=user.email, email=email, token=password_reset_token
     )
-    #return {"msg": "Password recovery email sent"}
-    return {"detail": "Password recovery email sent"}
-
+    #return {"detail": "Password recovery email sent"}
+    return {"detail": "패스워드 재설정 메일을 보냈습니다"}
 
 @router.post("/reset-password", response_model=auth_schemas.Msg)
 def reset_password(
@@ -91,7 +91,8 @@ def reset_password(
     if not user:
         raise HTTPException(
             status_code=404,
-            detail="The user with this username does not exist in the system.",
+            #detail="The user with this username does not exist in the system.",
+            detail="가입한 이메일 정보가 없습니다"
         )
     elif not crud_user.is_active(user):
         raise HTTPException(status_code=400, detail="Inactive user")
@@ -100,7 +101,7 @@ def reset_password(
     db.add(user)
     db.commit()
     #return {"msg": "Password updated successfully"}
-    return {"detail": "Password updated successfully"}
+    return {"detail": "패스워드를 변경하였습니다"}
 
 
 

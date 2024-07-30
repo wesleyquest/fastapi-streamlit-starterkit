@@ -1,17 +1,15 @@
 # fastapi-streamlit-starterkit
+### version
+v0.7.0
 
-#env info
+### env info
 python 3.11.9
 
-#backend
-fastapi
+#### backend
+python 3.11.9
+fastapi==0.111.1
 
-#frontend
-streamlit
-
-#start
-##create .env
-
-##docker compose start
-docker compose up --build
+### frontend
+python 3.11.9
+streamlit==1.37.0
 
