@@ -1,8 +1,0 @@
-fastapi==0.111.1
-pydantic-settings
-alembic
-tenacity
-psycopg2-binary
-passlib
-python-jose
-emails
