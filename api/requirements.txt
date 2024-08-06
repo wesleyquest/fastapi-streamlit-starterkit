@@ -1,0 +1,10 @@
+fastapi==0.111.1
+gunicorn
+pydantic-settings
+alembic
+tenacity
+psycopg2-binary
+asyncpg
+passlib
+python-jose
+emails

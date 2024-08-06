@@ -1,42 +1,41 @@
 version: '3.8'
 
 services:
-  backend:
-    container_name: ${BACKEND_SERVER}
-    build: ./backend
+  api:
+    container_name: ${API_SERVER}
+    build: ./api
     env_file:
       - .env
     volumes:
-      - ./backend:/app
-    ports:
-      - 8000:8000
+      - ./api:/app
+    #ports:
+    #  - 8000:${API_PORT}
     depends_on:
       - db
-    #command: /bin/bash -c "/app/pre-start.sh && uvicorn app.main:app --host 0.0.0.0 --port 80 --reload"
+    #command: /bin/bash -c "/app/pre-start.sh && uvicorn app.main:app --host 0.0.0.0 --port 80 --reload" 
+    #prod: gunicorn src.main:app --bind 0:8000 --workers 2 --worker-class uvicorn.workers.UvicornWorker --reload
+    #dev: fastapi dev ./src/main.py --host 0.0.0.0
     command:
       - /bin/bash
       - -c
       - |
         chmod +x ./src/pre-start.sh && ./src/pre-start.sh
-        fastapi dev ./src/main.py --host 0.0.0.0
+        fastapi dev ./src/main.py --host 0.0.0.0 --port ${API_PORT}
 
-  frontend:
-    container_name: ${FRONTEND_SERVER}
-    build: ./frontend
+  app:
+    container_name: ${APP_SERVER}
+    build: ./app
     env_file:
       - .env
     volumes:
-      - ./frontend:/app
-    ports:
-      - 8501:8501
+      - ./app:/app
+    #ports:
+    #  - 8001:${APP_PORT}
     depends_on:
-      - backend
-    stdin_open: true # docker run -i
-    tty: true        # docker run -t
-    command:
-      - streamlit
-      - run
-      - main.py
+      - api
+    command: streamlit run ./src/main.py --server.port ${APP_PORT}
+    #stdin_open: true # docker run -i
+    #tty: true        # docker run -t
 
   db:
     container_name: ${POSTGRES_SERVER}
@@ -46,12 +45,26 @@ services:
     env_file:
       - .env
     volumes:
-      - ./backend/volumes/${POSTGRES_SERVER}_volumes:/var/lib/postgresql/data
+      - ./api/volumes/${POSTGRES_SERVER}_volumes:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD", "pg_isready", "-q", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
-      retries: 5 
+      retries: 5
+
+  nginx:
+    container_name: ${NGINX_SERVER}
+    image: nginx:1.27.0-perl
+    ports:
+      - 80:80
+    env_file:
+      - .env
+    volumes:
+      - ./nginx/nginx_config.conf:/etc/nginx/nginx.conf
+      - ./nginx/log:/var/log/nginx
+    depends_on:
+      - api
+      - app
 
 
 networks:
