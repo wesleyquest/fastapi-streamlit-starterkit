@@ -26,15 +26,18 @@ if not st.session_state["token_status"]==True:
 
 #page settings
 #page
-set_page_config(st.session_state["auth_status"])
+set_page_config(auth_status=st.session_state["auth_status"],
+                layout="wide")
 #sidebar
 make_sidebar(st.session_state["auth_status"], st.session_state["user_info"])
 #style
 style_global()
 
 #main
-st.markdown("")
-st.subheader("📑 사용자 관리 API (관리자용)", anchor=False)
-st.markdown("""<div style="height:0.5px;border:none;color:#D3D3D3;background-color:#D3D3D3;" /> """, unsafe_allow_html=True)
+col1, col2, col3 = st.columns((1,8,1), gap="large")
+with col2:
+    st.markdown("")
+    st.subheader("📑 사용자 관리 API (관리자용)", anchor=False)
+    st.markdown("""<div style="height:0.5px;border:none;color:#D3D3D3;background-color:#D3D3D3;" /> """, unsafe_allow_html=True)
 
 

@@ -182,3 +182,8 @@
 2024/08/08 01:55:13 [error] 45#45: *58 "/etc/nginx/html/index.html" is not found (2: No such file or directory), client: 106.75.20.12, server: _, request: "GET / HTTP/1.1", host: "211.218.17.10:80"
 2024/08/08 01:58:35 [error] 46#46: *59 "/etc/nginx/html/index.html" is not found (2: No such file or directory), client: 106.75.168.236, server: _, request: "GET / HTTP/1.1", host: "211.218.17.10"
 2024/08/08 01:58:35 [error] 47#47: *60 open() "/etc/nginx/html/favicon.ico" failed (2: No such file or directory), client: 106.75.168.236, server: _, request: "GET /favicon.ico HTTP/1.1", host: "211.218.17.10"
+2024/08/08 04:38:58 [error] 40#40: *32 "/etc/nginx/html/index.html" is not found (2: No such file or directory), client: 198.235.24.206, server: _, request: "GET / HTTP/1.0"
+2024/08/08 05:06:50 [error] 29#29: *1 "/etc/nginx/html/index.html" is not found (2: No such file or directory), client: 211.218.17.9, server: _, request: "GET / HTTP/1.1", host: "211.218.17.10"
+2024/08/08 05:06:50 [error] 29#29: *1 open() "/etc/nginx/html/favicon.ico" failed (2: No such file or directory), client: 211.218.17.9, server: _, request: "GET /favicon.ico HTTP/1.1", host: "211.218.17.10", referrer: "http://211.218.17.10/"
+2024/08/08 05:06:53 [error] 29#29: *1 open() "/etc/nginx/html/메ㅔ" failed (2: No such file or directory), client: 211.218.17.9, server: _, request: "GET /%EB%A9%94%E3%85%94 HTTP/1.1", host: "211.218.17.10"
+2024/08/08 05:12:03 [error] 58#58: *107 "/etc/nginx/html/index.html" is not found (2: No such file or directory), client: 5.8.11.202, server: _, request: "GET / HTTP/1.0"

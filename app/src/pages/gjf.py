@@ -1,8 +1,11 @@
-import streamlit as st
-from time import sleep
+############################################################################
+#경기도 데이터 분석 (경기일자리재단)
+############################################################################
 
-from modules.settings.style import style_global
+import streamlit as st
+
 from modules.settings.page import set_page_config, make_sidebar
+from modules.settings.style import style_global
 from modules.auth.api_auth import validate_token, get_user_info
 
 #var
@@ -25,20 +28,24 @@ if not st.session_state["token_status"]==True:
     st.session_state = {}
     st.switch_page("main.py")
 
-#page settings
+#settings
 #page
-set_page_config(auth_status=st.session_state["auth_status"],
-                layout="wide")
+set_page_config(st.session_state["auth_status"],
+                layout="wide") #default
 #sidebar
 make_sidebar(st.session_state["auth_status"], st.session_state["user_info"])
 #style
 style_global()
 
+############################################################################
+
 #main
 col1, col2, col3 = st.columns((1,8,1), gap="large")
 with col2:
     st.markdown("")
-    st.subheader("🏠 개요", anchor=False)
+    st.subheader("🚀 경기도 데이터 분석", anchor=False)
     st.markdown("""<div style="height:0.5px;border:none;color:#D3D3D3;background-color:#D3D3D3;" /> """, unsafe_allow_html=True)
+
+
 
 

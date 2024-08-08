@@ -1,0 +1,38 @@
+#access-token
+summary: 토큰 발급을 요청합니다.
+method: POST
+url: /api/v1/auth/login/access-token
+auth_method: "-"
+request:
+  headers:
+    key_1:
+      name: Content-type
+      desc: application/x-www-form-urlencoded
+      required: O
+  body:
+    key_1:
+      name: username
+      type: String
+      desc: 가입 시 설정한 이메일 아이디
+      required: O
+    key_2:
+      name: password
+      type: String
+      desc: 가입 시 설정한 비밀번호
+      required: O
+response:
+  body:
+    key_1:
+      name: token_type
+      type: String
+      desc: 토큰 타입, bearer로 고정
+      required: O
+    key_2:
+      name: access_token
+      type: String
+      desc: 사용자 엑세스 토큰 값
+      required: O
+
+
+
+
