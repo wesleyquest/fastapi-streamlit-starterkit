@@ -135,7 +135,7 @@ def update_my_profile(token_type, access_token, email, username, password):
 def send_forgot_password_email(email):
     try:
         response = requests.post(
-            url=f"http://211.218.17.10:8000{API_V1_STR}/auth/password-recovery/{email}",
+            url=f"http://{API_SERVER}:{API_PORT}{API_V1_STR}/auth/password-recovery/{email}",
             json="",
             timeout=5
         )
@@ -156,7 +156,7 @@ def send_forgot_password_email(email):
 def reset_password(reset_password_token, new_password):
     try:
         response = requests.post(
-            url=f"http://211.218.17.10:8000{API_V1_STR}/auth/reset-password",
+            url=f"http://{API_SERVER}:{API_PORT}{API_V1_STR}/auth/reset-password",
             json={
                 "token": reset_password_token,
                 "new_password": new_password

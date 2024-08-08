@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 #minutes * hours * days // 60 * 24 * 8
     SERVER_HOST: AnyHttpUrl
     API_PORT: str
+    APP_SERVER: str
     APP_PORT: str
     # BACKEND_CORS_ORIGINS is a JSON-formatted list of origins
     # e.g: '["http://localhost", "http://localhost:4200", "http://localhost:3000", \
@@ -62,6 +63,7 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: Optional[str] = None
     EMAILS_FROM_EMAIL: Optional[EmailStr] = None
     EMAILS_FROM_NAME: Optional[str] = None
+    EMAIL_TEST_USER: EmailStr
 
     @field_validator("EMAILS_FROM_NAME", mode="before")
     @classmethod
@@ -82,8 +84,6 @@ class Settings(BaseSettings):
             and info.data.get("SMTP_PORT")
             and info.data.get("EMAILS_FROM_EMAIL")
         )
-
-    EMAIL_TEST_USER: EmailStr = "cykboy43@gmail.com"
 
     FIRST_SUPERUSER: EmailStr
     FIRST_SUPERUSER_PASSWORD: str

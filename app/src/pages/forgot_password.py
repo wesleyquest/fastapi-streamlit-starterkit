@@ -16,7 +16,8 @@ if "user_info" not in st.session_state:
 
 #settings
 #page
-set_page_config(st.session_state["auth_status"])
+set_page_config(auth_status=st.session_state["auth_status"],
+                layout="centered")
 #sidebar
 make_sidebar(st.session_state["auth_status"], st.session_state["user_info"])
 #style

@@ -29,4 +29,3 @@ def style_global():
 
 
 
-

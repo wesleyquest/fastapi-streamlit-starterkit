@@ -101,7 +101,7 @@ async def reset_password(
     hashed_password = utils.get_password_hash(new_password)
     user.hashed_password = hashed_password
     db.add(user)
-    db.commit()
+    await db.commit()
     return {"detail": "패스워드를 변경하였습니다."} #return {"msg": "Password updated successfully"}
 
 

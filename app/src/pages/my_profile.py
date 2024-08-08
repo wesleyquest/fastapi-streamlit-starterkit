@@ -28,7 +28,8 @@ if not st.session_state["token_status"]==True:
 
 #settings
 #page
-set_page_config(st.session_state["auth_status"])
+set_page_config(auth_status=st.session_state["auth_status"],
+                layout="centered")
 #sidebar
 make_sidebar(st.session_state["auth_status"], st.session_state["user_info"])
 #style
@@ -61,14 +62,15 @@ def open_change_myprofile_modal(token_type, access_token, email, username, passw
 
 #main
 st.markdown("")
-st.subheader("🐱 My Profile", anchor=False)
-st.markdown("")
+st.subheader("🐱 나의 정보", anchor=False) #st.subheader("🐱 My Profile", anchor=False)
+st.markdown("""<div style="height:0.5px;border:none;color:#D3D3D3;background-color:#D3D3D3;" /> """, unsafe_allow_html=True)
 tab1, tab2 = st.tabs(["프로필 보기", "프로필 변경"])
 with tab1:
     email = st.session_state["user_info"]["email"]
     username = st.session_state["user_info"]["username"]
     st.markdown(f"이메일  \n :gray-background[{email}]")
-    st.markdown(f"사용자명  \n :gray-background[{username}]")
+    if username:
+        st.markdown(f"사용자명  \n :gray-background[{username}]")
 
 
 with tab2:

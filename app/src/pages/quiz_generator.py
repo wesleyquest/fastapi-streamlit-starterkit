@@ -7,6 +7,8 @@ from modules.settings.style import style_global
 from modules.auth.api_auth import validate_token, get_user_info
 from modules.security.encryption import str_to_asterisk
 from modules.validation.key_validation import validate_openai_api_key
+from modules.validation.form_validation import validate_text
+from modules.quiz.api_quiz import get_quiz
 
 #var
 if "auth_status" not in st.session_state:
@@ -30,7 +32,8 @@ if not st.session_state["token_status"]==True:
 
 #settings
 #page
-set_page_config(st.session_state["auth_status"])
+set_page_config(auth_status=st.session_state["auth_status"],
+                layout="wide")
 #sidebar
 make_sidebar(st.session_state["auth_status"], st.session_state["user_info"])
 #style
@@ -60,30 +63,17 @@ def open_openaiapikey_modal(old_key=None):
         if st.button("닫기", type="secondary", use_container_width=True):
             st.rerun()
 
-
-# main
-st.markdown("")
-st.subheader("🚀 한국어 퀴즈 생성", anchor=False)
-st.markdown("""<div style="height:0.5px;border:none;color:#D3D3D3;background-color:#D3D3D3;" /> """, unsafe_allow_html=True)
-key_placeholder = st.container()
-
-if not st.session_state["key_status"]==True:
-    if key_placeholder.button("OpenAI API KEY 입력", type="primary", use_container_width=True, key="openai_api_key_button"):
-        open_openaiapikey_modal()
-else:
-    if key_placeholder.button("OpenAI API KEY 수정", type="secondary", use_container_width=True, key="openai_api_key_2_button"):
-        open_openaiapikey_modal(old_key=st.session_state["openai_api_key"])
-
 @st.dialog(" ", width="large")
 def open_settings_modal():
     st.markdown("")
     with st.form("quiz_generator_form"):
         st.markdown("퀴즈를 생성할 문서를 입력하세요")
         document = st.text_area(" ",label_visibility="collapsed")
+        document_valid_placeholder = st.container()
         
         #quiz content
         with st.container():
-            st.markdown("퀴즈 콘텐츠를 선택하세요")
+            st.markdown("퀴즈 콘텐츠를 선택하세요 (1개 이상)")
             col_1, col_2, col_3, col_4 = st.columns(4)
             with col_1: 
                 #Vocabulary Focused Quiz: 단어 중심
@@ -97,10 +87,10 @@ def open_settings_modal():
             with col_4:
                 #Word Order Quiz: 단어 순서
                 tog_content_word_order_quiz = st.toggle("단어 순서", value=True)  
-
+            tog_content_valid_placeholder = st.container()
             #quiz type
             with st.container():
-                st.markdown("퀴즈 타입을 선택하세요")
+                st.markdown("퀴즈 타입을 선택하세요 (1개 이상)")
                 col_1, col_2, col_3, col_4 = st.columns(4)
                 with col_1:
                     #Multiple Choice: 객관식
@@ -112,104 +102,123 @@ def open_settings_modal():
                     #Fill In The Blank: 빈칸채우기
                     tog_type_fill_in_the_blank = st.toggle("빈칸 채우기", value=True)
                 with col_4:
-                    st.markdown("")   
+                    st.markdown("")
+                tog_type_valid_placeholder =  st.container()
 
             #quiz number
             with st.container():
                 st.markdown("퀴즈 개수를 선택하세요")
-                number = st.slider(" ", 0, 10, 3,label_visibility="collapsed")
+                number = st.slider(" ", 1, 10, 3,label_visibility="collapsed")
 
             submitted = st.form_submit_button("생성 시작", type="primary", use_container_width=True)
             if submitted:
-                #initialization
-                st.session_state["quiz"] = {}
-                st.session_state["quiz"]["input"] = {}
-                st.session_state["quiz"]["output"] = {}
-                #document
-                print(document)
-                st.session_state["quiz"]["input"]["document"] = document
-                #quiz_content
-                st.session_state["quiz"]["input"]["quiz_content"] = []
-                print(tog_content_vocabulary_focused_quiz)
-                if tog_content_vocabulary_focused_quiz:
-                    st.session_state["quiz"]["input"]["quiz_content"].append("vocabulary_focused")
-                print(tog_content_sentence_example_based_quiz)
-                if tog_content_sentence_example_based_quiz:
-                    st.session_state["quiz"]["input"]["quiz_content"].append("sentence_example")
-                print(tog_content_cultural_information_quiz)
-                if tog_content_cultural_information_quiz:
-                    st.session_state["quiz"]["input"]["quiz_content"].append("cultural_information")
-                print(tog_content_word_order_quiz)
-                if tog_content_word_order_quiz:
-                    st.session_state["quiz"]["input"]["quiz_content"].append("tword_order")
-                #quiz_type
-                st.session_state["quiz"]["input"]["quiz_type"] = []
-                print(tog_type_multiple_choice)
-                if tog_type_multiple_choice:
-                    st.session_state["quiz"]["input"]["quiz_type"].append("multiple_choice")
-                print(tog_type_true_or_false)
-                if tog_type_true_or_false:
-                    st.session_state["quiz"]["input"]["quiz_type"].append("true_or_false")
-                print(tog_type_fill_in_the_blank)
-                if tog_type_fill_in_the_blank:
-                    st.session_state["quiz"]["input"]["quiz_type"].append("fill_in_the_blank")
-                print("---")
-                print(number)
-                st.session_state["quiz"]["input"]["number"] = number
-                with st.spinner('퀴즈를 생성 중입니다. 잠시만 기다려 주세요...'):
-                    time.sleep(2)
-                    st.session_state["quiz"]["output"] = """
-아래와 같이 퀴즈를 생성했어요.
-                    
-Quiz 1. What does the following Korean phrase mean? \n
-머리 잘라 주세요. \n
-① Cut my head  ② Cut my hair
-\n
-Quiz 2. What was the first act that happened? \n
-머리를 염색하기 전에 커트를 해요. \n
-① dye my hair ② get a haircut
-\n
-Answer \n
-Quiz 1. ② Cut my hair \n
-Quiz 2. ② get a haircut
-"""
-                    #st.session_state["quiz_messages"].append({"role": "assistant", "content": st.session_state["quiz"]})
-                    st.session_state["quiz_messages"].append({"role": "assistant", "content": st.session_state["quiz"]["output"]})
-                    st.rerun()
+                valid = False
+                if validate_text(document):
+                    if tog_content_vocabulary_focused_quiz | tog_content_sentence_example_based_quiz | tog_content_cultural_information_quiz | tog_content_word_order_quiz:
+                        if tog_type_multiple_choice | tog_type_true_or_false | tog_type_fill_in_the_blank:
+                            valid = True
+                        else:
+                            tog_type_valid_placeholder.markdown(":red[퀴즈 타입을 1개 이상 선택하세요]")
+                    else:
+                        tog_content_valid_placeholder.markdown(":red[퀴즈 콘텐츠를 1개 이상 선택하세요]")
+                else:
+                    document_valid_placeholder.markdown(":red[퀴즈를 생성할 문서를 입력하세요 (100자 이상)]")
+
+                if valid:
+                    #initialization
+                    st.session_state["quiz"] = {}
+                    st.session_state["quiz"]["input"] = {}
+                    st.session_state["quiz"]["output"] = {}
+                    #document
+                    print(document)
+                    st.session_state["quiz"]["input"]["document"] = document
+                    #quiz_content
+                    st.session_state["quiz"]["input"]["quiz_content"] = []
+                    print(tog_content_vocabulary_focused_quiz)
+                    if tog_content_vocabulary_focused_quiz:
+                        st.session_state["quiz"]["input"]["quiz_content"].append("vocabulary_focused")
+                    print(tog_content_sentence_example_based_quiz)
+                    if tog_content_sentence_example_based_quiz:
+                        st.session_state["quiz"]["input"]["quiz_content"].append("sentence_example")
+                    print(tog_content_cultural_information_quiz)
+                    if tog_content_cultural_information_quiz:
+                        st.session_state["quiz"]["input"]["quiz_content"].append("cultural_information")
+                    print(tog_content_word_order_quiz)
+                    if tog_content_word_order_quiz:
+                        st.session_state["quiz"]["input"]["quiz_content"].append("tword_order")
+                    #quiz_type
+                    st.session_state["quiz"]["input"]["quiz_type"] = []
+                    print(tog_type_multiple_choice)
+                    if tog_type_multiple_choice:
+                        st.session_state["quiz"]["input"]["quiz_type"].append("multiple_choice")
+                    print(tog_type_true_or_false)
+                    if tog_type_true_or_false:
+                        st.session_state["quiz"]["input"]["quiz_type"].append("true_or_false")
+                    print(tog_type_fill_in_the_blank)
+                    if tog_type_fill_in_the_blank:
+                        st.session_state["quiz"]["input"]["quiz_type"].append("fill_in_the_blank")
+                    print("---")
+                    print(number)
+                    st.session_state["quiz"]["input"]["number"] = number
+                    with st.spinner('퀴즈를 생성 중입니다. 잠시만 기다려 주세요...'):
+                        time.sleep(2)
+                        st.session_state["quiz"]["output"] = get_quiz(
+                            token_type = st.session_state["token_type"], 
+                            access_token = st.session_state["access_token"],
+                            openai_api_key = st.session_state["openai_api_key"],
+                            document = st.session_state["quiz"]["input"]["document"],
+                            quiz_content = st.session_state["quiz"]["input"]["quiz_content"],
+                            quiz_type = st.session_state["quiz"]["input"]["quiz_type"],
+                            number = st.session_state["quiz"]["input"]["number"]
+                        )
+                        #st.session_state["quiz_messages"].append({"role": "assistant", "content": st.session_state["quiz"]})
+                        st.session_state["quiz_messages"].append({"role": "assistant", "content": st.session_state["quiz"]["output"]["results"]})
+                        st.rerun()
 
 
+#func
 def reset_conversation():
   #message 초기화
   st.session_state["quiz_messages"] = [st.session_state["quiz_messages"][0]]
   ##st.session_state.chat_history = None
 
-#quiz generator
-if st.session_state["key_status"]==True:
-    openai_api_key_enc = str_to_asterisk(st.session_state["openai_api_key"])
-    st.toast(f"🟢 KEY : {openai_api_key_enc}")
+#main
+col1, col2, col3 = st.columns((1,8,1), gap="large")
+with col2:
+    st.markdown("")
+    st.subheader("🚀 한국어 퀴즈 생성", anchor=False)
+    st.markdown("""<div style="height:0.5px;border:none;color:#D3D3D3;background-color:#D3D3D3;" /> """, unsafe_allow_html=True)
+    if st.session_state["key_status"]!=True:
+        st.info("""👇 OpenAI API KEY를 입력하세요""")
+    st.markdown("")
+    col1, col2, col3 = st.columns((1,1,1), gap="large")
+    with col1:
+        key_placeholder = st.container()
+        if not st.session_state["key_status"]==True:
+            if key_placeholder.button("OpenAI API KEY 입력", type="primary", use_container_width=True, key="openai_api_key_button"):
+                open_openaiapikey_modal()
+        else:
+            if key_placeholder.button("OpenAI API KEY 수정", type="secondary", use_container_width=True, key="openai_api_key_2_button"):
+                open_openaiapikey_modal(old_key=st.session_state["openai_api_key"])
 
-    username = st.session_state["user_info"]["username"]
+    st.markdown("")
+    #quiz generator
+    if st.session_state["key_status"]==True:
+        openai_api_key_enc = str_to_asterisk(st.session_state["openai_api_key"])
+        st.toast(f"🟢 KEY : {openai_api_key_enc}")
+        username = st.session_state["user_info"]["username"]
 
-    with st.container():
-        col_1, col_2 = st.columns(2)
-        with col_1:
+        with col2:
             if st.button("퀴즈 생성", type="primary", use_container_width=True):
                 open_settings_modal()
 
-        with col_2:
+        with col3:
             st.button('퀴즈 삭제', on_click=reset_conversation, use_container_width=True)
 
-    #빈칸
-    with st.container():
-        st.markdown(" ")
+        if "quiz_messages" not in st.session_state:
+            st.session_state["quiz_messages"] = [{"role": "assistant", "content": f"안녕하세요 {username} 님 !  \n '퀴즈 생성' 버튼을 클릭하여 퀴즈를 생성해 주세요!"}]
 
-    if "quiz_messages" not in st.session_state:
-        st.session_state["quiz_messages"] = [{"role": "assistant", "content": f"안녕하세요 {username} 님 !  \n '퀴즈 생성' 버튼을 클릭하여 퀴즈를 생성해 주세요!"}]
-
-    if st.session_state["quiz_messages"]:
-        #반대 순서로 보기('reversed')
-        for msg in reversed(st.session_state["quiz_messages"]):
-            st.chat_message(msg["role"]).write(msg["content"])
-
-else:
-    st.info("""👆 OpenAI API KEY를 입력하세요""")
+        if st.session_state["quiz_messages"]:
+            #반대 순서로 보기('reversed')
+            for msg in reversed(st.session_state["quiz_messages"]):
+                st.chat_message(msg["role"]).write(msg["content"])
