@@ -1,5 +1,6 @@
 import streamlit as st
-from time import sleep
+import numpy as np
+import pandas as pd
 
 from modules.settings.style import style_global
 from modules.settings.page import set_page_config, make_sidebar
@@ -35,7 +36,15 @@ style_global()
 
 #main
 st.markdown("")
-st.subheader("👋 Hello", anchor=False)
+st.subheader("📑 로그인 API", anchor=False)
 st.markdown("""<div style="height:0.5px;border:none;color:#D3D3D3;background-color:#D3D3D3;" /> """, unsafe_allow_html=True)
+
+st.markdown("<h4>토큰 받기</h4>", unsafe_allow_html=True)
+st.markdown("<h5>기본 정보</h5>", unsafe_allow_html=True)
+
+
+
+
+
 
 

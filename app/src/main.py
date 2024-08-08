@@ -54,7 +54,7 @@ with st.form("login_form"):
         if valid==True:
             data = get_access_token(email=email, password=password)
             
-            if data["access_token"]:
+            if data["status"]:
                 st.session_state["auth_status"] = True
                 st.session_state["token_status"] = True
                 st.session_state["access_token"] = data["access_token"]

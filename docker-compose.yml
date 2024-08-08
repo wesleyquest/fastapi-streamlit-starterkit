@@ -8,8 +8,8 @@ services:
       - .env
     volumes:
       - ./api:/app
-    #ports:
-    #  - 8000:${API_PORT}
+    ports:
+      - 8000:${API_PORT}
     depends_on:
       - db
     #command: /bin/bash -c "/app/pre-start.sh && uvicorn app.main:app --host 0.0.0.0 --port 80 --reload" 

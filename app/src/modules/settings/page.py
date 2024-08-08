@@ -47,6 +47,7 @@ def get_current_page_name():
 def make_sidebar(auth_status, user_info):
     with st.sidebar:
         #st.markdown("<div style='text-align: center;'> 회사 로고 </div>", unsafe_allow_html=True)
+        st.logo("/app/src/images/logo_wesleyquest.png", link="http://wesleyquest.com")
         st.markdown(f"<div style='text-align:center;font-size:20px;'><b>📊 {APP_NAME}</b></div>", unsafe_allow_html=True)
         st.markdown(f"<div style='text-align:center;font-size:16px;color:grey;'>{PROJECT_VERSION}</div>", unsafe_allow_html=True)
         st.markdown("")
@@ -67,11 +68,15 @@ def make_sidebar(auth_status, user_info):
                     logout()
 
             #st.markdown("")
-            with st.expander("🏠&nbsp; Home", expanded=True):
+            st.markdown("""<div style="height:0.5px;border:none;color:#D3D3D3;background-color:#D3D3D3;" /> """, unsafe_allow_html=True)
+            with st.expander("🏠&nbsp; HOME", expanded=True):
                 st.page_link("pages/hello.py", label="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 개요")
-            with st.expander("🚀&nbsp; App", expanded=True):
-                st.page_link("pages/quiz_generator.py", label="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 한국어 퀴즈 생성기")
-
+            with st.expander("🚀&nbsp; APP", expanded=True):
+                st.page_link("pages/quiz_generator.py", label="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 한국어 퀴즈 생성")
+            with st.expander("📑&nbsp; API Docs", expanded=True):
+                st.page_link("pages/api_docs_auth.py", label="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 로그인 API")
+                st.page_link("pages/api_docs_quiz.py", label="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 한국어 퀴즈 생성 API")
+                st.page_link("pages/api_docs_user.py", label="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 사용자 관리 API (관리자용)")
         elif not auth_status == True:
             st.page_link("main.py", label="로그인")
             st.page_link("pages/signup.py", label="회원가입")

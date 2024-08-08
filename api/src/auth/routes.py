@@ -32,26 +32,22 @@ async def login_access_token(
     """
     OAuth2 compatible token login, get an access token for future requests
     """
-    try:
-        user = await crud_user.authenticate(
-            db, email=form_data.username, password=form_data.password
-        )
-        if not user:
-            raise HTTPException(status_code=401,
-                                detail="이메일 또는 비밀번호가 일치하지 않습니다.") #detail="Incorrect email or password"
-        elif not crud_user.is_active(user):
-            raise HTTPException(status_code=400,
-                                detail="비활성 사용자 입니다. 관리자에게 문의하세요.") #detail="Inactive user"
-        access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-        return {
-            "access_token": utils.create_access_token(
-                user.id, expires_delta=access_token_expires
-            ),
-            "token_type": "bearer",
-        }
-    except:
-        raise HTTPException(status_code=500,
-                            detail="요청을 처리할 수 없습니다. 다시 시도해 주세요.")
+    user = await crud_user.authenticate(
+        db, email=form_data.username, password=form_data.password
+    )
+    if not user:
+        raise HTTPException(status_code=400,
+                            detail="이메일 또는 비밀번호가 일치하지 않습니다.") #detail="Incorrect email or password"
+    elif not crud_user.is_active(user):
+        raise HTTPException(status_code=400,
+                            detail="비활성 사용자 입니다. 관리자에게 문의하세요.") #detail="Inactive user"
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    return {
+        "access_token": utils.create_access_token(
+            user.id, expires_delta=access_token_expires
+        ),
+        "token_type": "bearer",
+    }
 
 
 @router.post("/login/test-token", response_model=users_schemas.User)
@@ -67,22 +63,19 @@ async def recover_password(email: str, db: AsyncSession = Depends(deps.get_db)) 
     """
     Password Recovery
     """
-    try:
-        user = await crud_user.get_by_email(db, email=email)
+    user = await crud_user.get_by_email(db, email=email)
 
-        if not user:
-            raise HTTPException(
-                status_code=404,
-                detail="가입하신 이메일 정보가 없습니다." #detail="The user with this email does not exist in the system.",
-            )
-        password_reset_token = utils.generate_password_reset_token(email=email)
-        utils.send_reset_password_email(
-            email_to=user.email, email=email, token=password_reset_token
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="가입하신 이메일 정보가 없습니다." #detail="The user with this email does not exist in the system.",
         )
-        return {"detail": "패스워드 재설정 메일을 보냈습니다."} #return {"detail": "Password recovery email sent"}
-    except:
-        raise HTTPException(status_code=500,
-                            detail="요청을 처리할 수 없습니다. 다시 시도해 주세요.")
+    password_reset_token = utils.generate_password_reset_token(email=email)
+    utils.send_reset_password_email(
+        email_to=user.email, email=email, token=password_reset_token
+    )
+    return {"detail": "패스워드 재설정 메일을 보냈습니다."} #return {"detail": "Password recovery email sent"}
+
 
 
 @router.post("/reset-password", response_model=auth_schemas.Msg)
@@ -94,26 +87,23 @@ async def reset_password(
     """
     Reset password
     """
-    try:
-        email = utils.verify_password_reset_token(token)
-        if not email:
-            raise HTTPException(status_code=400, detail="Invalid token")
-        user = await crud_user.get_by_email(db, email=email)
-        if not user:
-            raise HTTPException(
-                status_code=404,
-                detail="가입하신 이메일 정보가 없습니다." #detail="The user with this username does not exist in the system.",
-            )
-        elif not crud_user.is_active(user):
-            raise HTTPException(status_code=400, detail="Inactive user")
-        hashed_password = utils.get_password_hash(new_password)
-        user.hashed_password = hashed_password
-        db.add(user)
-        db.commit()
-        return {"detail": "패스워드를 변경하였습니다."} #return {"msg": "Password updated successfully"}
-    except:
-        raise HTTPException(status_code=500,
-                            detail="요청을 처리할 수 없습니다. 다시 시도해 주세요.")
+    email = utils.verify_password_reset_token(token)
+    if not email:
+        raise HTTPException(status_code=400, detail="Invalid token")
+    user = await crud_user.get_by_email(db, email=email)
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="가입하신 이메일 정보가 없습니다." #detail="The user with this username does not exist in the system.",
+        )
+    elif not crud_user.is_active(user):
+        raise HTTPException(status_code=400, detail="Inactive user")
+    hashed_password = utils.get_password_hash(new_password)
+    user.hashed_password = hashed_password
+    db.add(user)
+    db.commit()
+    return {"detail": "패스워드를 변경하였습니다."} #return {"msg": "Password updated successfully"}
+
 
 
 

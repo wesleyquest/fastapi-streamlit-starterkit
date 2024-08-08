@@ -35,12 +35,8 @@ async def get_users(
     """
     Get users.
     """
-    try:
-        users = await crud_user.get_multi(db, skip=skip, limit=limit)
-        return users
-    except:
-        raise HTTPException(status_code=500,
-                            detail="요청을 처리할 수 없습니다. 다시 시도해 주세요.")
+    users = await crud_user.get_multi(db, skip=skip, limit=limit)
+    return users
 
 
 @router.post("/", response_model=schemas.User)
@@ -54,22 +50,18 @@ async def create_user(
     """
     Create new user.
     """
-    try:
-        user = await crud_user.get_by_email(db, email=user_in.email)
-        if user:
-            raise HTTPException(
-                status_code=400,
-                detail="The user with this username already exists in the system.",
-            )
-        user = await crud_user.create(db, obj_in=user_in)
-        if settings.EMAILS_ENABLED and user_in.email:
-            send_new_account_email(
-                email_to=user_in.email, username=user_in.email, password=user_in.password
-            )
-        return user
-    except:
-        raise HTTPException(status_code=500,
-                            detail="요청을 처리할 수 없습니다. 다시 시도해 주세요.")
+    user = await crud_user.get_by_email(db, email=user_in.email)
+    if user:
+        raise HTTPException(
+            status_code=400,
+            detail= "사용할 수 없는 이메일 아이디입니다. 다른 이메일을 입력해 주세요.", #"The user with this username already exists in the system.",
+        )
+    user = await crud_user.create(db, obj_in=user_in)
+    if settings.EMAILS_ENABLED and user_in.email:
+        send_new_account_email(
+            email_to=user_in.email, username=user_in.email, password=user_in.password
+        )
+    return user
 
 
 @router.put("/me", response_model=schemas.User)
@@ -84,20 +76,16 @@ async def update_user_me(
     """
     Update current user info.
     """
-    try:
-        current_user_data = jsonable_encoder(current_user)
-        user_in = schemas.UserUpdate(**current_user_data)
-        if password is not None:
-            user_in.password = password
-        if username is not None:
-            user_in.username = username
-        if email is not None:
-            user_in.email = email
-        user = await crud_user.update(db, db_obj=current_user, obj_in=user_in)
-        return user
-    except:
-        raise HTTPException(status_code=500,
-                            detail="요청을 처리할 수 없습니다. 다시 시도해 주세요.")
+    current_user_data = jsonable_encoder(current_user)
+    user_in = schemas.UserUpdate(**current_user_data)
+    if password is not None:
+        user_in.password = password
+    if username is not None:
+        user_in.username = username
+    if email is not None:
+        user_in.email = email
+    user = await crud_user.update(db, db_obj=current_user, obj_in=user_in)
+    return user
 
 
 @router.get("/me", response_model=schemas.User)
@@ -108,11 +96,7 @@ async def get_user_me(
     """
     Get current user.
     """
-    try:
-        return current_user
-    except:
-        raise HTTPException(status_code=500,
-                            detail="요청을 처리할 수 없습니다. 다시 시도해 주세요.")
+    return current_user
 
 
 @router.post("/signup", response_model=schemas.User)
@@ -127,26 +111,22 @@ async def create_user_open_signup(
     """
     Create new user without the need to be logged in.
     """
-    try:
-        if not settings.USERS_OPEN_REGISTRATION:
-            raise HTTPException(
-                status_code=403,
-                detail="new user is forbidden to sign up" #"Open user registration is forbidden on this server" 
-            )
-        
-        user = await crud_user.get_by_email(db, email=email)
-        if user:
-            raise HTTPException(
-                status_code=400,
-                detail="The user with this email address already exists"
-            )
-        
-        user_in = schemas.UserCreate(password=password, email=email, username=username)
-        user = await crud_user.create(db, obj_in=user_in)
-        return user
-    except:
-        raise HTTPException(status_code=500,
-                            detail="요청을 처리할 수 없습니다. 다시 시도해 주세요.")
+    if not settings.USERS_OPEN_REGISTRATION:
+        raise HTTPException(
+            status_code=400, #403
+            detail= "권한이 없습니다. 관리자에게 문의하세요.", #"new user is forbidden to sign up" #"Open user registration is forbidden on this server" 
+        )
+    
+    user = await crud_user.get_by_email(db, email=email)
+    if user:
+        raise HTTPException(
+            status_code=400,
+            detail= "사용할 수 없는 이메일 아이디입니다. 다른 이메일을 입력해 주세요.", #"The user with this email address already exists"
+        )
+    
+    user_in = schemas.UserCreate(password=password, email=email, username=username)
+    user = await crud_user.create(db, obj_in=user_in)
+    return user
 
 
 @router.get("/{user_id}", response_model=schemas.User)
@@ -158,18 +138,15 @@ async def get_user_by_id(
     """
     Get a user by id.
     """
-    try:
-        user = await crud_user.get(db, id=user_id)
-        if user == current_user:
-            return user
-        if not crud_user.is_superuser(current_user):
-            raise HTTPException(
-                status_code=400, detail="The user doesn't have enough privileges"
-            )
+    user = await crud_user.get(db, id=user_id)
+    if user == current_user:
         return user
-    except:
-        raise HTTPException(status_code=500,
-                            detail="요청을 처리할 수 없습니다. 다시 시도해 주세요.")
+    if not crud_user.is_superuser(current_user):
+        raise HTTPException(
+            status_code=400,
+            detail="권한이 없습니다. 관리자에게 문의하세요.", #"The user doesn't have enough privileges"
+        )
+    return user
 
 
 @router.put("/{user_id}", response_model=schemas.User)
@@ -183,16 +160,21 @@ async def update_user_by_id(
     """
     Update a user by id.
     """
-    try:
-        user = await crud_user.get(db, id=user_id)
-        if not user:
-            raise HTTPException(
-                status_code=404,
-                detail="The user with this username does not exist in the system",
-            )
-        user = await crud_user.update(db, db_obj=user, obj_in=user_in)
-        return user
-    except:
-        raise HTTPException(status_code=500,
-                            detail="요청을 처리할 수 없습니다. 다시 시도해 주세요.")
+    user = await crud_user.get(db, id=user_id)
+    user = await crud_user.update(db, db_obj=user, obj_in=user_in)
+    return user
+
+#
+@router.delete("/{user_id}", response_model=schemas.User)
+async def delete_user_by_id(
+    user_id: int,
+    current_user: models.User = Depends(deps.get_current_active_superuser),
+    db: AsyncSession = Depends(deps.get_db),
+) -> Any:
+    """
+    Delete a user by id.
+    """
+    user = await crud_user.get(db, id=user_id)
+    user = await crud_user.remove(db, id=user_id)
+    return user
 
