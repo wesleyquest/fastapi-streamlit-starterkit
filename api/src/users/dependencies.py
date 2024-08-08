@@ -38,12 +38,12 @@ async def get_current_user(
         token_data = TokenPayload(**payload)
     except (jwt.JWTError, ValidationError):
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
+            status_code=400, #status.HTTP_403_FORBIDDEN
             detail="자격 증명을 확인할 수 없습니다.", #detail="Could not validate credentials",
         )
     user = await crud_user.get(db, id=token_data.sub)
     if not user:
-        raise HTTPException(status_code=404,
+        raise HTTPException(status_code=400, #404
                             detail="사용자를 찾을 수 없습니다.") #detail="User not found"
     return user
 

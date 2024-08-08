@@ -36,7 +36,8 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         data = await db.execute(select(self.model).where(self.model.id == id))
         data = data.scalar_one_or_none()
         if data is None:
-            raise HTTPException(status_code=404, detail="Not Found")
+            raise HTTPException(status_code=400, #400
+                                detail="해당 사용자 정보가 없습니다. 다시 시도해 주세요.") #"Not Found"
 
         return data
 
@@ -77,11 +78,14 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return db_obj
 
     async def remove(self, db: AsyncSession, *, id: int) -> ModelType:
-        #obj = db.query(self.model).get(id)
-        obj = await db.execute(select(self.model)).get(id)
-        await db.delete(obj)
+        if id == 1:
+            raise HTTPException(status_code=400, #400
+                                detail="해당 사용자는 삭제할 수 없습니다. 다시 시도해 주세요.")
+        data = await db.execute(select(self.model).where(self.model.id == id))
+        data = data.scalar_one_or_none()
+        await db.delete(data)
         await db.commit()
-        return obj
+        return data
 
 
 

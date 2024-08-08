@@ -63,7 +63,7 @@ def open_openaiapikey_modal(old_key=None):
 
 # main
 st.markdown("")
-st.subheader("🚀 Kotact Quiz Generator", anchor=False)
+st.subheader("🚀 한국어 퀴즈 생성", anchor=False)
 st.markdown("""<div style="height:0.5px;border:none;color:#D3D3D3;background-color:#D3D3D3;" /> """, unsafe_allow_html=True)
 key_placeholder = st.container()
 
@@ -121,22 +121,60 @@ def open_settings_modal():
 
             submitted = st.form_submit_button("생성 시작", type="primary", use_container_width=True)
             if submitted:
-                
+                #initialization
+                st.session_state["quiz"] = {}
+                st.session_state["quiz"]["input"] = {}
+                st.session_state["quiz"]["output"] = {}
+                #document
                 print(document)
-                print("---")
+                st.session_state["quiz"]["input"]["document"] = document
+                #quiz_content
+                st.session_state["quiz"]["input"]["quiz_content"] = []
                 print(tog_content_vocabulary_focused_quiz)
+                if tog_content_vocabulary_focused_quiz:
+                    st.session_state["quiz"]["input"]["quiz_content"].append("vocabulary_focused")
                 print(tog_content_sentence_example_based_quiz)
+                if tog_content_sentence_example_based_quiz:
+                    st.session_state["quiz"]["input"]["quiz_content"].append("sentence_example")
                 print(tog_content_cultural_information_quiz)
+                if tog_content_cultural_information_quiz:
+                    st.session_state["quiz"]["input"]["quiz_content"].append("cultural_information")
                 print(tog_content_word_order_quiz)
-                print("---")
+                if tog_content_word_order_quiz:
+                    st.session_state["quiz"]["input"]["quiz_content"].append("tword_order")
+                #quiz_type
+                st.session_state["quiz"]["input"]["quiz_type"] = []
                 print(tog_type_multiple_choice)
+                if tog_type_multiple_choice:
+                    st.session_state["quiz"]["input"]["quiz_type"].append("multiple_choice")
                 print(tog_type_true_or_false)
+                if tog_type_true_or_false:
+                    st.session_state["quiz"]["input"]["quiz_type"].append("true_or_false")
                 print(tog_type_fill_in_the_blank)
+                if tog_type_fill_in_the_blank:
+                    st.session_state["quiz"]["input"]["quiz_type"].append("fill_in_the_blank")
                 print("---")
                 print(number)
+                st.session_state["quiz"]["input"]["number"] = number
                 with st.spinner('퀴즈를 생성 중입니다. 잠시만 기다려 주세요...'):
                     time.sleep(2)
-                    st.session_state["quiz_messages"].append({"role": "assistant", "content": "아래와 같이 퀴즈를 생성했어요."})
+                    st.session_state["quiz"]["output"] = """
+아래와 같이 퀴즈를 생성했어요.
+                    
+Quiz 1. What does the following Korean phrase mean? \n
+머리 잘라 주세요. \n
+① Cut my head  ② Cut my hair
+\n
+Quiz 2. What was the first act that happened? \n
+머리를 염색하기 전에 커트를 해요. \n
+① dye my hair ② get a haircut
+\n
+Answer \n
+Quiz 1. ② Cut my hair \n
+Quiz 2. ② get a haircut
+"""
+                    #st.session_state["quiz_messages"].append({"role": "assistant", "content": st.session_state["quiz"]})
+                    st.session_state["quiz_messages"].append({"role": "assistant", "content": st.session_state["quiz"]["output"]})
                     st.rerun()
 
 
@@ -174,4 +212,4 @@ if st.session_state["key_status"]==True:
             st.chat_message(msg["role"]).write(msg["content"])
 
 else:
-    st.info("""👈 OpenAI API KEY를 입력하세요""")
+    st.info("""👆 OpenAI API KEY를 입력하세요""")

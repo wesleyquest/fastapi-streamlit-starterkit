@@ -20,14 +20,8 @@ app = FastAPI(title='starterkit API') #, root_path="/api/"
 router = APIRouter()
 
 @router.get("/")
-async def default():
-    return {"message": "Hello API"}
-
-@router.get("/info")
-async def info(settings: Annotated[config.Settings, Depends(get_settings)]):
-    return {
-        "api_name": settings.API_NAME
-    }
+async def default(settings: Annotated[config.Settings, Depends(get_settings)]):
+    return f"Hello! This is {settings.API_NAME}"
 
 #startup
 @app.on_event("startup")
