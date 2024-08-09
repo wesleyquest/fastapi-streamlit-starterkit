@@ -4,4 +4,4 @@ env
 .env
 alembic.ini
 volumes/
-
+log/
