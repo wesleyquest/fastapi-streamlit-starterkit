@@ -11,7 +11,8 @@ from modules.auth.api_auth import validate_token, get_user_info
 
 load_dotenv()
 SERVER_HOST = os.getenv("SERVER_HOST")
-with open('/app/src/docs/api_docs_access-token.yml') as f:
+#@st.cache_data
+with open('/app/src/docs/auth/api_docs_access-token.yml') as f:
     docs = yaml.load(f, Loader=yaml.FullLoader)
 
 #var
@@ -49,9 +50,6 @@ with col2:
     st.markdown("")
     st.subheader("📑 로그인 API", anchor=False)
     st.markdown("""<div style="height:0.5px;border:none;color:#D3D3D3;background-color:#D3D3D3;" /> """, unsafe_allow_html=True)
-
-
-
 
     st.markdown("<h4>토큰 받기</h4>", unsafe_allow_html=True)
     st.markdown("<h5>기본 정보</h5>", unsafe_allow_html=True)

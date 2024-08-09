@@ -1,5 +1,5 @@
 #access-token
-summary: 토큰 발급을 요청합니다.
+summary: 엑세스 토큰 발급을 요청합니다.
 method: POST
 url: /api/v1/auth/login/access-token
 auth_method: "-"

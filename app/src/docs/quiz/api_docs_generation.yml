@@ -1,0 +1,52 @@
+#access-token
+summary: 한국어 퀴즈를 생성합니다. <br> ※ 엑세스 토큰 필요 - 토큰 받기 API 참고
+method: POST
+url: /api/v1/quiz/generation
+auth_method: "엑세스 토큰"
+request:
+  headers:
+    key_1:
+      name: Content-type
+      desc: application/json
+      required: O
+    key_2:
+      name: Authorization
+      desc: 토큰 타입과 엑세트 토큰 <br> (예시) <br> "bearer eyJh...XYOw"
+      required: O
+  body:
+    key_1:
+      name: openai_api_key
+      type: String
+      desc: OpenAI API 키
+      required: O
+    key_2:
+      name: document
+      type: String
+      desc: 퀴즈생성용 문서
+      required: O
+    key_3:
+      name: quiz_content
+      type: List
+      desc: 생성할 퀴즈 콘텐츠 리스트 <br> (예시) <br> ["vocabulary_focused", "sentence_example", "cultural_information", "word_order"]
+      required: O
+    key_4:
+      name: quiz_type
+      type: List
+      desc: 생성할 퀴즈 타입 리스트 <br> (예시) <br> ["multiple_choice", "true_or_false", "fill_in_the_blank"]
+      required: O
+    key_5:
+      name: number
+      type: Int
+      desc: 생성할 퀴즈 수
+      required: O
+response:
+  body:
+    key_1:
+      name: results
+      type: String
+      desc: 생성된 퀴즈
+      required: O
+
+
+
+

@@ -145,7 +145,7 @@ def open_settings_modal():
                         st.session_state["quiz"]["input"]["quiz_content"].append("cultural_information")
                     print(tog_content_word_order_quiz)
                     if tog_content_word_order_quiz:
-                        st.session_state["quiz"]["input"]["quiz_content"].append("tword_order")
+                        st.session_state["quiz"]["input"]["quiz_content"].append("word_order")
                     #quiz_type
                     st.session_state["quiz"]["input"]["quiz_type"] = []
                     print(tog_type_multiple_choice)
