@@ -13,5 +13,5 @@ template: |
 
   The example is provided to show how to format the quizzes according to "quiz_content" and "quiz_type".
 
-  Create only {number} quizzes total and create only set of quizzes ,answers and expains without other explanation.
+  Create only {number} quizzes total and create only set of quizzes ,answers, explains, sentences and dialogs without other explanation.
   The quiz index always starts from 1.
