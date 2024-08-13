@@ -1,0 +1,17 @@
+_type: prompt
+input_variables:
+  ["topic","reference","quiz_content","quiz_type","fewshot","number"]
+template: |
+  Your goal is to create a well crafted set of quizzes about the "topic" in the format of "quiz_content" and "quiz_type" with "reference".
+  The purpose of the quiz is to assess learners' understanding of how to use "topic".
+  
+  # topic: {topic}
+  # reference: {reference}
+  # quiz_content: {quiz_content}
+  # quiz_type is: {quiz_type}
+  # example: {fewshot}
+
+  The example is provided to show how to format the quizzes according to "quiz_content" and "quiz_type".
+
+  Create only {number} quizzes total and create only set of quizzes ,answers and expains without other explanation.
+  The quiz index always starts from 1.
