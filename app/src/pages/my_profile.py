@@ -64,49 +64,50 @@ def open_change_myprofile_modal(token_type, access_token, email, username, passw
 st.markdown("")
 st.subheader("🐱 나의 정보", anchor=False) #st.subheader("🐱 My Profile", anchor=False)
 st.markdown("""<div style="height:0.5px;border:none;color:#D3D3D3;background-color:#D3D3D3;" /> """, unsafe_allow_html=True)
-tab1, tab2 = st.tabs(["프로필 보기", "프로필 변경"])
-with tab1:
-    email = st.session_state["user_info"]["email"]
-    username = st.session_state["user_info"]["username"]
-    st.markdown(f"이메일  \n :gray-background[{email}]")
-    if username:
-        st.markdown(f"사용자명  \n :gray-background[{username}]")
+with st.container(border=True):
+    tab1, tab2 = st.tabs(["프로필 보기", "프로필 변경"])
+    with tab1:
+        email = st.session_state["user_info"]["email"]
+        username = st.session_state["user_info"]["username"]
+        st.markdown(f"이메일  \n :gray-background[{email}]")
+        if username:
+            st.markdown(f"사용자명  \n :gray-background[{username}]")
 
 
-with tab2:
-    myprofile_info_placeholder = st.container()
-    with st.form("my_profile_form"):
-        email = st.text_input("이메일", value=st.session_state["user_info"]["email"], disabled=True)
-        st.markdown(" ")
-        username = st.text_input("사용자명", value=st.session_state["user_info"]["username"], max_chars=30)
-        username_valid_placeholder = st.container()
-        st.markdown(" ")
-        st.markdown(" ")
-        password = st.text_input("*변경하시려면 비밀번호를 입력하세요", placeholder="비밀번호를 입력하세요 (4자리 이상)", type="password", max_chars=30)
-        password_valid_placeholder = st.container()
-        st.markdown(" ")
-        submitted = st.form_submit_button("변경", type="primary", use_container_width=True)
+    with tab2:
+        myprofile_info_placeholder = st.container()
+        with st.form("my_profile_form"):
+            email = st.text_input("이메일", value=st.session_state["user_info"]["email"], disabled=True)
+            st.markdown(" ")
+            username = st.text_input("사용자명", value=st.session_state["user_info"]["username"], max_chars=30)
+            username_valid_placeholder = st.container()
+            st.markdown(" ")
+            st.markdown(" ")
+            password = st.text_input("*변경하시려면 비밀번호를 입력하세요", placeholder="비밀번호를 입력하세요 (4자리 이상)", type="password", max_chars=30)
+            password_valid_placeholder = st.container()
+            st.markdown(" ")
+            submitted = st.form_submit_button("변경", type="primary", use_container_width=True)
 
-        if submitted:
-            #form validate
-            valid = False
-            if validate_username(username):
-                if validate_password(password):
-                    if get_access_token(st.session_state["user_info"]["email"], password)["status"]: #토큰은 받지 않지만 email, password 유효성 검증
-                        valid=True
+            if submitted:
+                #form validate
+                valid = False
+                if validate_username(username):
+                    if validate_password(password):
+                        if get_access_token(st.session_state["user_info"]["email"], password)["status"]: #토큰은 받지 않지만 email, password 유효성 검증
+                            valid=True
+                        else:
+                            myprofile_info_placeholder.error("비밀번호를 확인하세요")
                     else:
-                        myprofile_info_placeholder.error("비밀번호를 확인하세요")
+                        password_valid_placeholder.markdown(":red[비밀번호를 4자리 이상 입력하세요]")
                 else:
-                    password_valid_placeholder.markdown(":red[비밀번호를 4자리 이상 입력하세요]")
-            else:
-                username_valid_placeholder.markdown(":red[사용자명을 4자리 이상 입력하세요]")
+                    username_valid_placeholder.markdown(":red[사용자명을 4자리 이상 입력하세요]")
 
-            if valid == True:
-                open_change_myprofile_modal(token_type=st.session_state["token_type"],
-                                            access_token=st.session_state["access_token"],
-                                            email=st.session_state["user_info"]["email"],
-                                            password=password,
-                                            username=username)
+                if valid == True:
+                    open_change_myprofile_modal(token_type=st.session_state["token_type"],
+                                                access_token=st.session_state["access_token"],
+                                                email=st.session_state["user_info"]["email"],
+                                                password=password,
+                                                username=username)
 
 
 

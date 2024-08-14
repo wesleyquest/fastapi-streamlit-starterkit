@@ -35,7 +35,7 @@ make_sidebar(st.session_state["auth_status"], st.session_state["user_info"])
 style_global()
 
 #main
-col1, col2, col3 = st.columns((1,8,1), gap="large")
+col1, col2, col3 = st.columns((1,8,1), gap="small")
 with col2:
     st.markdown("")
     st.subheader("🏠 개요", anchor=False)

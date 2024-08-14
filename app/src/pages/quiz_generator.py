@@ -183,15 +183,15 @@ def reset_conversation():
   ##st.session_state.chat_history = None
 
 #main
-col1, col2, col3 = st.columns((1,8,1), gap="large")
+
+col1, col2, col3 = st.columns((1,8,1), gap="small")
 with col2:
     st.markdown("")
     st.subheader("🚀 한국어 퀴즈 생성", anchor=False)
     st.markdown("""<div style="height:0.5px;border:none;color:#D3D3D3;background-color:#D3D3D3;" /> """, unsafe_allow_html=True)
     if st.session_state["key_status"]!=True:
-        st.info("""👇 OpenAI API KEY를 입력하세요""")
-    st.markdown("")
-    col1, col2, col3 = st.columns((1,1,1), gap="large")
+        st.info("""👇&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OpenAI API KEY를 입력하세요""")
+    col1, col2, col3 = st.columns((1,1,1), gap="small")
     with col1:
         key_placeholder = st.container()
         if not st.session_state["key_status"]==True:
