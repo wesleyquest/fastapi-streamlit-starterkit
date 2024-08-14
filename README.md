@@ -1,15 +1,13 @@
 # fastapi-streamlit-starterkit
-### version
+#### version
 v0.8.1
-
-### env info
-python 3.11.9
-
-### backend
+#### api (FastAPI)
 python 3.11.9
 fastapi==0.111.1
-
-### frontend
+#### dashboard (Streamlit)
 python 3.11.9
 streamlit==1.37.0
+#### how to use
+1. create .env in main folder
+2. docker compose up 
 

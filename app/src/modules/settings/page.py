@@ -61,9 +61,10 @@ def make_sidebar(auth_status, user_info):
                     #st.image("/app/src/images/profile_sample.png")
                 with col3:
                     #st.markdown("<div style='text-align: center;'> 🐱 </div>", unsafe_allow_html=True)
-                    if user_info["username"]:
+                    if "username" in user_info:
                         st.markdown(f"""<div> {user_info["username"]} </div>""", unsafe_allow_html=True)
-                    st.markdown(f"""<div style='color: grey;'> {user_info["email"]} </div>""", unsafe_allow_html=True)  
+                    if "email" in user_info:
+                        st.markdown(f"""<div style='color: grey;'> {user_info["email"]} </div>""", unsafe_allow_html=True)  
                 #st.markdown("")
                 col1, col2, col3, col4 = st.columns((1,4,4,1), gap="small")
                 with col2:

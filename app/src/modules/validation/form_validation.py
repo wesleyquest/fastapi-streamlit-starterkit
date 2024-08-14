@@ -44,7 +44,7 @@ def validate_password_re(data, password):
     return False
 
 def validate_text(data):
-    exp = re.compile('.{100,}')
+    exp = re.compile('.{10,}')
 
     #validation
     val = exp.match(data)

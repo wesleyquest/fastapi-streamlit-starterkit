@@ -1,5 +1,4 @@
 import streamlit as st
-from openai import OpenAI
 import time
 
 from modules.settings.page import set_page_config, make_sidebar
@@ -122,13 +121,12 @@ def open_settings_modal():
                     else:
                         tog_content_valid_placeholder.markdown(":red[퀴즈 콘텐츠를 1개 이상 선택하세요]")
                 else:
-                    document_valid_placeholder.markdown(":red[퀴즈를 생성할 문서를 입력하세요 (100자 이상)]")
+                    document_valid_placeholder.markdown(":red[퀴즈를 생성할 문서를 입력하세요 (10자 이상)]")
 
                 if valid:
                     #initialization
                     st.session_state["quiz"] = {}
                     st.session_state["quiz"]["input"] = {}
-                    st.session_state["quiz"]["output"] = {}
                     #document
                     print(document)
                     st.session_state["quiz"]["input"]["document"] = document
@@ -161,8 +159,8 @@ def open_settings_modal():
                     print(number)
                     st.session_state["quiz"]["input"]["number"] = number
                     with st.spinner('퀴즈를 생성 중입니다. 잠시만 기다려 주세요...'):
-                        time.sleep(2)
-                        st.session_state["quiz"]["output"] = get_quiz(
+                        time.sleep(1)
+                        quiz_output = get_quiz(
                             token_type = st.session_state["token_type"], 
                             access_token = st.session_state["access_token"],
                             openai_api_key = st.session_state["openai_api_key"],
@@ -172,7 +170,7 @@ def open_settings_modal():
                             number = st.session_state["quiz"]["input"]["number"]
                         )
                         #st.session_state["quiz_messages"].append({"role": "assistant", "content": st.session_state["quiz"]})
-                        st.session_state["quiz_messages"].append({"role": "assistant", "content": st.session_state["quiz"]["output"]["results"]})
+                        st.session_state["quiz_messages"].append({"role": "assistant", "content": quiz_output["results"]})
                         st.rerun()
 
 
@@ -183,7 +181,6 @@ def reset_conversation():
   ##st.session_state.chat_history = None
 
 #main
-
 col1, col2, col3 = st.columns((1,8,1), gap="small")
 with col2:
     st.markdown("")
@@ -222,3 +219,5 @@ with col2:
             #반대 순서로 보기('reversed')
             for msg in reversed(st.session_state["quiz_messages"]):
                 st.chat_message(msg["role"]).write(msg["content"])
+
+

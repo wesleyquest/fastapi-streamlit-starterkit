@@ -3,7 +3,7 @@ from langchain.chat_models import ChatOpenAI
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import load_prompt
-from fewshot import sample_fewshot
+from src.quiz.utils.fewshot import sample_fewshot
 
 
 async def generate_gpt4o_quiz(
@@ -16,7 +16,7 @@ async def generate_gpt4o_quiz(
     llm = ChatOpenAI(model_name = "gpt-4o", streaming=True, callbacks=[StreamingStdOutCallbackHandler()],
                     temperature = 0,
                     openai_api_key= openai_api_key)
-    prompt = load_prompt(os.path.join('./prompt', 'quiz_generator.yaml'))
+    prompt = load_prompt(os.path.join('/app/src/quiz/utils/prompt', 'quiz_generator.yaml'))
     topic = document.split('\n')[0]
     reference = '\n'.join(document.split('\n')[1:])
     quiz_content_list = {'vocabulary_focused':'create quizzes based on words',

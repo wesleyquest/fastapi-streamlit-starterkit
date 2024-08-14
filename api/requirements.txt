@@ -1,3 +1,4 @@
+#python 3.11.9
 fastapi==0.111.1
 gunicorn
 pydantic-settings
@@ -8,5 +9,8 @@ asyncpg
 passlib
 python-jose
 emails
-random
+openai
 langchain
+langchain_community
+
+
