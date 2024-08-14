@@ -1,6 +1,5 @@
 import streamlit as st
 
-
 #style
 def style_global():
     st.markdown("""
@@ -25,7 +24,22 @@ def style_global():
             padding-left: 5rem;
             padding-right: 5rem;
         }
-        </style>""", unsafe_allow_html=True)
+        </style>
+        """, unsafe_allow_html=True)
 
+    st.markdown("""
+        <style>
+        div.st-emotion-cache {
+            background-color: #e5e5f7;
+        }
+        </style>
+        """, unsafe_allow_html=True)
 
-
+   
+#    st.markdown("""
+#        <style>
+#        [data-testid="stVerticalBlockBorderWrapper"]{
+#        background-color: #e5e5f7;
+#        }
+#        </style>
+#        """, unsafe_allow_html=True)
