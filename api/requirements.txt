@@ -8,3 +8,5 @@ asyncpg
 passlib
 python-jose
 emails
+random
+langchain
