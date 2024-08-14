@@ -17,31 +17,25 @@ def get_quiz(
         quiz_type,
         number
 ):
-    try:
-        response = requests.post(
-            url=f"http://{API_SERVER}:{API_PORT}{API_V1_STR}/quiz/generation",
-            headers = {'Authorization': f'{token_type} {access_token}'},
-            json={
-                "openai_api_key": openai_api_key,
-                "document": document,
-                "quiz_content": quiz_content,
-                "quiz_type": quiz_type,
-                "number": number
-            },
-            timeout=5
-        )
-        
-        data = response.json()
-        if response.status_code == 200:    
-            data["status"] = True
-        else:
-            data["status"] = False
-            data["results"] = "요청을 처리할 수 없습니다. 다시 시도해 주세요."
-        return data
+    response = requests.post(
+        url=f"http://{API_SERVER}:{API_PORT}{API_V1_STR}/quiz/generation",
+        headers = {'Authorization': f'{token_type} {access_token}'},
+        json={
+            "openai_api_key": openai_api_key,
+            "document": document,
+            "quiz_content": quiz_content,
+            "quiz_type": quiz_type,
+            "number": number
+        },
+        timeout=60
+    )
+    
+    data = response.json()
+    if response.status_code == 200:    
+        data["status"] = True
+    else:
+        data["status"] = False
+        data["results"] = "요청을 처리할 수 없습니다. 다시 시도해 주세요."
+    return data
 
-    except:
-        return {
-            "status": False,
-            "results": "요청을 처리할 수 없습니다. 다시 시도해 주세요."
-        }
 

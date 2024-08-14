@@ -1,3 +1,4 @@
+#python 3.11.9
 streamlit==1.37.0
 openai
 st-pages
