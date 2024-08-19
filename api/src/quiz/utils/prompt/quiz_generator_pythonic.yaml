@@ -6,7 +6,7 @@ template: |
     """Your goal is to create a well crafted set of quizzes about the "topic" in the format of "quiz_content" and "quiz_type" with "reference".
     The purpose of the quiz is to assess learners' understanding of how to use "topic".
     Return the result as if the class `QuizzesGenerator` was executed to produce the quizzes.
-    You only return the result.
+    You only return the result and result2.
 
     Parameters:
       topic (str): topic of quizzes to create
@@ -39,42 +39,51 @@ template: |
       if len(set_type)>= self.number:
         set = random.sample(set_type,k=self.number)
       else:
-        set = set_type + random.sample(set_type,k=self.number-len(set_type))
-      set = random.shuffle(set)
+        for _ in range(self.number//len(set_type)):
+          set = set_type
+        set += random.sample(set_type,k=self.number-len(set_type))
+      random.shuffle(set)
       quizzes = []
       for content, type in set:
-          quiz{{
+          quiz:
             'type': [cotent, type]
-            'quiz': f"Sample quiz about self.topic, self.reference, content and type",
-            'answer': "Sample answer",
-            'explain': "Sample explanation",
-            'sentence': "Three sample sentence",
-            'dialog': "Sample dialog"
-          }}
+            'quiz': f"generated quiz about self.topic, self.reference, content and type",
+            'answer': "generated answer",
+            'explain': "generated explanation",
+            'sentence': "generated Three sample sentence",
+            'dialog': "generated dialog"          
           quizzes.append(quiz)
       return quizzes
 
     #make quiz format function
     def generate_quizzes(self):
-      type='🚀 Type\n'
-      quiz='🚀 Quiz\n'
-      answer='🚀 Answer\n'
-      explain='🚀 Explain\n'
-      sentence='🚀 Sentence\n'
-      dialog='🚀 Dialog\n'
+      type="🚀 Type" + "\n"
+      quiz="🚀 Quiz" + "\n"
+      answer="🚀 Answer" + "\n"
+      explain="🚀 Explain" + "\n"
+      sentence="🚀 Sentence" + "\n"
+      dialog="🚀 Dialog" + "\n"
 
       quizzes_set = self.create_quizzes()
 
       for idx, quiz_set in enumerate(quizzes_set):
-        type += '🔆 Quiz idx+1. ' + quiz_set['type'] + "\n"
-        quiz += '🔆 Quiz idx+1. ' + quiz_set['quiz'] + "\n"
-        answer += '🔆 Quiz idx+1. ' + quiz_set['answer'] + "\n"
-        explain += '🔆 Quiz idx+1. ' + quiz_set['explain'] + "\n"
-        sentence += '🔆 Quiz idx+1. ' + quiz_set['sentence'] + "\n"
-        dialog += '🔆 Quiz idx+1. ' + quiz_set['dialog'] + "\n"
+        type += "🔆 Quiz idx+1. " + quiz_set['type'] + "\n"
+        quiz += "🔆 Quiz idx+1. " + quiz_set['quiz'] + "\n"
+        answer += "🔆 Quiz idx+1. " + quiz_set['answer'] + "\n"
+        explain += "🔆 Quiz idx+1. " + quiz_set['explain'] + "\n"
+        sentence += "🔆 Quiz idx+1. " + quiz_set['sentence'] + "\n"
+        dialog += "🔆 Quiz idx+1. " + quiz_set['dialog'] + "\n"
       
-      quiz_set = type + "\n"quiz + "\n"+answer + "\n"+explain + "\n"+sentence + "\n"+dialog
+      quiz_set = type + "\n"+quiz + "\n"+answer + "\n"+explain + "\n"+sentence + "\n"+dialog
       return quiz_set
+    
+    def translate_quizzes(self, language):
+      '''
+      Translate all parts written in English into the specified (language).
+      '''
+      quizzes = self.generate_quizzes()
+      return translate_english_to_language(quizzes, language)
 
   Quizzes_Generator = QuizzesGenerator({topic}, {reference}, {quiz_content}, {quiz_type},{number})
   result = Quizzes_Generator.generate_quizzes()
+  result2 = Quizzes_Generator.translate_quizzes(Japanese)
