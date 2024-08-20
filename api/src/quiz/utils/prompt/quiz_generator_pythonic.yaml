@@ -6,7 +6,7 @@ template: |
     """Your goal is to create a well crafted set of quizzes about the "topic" in the format of "quiz_content" and "quiz_type" with "reference".
     The purpose of the quiz is to assess learners' understanding of how to use "topic".
     Return the result as if the class `QuizzesGenerator` was executed to produce the quizzes.
-    You only return the result and result2.
+    You only return the result.
 
     Parameters:
       topic (str): topic of quizzes to create
@@ -17,7 +17,7 @@ template: |
         cultural_information:create quizzes based on culture
         word_order:create quizzes based on the order of words
       quiz_type (list): list of possible types for the quizzes
-        multiple_choice:create multiple choice(4) quizzes
+        multiple_choice:create multiple choice quizzes with 4 answer options
         true_or_false:create true/false quizzes
         fill_in_the_blank:create fill-in-the-blank quizzes
       number (int): number of quizzes to create
@@ -36,11 +36,12 @@ template: |
     #make quiz function
     def create_quizzes(self):
       set_type = [(content,type) for content in self.quiz_content for type in self.quiz_type]
+      set = []
       if len(set_type)>= self.number:
         set = random.sample(set_type,k=self.number)
       else:
         for _ in range(self.number//len(set_type)):
-          set = set_type
+          set += set_type
         set += random.sample(set_type,k=self.number-len(set_type))
       random.shuffle(set)
       quizzes = []
@@ -76,14 +77,6 @@ template: |
       
       quiz_set = type + "\n"+quiz + "\n"+answer + "\n"+explain + "\n"+sentence + "\n"+dialog
       return quiz_set
-    
-    def translate_quizzes(self, language):
-      '''
-      Translate all parts written in English into the specified (language).
-      '''
-      quizzes = self.generate_quizzes()
-      return translate_english_to_language(quizzes, language)
 
   Quizzes_Generator = QuizzesGenerator({topic}, {reference}, {quiz_content}, {quiz_type},{number})
   result = Quizzes_Generator.generate_quizzes()
-  result2 = Quizzes_Generator.translate_quizzes(Japanese)

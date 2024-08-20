@@ -1,0 +1,5 @@
+_type: prompt
+input_variables:
+  ["content","number"]
+template: |
+  your goal is translate
