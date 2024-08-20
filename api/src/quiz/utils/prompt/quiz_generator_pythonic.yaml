@@ -1,0 +1,82 @@
+_type: prompt
+input_variables:
+  ["topic","reference","quiz_content","quiz_type","number"]
+template: |
+  class QuizzesGenerator:
+    """Your goal is to create a well crafted set of quizzes about the "topic" in the format of "quiz_content" and "quiz_type" with "reference".
+    The purpose of the quiz is to assess learners' understanding of how to use "topic".
+    Return the result as if the class `QuizzesGenerator` was executed to produce the quizzes.
+    You only return the result.
+
+    Parameters:
+      topic (str): topic of quizzes to create
+      reference (str): quizzes should be based on references
+      quiz_content (list): list of possible content types for the quizzes
+        vocabulary_focused:create quizzes based on words
+        sentence_example:create quizzes based on sentences
+        cultural_information:create quizzes based on culture
+        word_order:create quizzes based on the order of words
+      quiz_type (list): list of possible types for the quizzes
+        multiple_choice:create multiple choice quizzes with 4 answer options
+        true_or_false:create true/false quizzes
+        fill_in_the_blank:create fill-in-the-blank quizzes
+      number (int): number of quizzes to create
+
+    Returns: 
+      str: set of quizzes(quiz, answer, explain, sentence, dialog)
+    """
+    #파라미터 정의
+    def __init__(self, topic, reference, quiz_content, quiz_type, number):
+      self.topic = topic
+      self.reference = reference
+      self.quiz_content = quiz_content
+      self.quiz_type = quiz_type
+      self.number = number
+    
+    #make quiz function
+    def create_quizzes(self):
+      set_type = [(content,type) for content in self.quiz_content for type in self.quiz_type]
+      set = []
+      if len(set_type)>= self.number:
+        set = random.sample(set_type,k=self.number)
+      else:
+        for _ in range(self.number//len(set_type)):
+          set += set_type
+        set += random.sample(set_type,k=self.number-len(set_type))
+      random.shuffle(set)
+      quizzes = []
+      for content, type in set:
+          quiz:
+            'type': [cotent, type]
+            'quiz': f"generated quiz about self.topic, self.reference, content and type",
+            'answer': "generated answer",
+            'explain': "generated explanation",
+            'sentence': "generated Three sample sentence",
+            'dialog': "generated dialog"          
+          quizzes.append(quiz)
+      return quizzes
+
+    #make quiz format function
+    def generate_quizzes(self):
+      type="🚀 Type" + "\n"
+      quiz="🚀 Quiz" + "\n"
+      answer="🚀 Answer" + "\n"
+      explain="🚀 Explain" + "\n"
+      sentence="🚀 Sentence" + "\n"
+      dialog="🚀 Dialog" + "\n"
+
+      quizzes_set = self.create_quizzes()
+
+      for idx, quiz_set in enumerate(quizzes_set):
+        type += "🔆 Quiz idx+1. " + quiz_set['type'] + "\n"
+        quiz += "🔆 Quiz idx+1. " + quiz_set['quiz'] + "\n"
+        answer += "🔆 Quiz idx+1. " + quiz_set['answer'] + "\n"
+        explain += "🔆 Quiz idx+1. " + quiz_set['explain'] + "\n"
+        sentence += "🔆 Quiz idx+1. " + quiz_set['sentence'] + "\n"
+        dialog += "🔆 Quiz idx+1. " + quiz_set['dialog'] + "\n"
+      
+      quiz_set = type + "\n"+quiz + "\n"+answer + "\n"+explain + "\n"+sentence + "\n"+dialog
+      return quiz_set
+
+  Quizzes_Generator = QuizzesGenerator({topic}, {reference}, {quiz_content}, {quiz_type},{number})
+  result = Quizzes_Generator.generate_quizzes()
