@@ -5,7 +5,7 @@ toolbarMode="minimal"
 [theme]
 primaryColor="#3D52A0" #"#FF4B4B"
 backgroundColor="#FFFFFF" #"#F9F7F7"
-secondaryBackgroundColor="#F0F2F6" #"#F0F2F6"
+secondaryBackgroundColor="#F0F2F6" #"#F7F7F7" #"#F0F2F6"
 textColor="#31333F"
 font="sans serif"
 
