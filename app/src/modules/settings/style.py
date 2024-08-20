@@ -4,7 +4,9 @@ import streamlit as st
 def style_global():
     st.markdown("""
         <style>
-        div.stButton {text-align:center}
+        div.stButton {
+                text-align:center;
+            }
         </style>""", unsafe_allow_html=True)
 
     st.markdown("""
@@ -27,19 +29,15 @@ def style_global():
         </style>
         """, unsafe_allow_html=True)
 
-    st.markdown("""
+    st.markdown(
+        """
         <style>
-        div.st-emotion-cache {
-            background-color: #e5e5f7;
-        }
+            .custom-font-1 {
+                font-size:16px;
+                font-weight: bold;
+            }
         </style>
-        """, unsafe_allow_html=True)
+        """,
+        unsafe_allow_html=True,
+    )
 
-   
-#    st.markdown("""
-#        <style>
-#        [data-testid="stVerticalBlockBorderWrapper"]{
-#        background-color: #e5e5f7;
-#        }
-#        </style>
-#        """, unsafe_allow_html=True)

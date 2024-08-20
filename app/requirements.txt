@@ -1,5 +1,6 @@
 #python 3.11.9
 streamlit==1.37.0
+streamlit-extras
 openai
 st-pages
 python-dotenv
