@@ -187,86 +187,118 @@ def reset_conversation():
 username = st.session_state["user_info"]["username"]
 st.markdown("")
 
-col1, col2 = st.columns((2,8), gap="small")
+col1, col2 = st.columns((3,1), gap="small")
+
 with col1:
-    from streamlit_extras.stylable_container import stylable_container
-    with stylable_container(
-        key="quiz_chat",
-        css_styles="""{
-        border: 1px solid rgba(49, 51, 63, 0.2);
-        border-radius: 0.5rem;
-        padding: calc(1em - 1px);
-        background-color: #F0F2F6;
-        button {
-                background-color: none;
-            }
-        }
-        """
-    ):
-        st.markdown("")
+    with st.container(border=True, height=450):
+        if "quiz_messages" not in st.session_state:
+            st.session_state["quiz_messages"] = [{"role": "assistant", "content": f"안녕하세요 {username} 님 !  \n '퀴즈 생성' 버튼을 클릭하여 퀴즈를 생성해 주세요!"}]
+        
+        if st.session_state["quiz_messages"]:
+
+            #반대 순서로 보기('reversed')
+            for idx, msg in enumerate(st.session_state["quiz_messages"]):
+                # with st.expander("번역 보기"):
+                #     trans1, trans2 = st.columns((1,1))
+                #     with trans1:
+                #         language = st.selectbox('', ["Vietnamese", "Japanese", "Chinese"], key=f"language_select{idx}",label_visibility="collapsed")
+                #     with trans2:
+                #         translate_button =  st.button(f"번역 (메시지)", key=f"translate{idx}", use_container_width=True)
+                #     if translate_button:
+                #         with st.spinner('퀴즈를 번역 중입니다. 잠시만 기다려 주세요...'):
+                #             time.sleep(1)
+                #             translated_quiz = translate_quiz(
+                #                 token_type = st.session_state["token_type"], 
+                #                 access_token = st.session_state["access_token"],
+                #                 openai_api_key = st.session_state["openai_api_key"],
+                #                 quiz = msg["content"],
+                #                 language = language
+                #             )
+                            # st.session_state["quiz_messages"].append({"role": "assistant", "content": translated_quiz["results"]})
+                            # st.rerun()
+                #            st.write(translated_quiz["results"])
+                with st.chat_message(name=msg["role"], avatar="/app/src/images/bot_icon_2.jpg"): #avatar="https://raw.githubusercontent.com/dataprofessor/streamlit-chat-avatar/master/bot-icon.png"
+                    st.markdown(msg["content"])
+
+    but1, but2, but3 = st.columns((1,1,1), gap="small")
+    with but1:
         key_placeholder = st.container()
-        quiz_gen_placeholder = st.container()
-        quiz_tran_placeholder = st.container()
-        quiz_del_placeholder = st.container()
         if not st.session_state["key_status"]==True:
             if key_placeholder.button("OpenAI API KEY", type="primary", use_container_width=True, key="openai_api_key_button"):
                 open_openaiapikey_modal()
         else:
             if key_placeholder.button("OpenAI API KEY", type="secondary", use_container_width=True, key="openai_api_key_2_button"):
                 open_openaiapikey_modal(old_key=st.session_state["openai_api_key"])
-
+    with but2:
+        quiz_gen_placeholder = st.container()
         if not st.session_state["key_status"]==True:
             quiz_gen_placeholder.button("퀴즈 생성", type="primary", disabled=True, use_container_width=True)
         else:
             if quiz_gen_placeholder.button("퀴즈 생성", type="primary", use_container_width=True):
                 open_settings_modal()
-
-        quiz_tran_placeholder.button("대화 번역", use_container_width=True)
-
+    with but3:
+        quiz_del_placeholder = st.container()
         quiz_del_placeholder.button('대화 삭제', on_click=reset_conversation, use_container_width=True)
+    
+      
 
-        st.markdown("")
+    st.markdown("")
 
 with col2:
-    with st.container(border=True, height=650):
-        if "quiz_messages" not in st.session_state:
-<<<<<<< HEAD
-            st.session_state["quiz_messages"] = [{"role": "assistant", "content": f"안녕하세요 {username} 님 !  \n '퀴즈 생성' 버튼을 클릭하여 퀴즈를 생성해 주세요!"}]
-        
-        if st.session_state["quiz_messages"]:
+    # from streamlit_extras.stylable_container import stylable_container
+    # with stylable_container(
+    #     key="quiz_chat",
+    #     css_styles="""{
+    #     border: 1px solid rgba(49, 51, 63, 0.2);
+    #     border-radius: 0.5rem;
+    #     padding: calc(1em - 1px);
+    #     background-color: #F0F2F6;
+    #     button {
+    #             background-color: none;
+    #         }
+    #     }
+    #     """
+    # ):
+    
+    with st.container(height=450):
+        with st.popover('번역 언어',use_container_width=True):
+            st.selectbox('From',['English'])
+            language = st.selectbox('To',["Vietnamese", "Japanese", "Chinese"])
+        messages = st.container(height=350)
+    if prompt := st.chat_input("Say something"):
+        messages.chat_message("user").write(prompt)
+        translated_quiz = translate_quiz(
+            token_type = st.session_state["token_type"], 
+            access_token = st.session_state["access_token"],
+            openai_api_key = st.session_state["openai_api_key"],
+            quiz = prompt,
+            language = language)
+        messages.chat_message("assistant").write(translated_quiz["results"])
 
-            #반대 순서로 보기('reversed')
-            for idx, msg in enumerate(reversed(st.session_state["quiz_messages"])):
-                with st.expander("번역 보기"):
-                    trans1, trans2 = st.columns((1,1))
-                    with trans1:
-                        language = st.selectbox('', ["Vietnamese", "Japanese", "Chinese"], key=f"language_select{idx}",label_visibility="collapsed")
-                    with trans2:
-                        translate_button =  st.button(f"번역 (메시지)", key=f"translate{idx}", use_container_width=True)
-                    if translate_button:
-                        with st.spinner('퀴즈를 번역 중입니다. 잠시만 기다려 주세요...'):
-                            time.sleep(1)
-                            translated_quiz = translate_quiz(
-                                token_type = st.session_state["token_type"], 
-                                access_token = st.session_state["access_token"],
-                                openai_api_key = st.session_state["openai_api_key"],
-                                quiz = msg["content"],
-                                language = language
-                            )
-                            # st.session_state["quiz_messages"].append({"role": "assistant", "content": translated_quiz["results"]})
-                            # st.rerun()
-                            st.write(translated_quiz["results"])
-                with st.chat_message(name=msg["role"], avatar="/app/src/images/bot_icon_2.jpg"): #avatar="https://raw.githubusercontent.com/dataprofessor/streamlit-chat-avatar/master/bot-icon.png"
-                    st.markdown(msg["content"])
+    # quiz_tran_placeholder = st.container()
+    # quiz_tran_placeholder.button("대화 번역", use_container_width=True)
+        # key_placeholder = st.container()
+        # quiz_gen_placeholder = st.container()
+        # quiz_tran_placeholder = st.container()
+        # quiz_del_placeholder = st.container()
+        # if not st.session_state["key_status"]==True:
+        #     if key_placeholder.button("OpenAI API KEY", type="primary", use_container_width=True, key="openai_api_key_button"):
+        #         open_openaiapikey_modal()
+        # else:
+        #     if key_placeholder.button("OpenAI API KEY", type="secondary", use_container_width=True, key="openai_api_key_2_button"):
+        #         open_openaiapikey_modal(old_key=st.session_state["openai_api_key"])
 
-=======
-                st.session_state["quiz_messages"] = [{"role": "assistant", "content": f"안녕하세요 {username} 님! \n 1. OpenAI API KEY를 입력해 주세요 \n 2. 퀴즈 생성 버튼을 활용해 퀴즈를 생성해 주세요"}]
+        # if not st.session_state["key_status"]==True:
+        #     quiz_gen_placeholder.button("퀴즈 생성", type="primary", disabled=True, use_container_width=True)
+        # else:
+        #     if quiz_gen_placeholder.button("퀴즈 생성", type="primary", use_container_width=True):
+        #         open_settings_modal()
 
-        if st.session_state["quiz_messages"]:
-            for msg in st.session_state["quiz_messages"]:
-                with st.chat_message(name=msg["role"], avatar="/app/src/images/bot_icon_2.jpg"): #avatar="https://raw.githubusercontent.com/dataprofessor/streamlit-chat-avatar/master/bot-icon.png"
-                    st.markdown(msg["content"])
->>>>>>> main
+        # quiz_tran_placeholder.button("대화 번역", use_container_width=True)
+
+        # quiz_del_placeholder.button('대화 삭제', on_click=reset_conversation, use_container_width=True)
+
+        # st.markdown("")
 
 
 
