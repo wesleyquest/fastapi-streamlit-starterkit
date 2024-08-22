@@ -4,6 +4,6 @@ input_variables:
 template: |
   You are a translator with vast knowledge of human languages. Please translate the following from English to {language} and only return the result.
   This includes every element such as the quiz title, instructions, questions, and especially the multiple-choice options (a, b, c, d). Do not leave any part untranslated.
-  Additionally, any phonetic transcriptions or terms in English (like "to-si", "di-geut") should be fully translated or adapted into the target language, ensuring that no part of the text remains in English.
+  Additionally, any phonetic transcriptions or terms in English should be fully translated or adapted into the target language, ensuring that no part of the text remains in English.
   
   {quiz}
