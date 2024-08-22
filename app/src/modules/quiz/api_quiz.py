@@ -38,4 +38,30 @@ def get_quiz(
         data["results"] = "요청을 처리할 수 없습니다. 다시 시도해 주세요."
     return data
 
+def translate_quiz(
+        token_type,
+        access_token,
+        openai_api_key,
+        quiz,
+        language
+):
+    response = requests.post(
+        url=f"http://{API_SERVER}:{API_PORT}{API_V1_STR}/quiz/translation",
+        headers = {'Authorization': f'{token_type} {access_token}'},
+        json={
+            "openai_api_key": openai_api_key,
+            "quiz": quiz,
+            "language": language,
+        },
+        timeout=60
+    )
+    
+    data = response.json()
+    if response.status_code == 200:    
+        data["status"] = True
+    else:
+        data["status"] = False
+        data["results"] = "요청을 처리할 수 없습니다. 다시 시도해 주세요."
+    return data
+
 

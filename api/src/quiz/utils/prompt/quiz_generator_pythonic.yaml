@@ -58,22 +58,22 @@ template: |
 
     #make quiz format function
     def generate_quizzes(self):
-      type="🚀 Type" + "\n"
-      quiz="🚀 Quiz" + "\n"
-      answer="🚀 Answer" + "\n"
-      explain="🚀 Explain" + "\n"
-      sentence="🚀 Sentence" + "\n"
-      dialog="🚀 Dialog" + "\n"
+      type="🚀 Type" + "\n\n"
+      quiz="🚀 Quiz" + "\n\n"
+      answer="🚀 Answer" + "\n\n"
+      explain="🚀 Explain" + "\n\n"
+      sentence="🚀 Sentence" + "\n\n"
+      dialog="🚀 Dialog" + "\n\n"
 
       quizzes_set = self.create_quizzes()
 
       for idx, quiz_set in enumerate(quizzes_set):
-        type += "🔆 Quiz idx+1. " + quiz_set['type'] + "\n"
-        quiz += "🔆 Quiz idx+1. " + quiz_set['quiz'] + "\n"
-        answer += "🔆 Quiz idx+1. " + quiz_set['answer'] + "\n"
-        explain += "🔆 Quiz idx+1. " + quiz_set['explain'] + "\n"
-        sentence += "🔆 Quiz idx+1. " + quiz_set['sentence'] + "\n"
-        dialog += "🔆 Quiz idx+1. " + quiz_set['dialog'] + "\n"
+        type += "🔆 Quiz idx+1. " + quiz_set['type'] + "\n\n"
+        quiz += "🔆 Quiz idx+1. " + quiz_set['quiz'] + "\n\n"
+        answer += "🔆 Quiz idx+1. " + quiz_set['answer'] + "\n\n"
+        explain += "🔆 Quiz idx+1. " + quiz_set['explain'] + "\n\n"
+        sentence += "🔆 Quiz idx+1. " + quiz_set['sentence'] + "\n\n"
+        dialog += "🔆 Quiz idx+1. " + quiz_set['dialog'] + "\n\n"
       
       quiz_set = type + "\n"+quiz + "\n"+answer + "\n"+explain + "\n"+sentence + "\n"+dialog
       return quiz_set

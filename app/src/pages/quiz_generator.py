@@ -7,7 +7,7 @@ from modules.auth.api_auth import validate_token, get_user_info
 from modules.security.encryption import str_to_asterisk
 from modules.validation.key_validation import validate_openai_api_key
 from modules.validation.form_validation import validate_text
-from modules.quiz.api_quiz import get_quiz
+from modules.quiz.api_quiz import get_quiz, translate_quiz
 
 #var
 if "auth_status" not in st.session_state:
@@ -214,10 +214,32 @@ with col2:
 
         if "quiz_messages" not in st.session_state:
             st.session_state["quiz_messages"] = [{"role": "assistant", "content": f"안녕하세요 {username} 님 !  \n '퀴즈 생성' 버튼을 클릭하여 퀴즈를 생성해 주세요!"}]
-
+        
         if st.session_state["quiz_messages"]:
+
             #반대 순서로 보기('reversed')
-            for msg in reversed(st.session_state["quiz_messages"]):
+            for idx, msg in enumerate(reversed(st.session_state["quiz_messages"])):
+                with st.expander("번역 보기"):
+                    trans1, trans2 = st.columns((1,1))
+                    with trans1:
+                        language = st.selectbox('', ["Vietnamese", "Japanese", "Chinese"], key=f"language_select{idx}",label_visibility="collapsed")
+                    with trans2:
+                        translate_button =  st.button(f"번역 (메시지)", key=f"translate{idx}", use_container_width=True)
+                    if translate_button:
+                        with st.spinner('퀴즈를 번역 중입니다. 잠시만 기다려 주세요...'):
+                            time.sleep(1)
+                            translated_quiz = translate_quiz(
+                                token_type = st.session_state["token_type"], 
+                                access_token = st.session_state["access_token"],
+                                openai_api_key = st.session_state["openai_api_key"],
+                                quiz = msg["content"],
+                                language = language
+                            )
+                            # st.session_state["quiz_messages"].append({"role": "assistant", "content": translated_quiz["results"]})
+                            # st.rerun()
+                            st.write(translated_quiz["results"])
                 st.chat_message(msg["role"]).write(msg["content"])
+
+
 
 
