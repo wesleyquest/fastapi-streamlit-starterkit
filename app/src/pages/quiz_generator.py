@@ -160,6 +160,7 @@ def open_settings_modal():
                     st.session_state["quiz"]["input"]["number"] = number
                     with st.spinner('퀴즈를 생성 중입니다. 잠시만 기다려 주세요...'):
                         time.sleep(1)
+                        """
                         quiz_output = get_quiz(
                             token_type = st.session_state["token_type"], 
                             access_token = st.session_state["access_token"],
@@ -171,8 +172,10 @@ def open_settings_modal():
                         )
                         #st.session_state["quiz_messages"].append({"role": "assistant", "content": st.session_state["quiz"]})
                         st.session_state["quiz_messages"].append({"role": "assistant", "content": quiz_output["results"]})
-                        st.rerun()
+                        """
+                        st.session_state["quiz_messages"].append({"role": "assistant", "content": "샘플입니다."})
 
+                        st.rerun()
 
 #func
 def reset_conversation():
@@ -181,38 +184,53 @@ def reset_conversation():
   ##st.session_state.chat_history = None
 
 #main
-col1, col2, col3 = st.columns((1,8,1), gap="small")
-with col2:
-    st.markdown("")
-    st.subheader("🚀 한국어 퀴즈 생성", anchor=False)
-    st.markdown("""<div style="height:0.5px;border:none;color:#D3D3D3;background-color:#D3D3D3;" /> """, unsafe_allow_html=True)
-    if st.session_state["key_status"]!=True:
-        st.info("""👇&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; OpenAI API KEY를 입력하세요""")
-    col1, col2, col3 = st.columns((1,1,1), gap="small")
-    with col1:
+username = st.session_state["user_info"]["username"]
+st.markdown("")
+
+col1, col2 = st.columns((2,8), gap="small")
+with col1:
+    from streamlit_extras.stylable_container import stylable_container
+    with stylable_container(
+        key="quiz_chat",
+        css_styles="""{
+        border: 1px solid rgba(49, 51, 63, 0.2);
+        border-radius: 0.5rem;
+        padding: calc(1em - 1px);
+        background-color: #F0F2F6;
+        button {
+                background-color: none;
+            }
+        }
+        """
+    ):
+        st.markdown("")
         key_placeholder = st.container()
+        quiz_gen_placeholder = st.container()
+        quiz_tran_placeholder = st.container()
+        quiz_del_placeholder = st.container()
         if not st.session_state["key_status"]==True:
-            if key_placeholder.button("OpenAI API KEY 입력", type="primary", use_container_width=True, key="openai_api_key_button"):
+            if key_placeholder.button("OpenAI API KEY", type="primary", use_container_width=True, key="openai_api_key_button"):
                 open_openaiapikey_modal()
         else:
-            if key_placeholder.button("OpenAI API KEY 수정", type="secondary", use_container_width=True, key="openai_api_key_2_button"):
+            if key_placeholder.button("OpenAI API KEY", type="secondary", use_container_width=True, key="openai_api_key_2_button"):
                 open_openaiapikey_modal(old_key=st.session_state["openai_api_key"])
 
-    st.markdown("")
-    #quiz generator
-    if st.session_state["key_status"]==True:
-        openai_api_key_enc = str_to_asterisk(st.session_state["openai_api_key"])
-        st.toast(f"🟢 KEY : {openai_api_key_enc}")
-        username = st.session_state["user_info"]["username"]
-
-        with col2:
-            if st.button("퀴즈 생성", type="primary", use_container_width=True):
+        if not st.session_state["key_status"]==True:
+            quiz_gen_placeholder.button("퀴즈 생성", type="primary", disabled=True, use_container_width=True)
+        else:
+            if quiz_gen_placeholder.button("퀴즈 생성", type="primary", use_container_width=True):
                 open_settings_modal()
 
-        with col3:
-            st.button('퀴즈 삭제', on_click=reset_conversation, use_container_width=True)
+        quiz_tran_placeholder.button("대화 번역", use_container_width=True)
 
+        quiz_del_placeholder.button('대화 삭제', on_click=reset_conversation, use_container_width=True)
+
+        st.markdown("")
+
+with col2:
+    with st.container(border=True, height=650):
         if "quiz_messages" not in st.session_state:
+<<<<<<< HEAD
             st.session_state["quiz_messages"] = [{"role": "assistant", "content": f"안녕하세요 {username} 님 !  \n '퀴즈 생성' 버튼을 클릭하여 퀴즈를 생성해 주세요!"}]
         
         if st.session_state["quiz_messages"]:
@@ -238,8 +256,17 @@ with col2:
                             # st.session_state["quiz_messages"].append({"role": "assistant", "content": translated_quiz["results"]})
                             # st.rerun()
                             st.write(translated_quiz["results"])
-                st.chat_message(msg["role"]).write(msg["content"])
+                with st.chat_message(name=msg["role"], avatar="/app/src/images/bot_icon_2.jpg"): #avatar="https://raw.githubusercontent.com/dataprofessor/streamlit-chat-avatar/master/bot-icon.png"
+                    st.markdown(msg["content"])
 
+=======
+                st.session_state["quiz_messages"] = [{"role": "assistant", "content": f"안녕하세요 {username} 님! \n 1. OpenAI API KEY를 입력해 주세요 \n 2. 퀴즈 생성 버튼을 활용해 퀴즈를 생성해 주세요"}]
+
+        if st.session_state["quiz_messages"]:
+            for msg in st.session_state["quiz_messages"]:
+                with st.chat_message(name=msg["role"], avatar="/app/src/images/bot_icon_2.jpg"): #avatar="https://raw.githubusercontent.com/dataprofessor/streamlit-chat-avatar/master/bot-icon.png"
+                    st.markdown(msg["content"])
+>>>>>>> main
 
 
 

@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit_extras.stylable_container import stylable_container
 from st_pages import hide_pages
 from time import sleep
 from streamlit.runtime.scriptrunner import get_script_run_ctx
@@ -54,37 +55,46 @@ def make_sidebar(auth_status, user_info):
         #st.markdown("")
         #st.markdown("")
         if auth_status == True:
-            with st.container(border=False):
-                col1, col2, col3 = st.columns((1,2,7), gap="small")
-                with col2:
-                    st.markdown("<div style='text-align:center; font-size:35px;padding-bottom: 0.5rem;'>🐱</div>", unsafe_allow_html=True)
-                    #st.image("/app/src/images/profile_sample.png")
-                with col3:
-                    #st.markdown("<div style='text-align: center;'> 🐱 </div>", unsafe_allow_html=True)
-                    if "username" in user_info:
-                        st.markdown(f"""<div> {user_info["username"]} </div>""", unsafe_allow_html=True)
-                    if "email" in user_info:
-                        st.markdown(f"""<div style='color: grey;'> {user_info["email"]} </div>""", unsafe_allow_html=True)  
-                #st.markdown("")
-                col1, col2, col3, col4 = st.columns((1,4,4,1), gap="small")
-                with col2:
-                    if st.button("나의 정보", use_container_width=True):
-                        st.switch_page("pages/my_profile.py")
-                with col3:
-                    if st.button("로그 아웃", use_container_width=True):
-                        logout()
-
+            with stylable_container(
+                key="profile_popover",
+                css_styles="""
+                button {
+                    color:white;
+                    background-color:none;
+                    border-style:none;
+                    text-align:left;
+                }
+                """
+            ):
+                with st.popover(f""":gray[**{user_info["username"]}**]  
+                            :gray[{user_info["email"]}]""", use_container_width=True):
+                    if st.button(":material/account_circle:&nbsp;&nbsp;나의 정보 (My Profile)", use_container_width=True):
+                        profile_modal()
+                        #st.switch_page("pages/my_profile.py")     
+                    if st.button(":material/logout:&nbsp;&nbsp;로그 아웃 (Log Out)", use_container_width=True):
+                        logout()               
+            
             #st.markdown("")
-            st.markdown("""<div style="height:0.5px;border:none;color:#D3D3D3;background-color:#D3D3D3;" /> """, unsafe_allow_html=True)
-            with st.expander("**HOME**", expanded=True):
-                st.page_link("pages/hello.py", label="🏠&nbsp;&nbsp; 개요")
-            with st.expander("**APP**", expanded=True):
-                st.page_link("pages/quiz_generator.py", label="🚀&nbsp;&nbsp; 한국어 퀴즈 생성")
-                st.page_link("pages/gjf.py", label="🚀&nbsp;&nbsp; 경기도 데이터 분석")
-            with st.expander("**API Docs**", expanded=True):
-                st.page_link("pages/api_docs_auth.py", label="📑&nbsp;&nbsp; 로그인 API")
-                st.page_link("pages/api_docs_quiz.py", label="📑&nbsp;&nbsp; 한국어 퀴즈 생성 API")
-                st.page_link("pages/api_docs_user.py", label="📑&nbsp;&nbsp; 사용자 관리 API (관리자용)")
+            #st.markdown("""<div style="height:0.5px;border:none;color:#D3D3D3;background-color:#D3D3D3;" /> """, unsafe_allow_html=True)
+            with stylable_container(
+                key="menu_expander",
+                css_styles="""
+                [data-testid="stExpander"] details{
+                border-style:none;
+                }
+                """
+            ):
+                with st.expander("**HOME**", expanded=True):
+                    st.page_link("pages/hello.py", label="개요", icon=":material/home:")
+                with st.expander("**APP**", expanded=True):
+                    st.page_link("pages/quiz_generator.py", label="한국어 퀴즈 생성", icon=":material/space_dashboard:")
+                    st.page_link("pages/gjf.py", label="경기도 데이터 분석", icon=":material/space_dashboard:")
+                    st.page_link("pages/resource_monitoring.py", label="자원 모니터링 분석", icon=":material/space_dashboard:")
+                with st.expander("**API Docs**", expanded=True):
+                    st.page_link("pages/api_docs_auth.py", label="로그인 API", icon=":material/description:")
+                    st.page_link("pages/api_docs_quiz.py", label="한국어 퀴즈 생성 API", icon=":material/description:")
+                    st.page_link("pages/api_docs_user.py", label="사용자 관리 API (관리자용)", icon=":material/description:")
+
         elif not auth_status == True:
             st.page_link("main.py", label="로그인")
             st.page_link("pages/signup.py", label="회원가입")
@@ -98,3 +108,65 @@ def logout():
     st.session_state = {}
     st.switch_page("main.py")
 
+
+
+
+
+from modules.auth.api_auth import get_access_token, validate_token, update_my_profile, get_user_info
+from modules.validation.form_validation import validate_username, validate_password
+#modal
+@st.dialog(" ", width="small")
+def profile_modal():
+    st.markdown("""<div style="text-align:center;font-weight: bold;padding-bottom:5px;"> 나의 정보 </div>""", unsafe_allow_html=True)
+    my_profile_form_placeholder = st.container()
+    myprofile_info_placeholder = st.container()
+    with my_profile_form_placeholder.form("my_profile_form"):
+        email = st.text_input("이메일", value=st.session_state["user_info"]["email"], disabled=True)
+        st.markdown(" ")
+        username = st.text_input("사용자명", value=st.session_state["user_info"]["username"], max_chars=30)
+        username_valid_placeholder = st.container()
+        st.markdown(" ")
+        st.markdown(" ")
+        password = st.text_input("*변경하시려면 비밀번호를 입력하세요", placeholder="비밀번호를 입력하세요 (4자리 이상)", type="password", max_chars=30)
+        password_valid_placeholder = st.container()
+        st.markdown(" ")
+        submitted = st.form_submit_button("&nbsp;&nbsp;저&nbsp;&nbsp;장&nbsp;&nbsp;", type="primary", use_container_width=False)
+        if submitted:
+            #redirect
+            if not st.session_state["auth_status"]==True:
+                st.session_state = {}
+                st.switch_page("main.py")
+            st.session_state["token_status"] = validate_token(token_type=st.session_state["token_type"], access_token=st.session_state["access_token"])["status"]
+            if not st.session_state["token_status"]==True:
+                st.session_state = {}
+                st.switch_page("main.py")
+            #form validate
+            valid = False
+            if validate_username(username):
+                if validate_password(password):
+                    if get_access_token(st.session_state["user_info"]["email"], password)["status"]: #토큰은 받지 않지만 email, password 유효성 검증
+                        valid=True
+                    else:
+                        myprofile_info_placeholder.error("비밀번호를 다시 입력하세요")
+                else:
+                    password_valid_placeholder.markdown(":red[비밀번호를 4자리 이상 입력하세요]")
+            else:
+                username_valid_placeholder.markdown(":red[사용자명을 4자리 이상 입력하세요]")
+
+            if valid == True:
+                #api
+                data = update_my_profile(token_type = st.session_state["token_type"] ,
+                                            access_token = st.session_state["access_token"],
+                                            email = st.session_state["user_info"]["email"],
+                                            username = username,
+                                            password = password)
+                
+                if data["status"]:
+                    myprofile_info_placeholder.info("성공적으로 변경되었습니다")
+                    sleep(1)
+                    st.rerun()
+                else:
+                    myprofile_info_placeholder.error(data["detail"])
+    if st.button("&nbsp;&nbsp;닫&nbsp;&nbsp;기&nbsp;&nbsp;", type="secondary", use_container_width=False):
+        st.rerun()
+                        
