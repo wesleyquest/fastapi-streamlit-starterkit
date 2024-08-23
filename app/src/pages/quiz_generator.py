@@ -265,7 +265,7 @@ with col2:
             st.selectbox('From',['English'])
             language = st.selectbox('To',["Vietnamese", "Japanese", "Chinese"])
         messages = st.container(height=350)
-    if prompt := st.chat_input("Say something"):
+    if prompt := st.chat_input("번역할 문장을 입력해 주세요"):
         messages.chat_message("user").write(prompt)
         translated_quiz = translate_quiz(
             token_type = st.session_state["token_type"], 
