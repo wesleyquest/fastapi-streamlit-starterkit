@@ -48,17 +48,38 @@ async def generate_gpt4o_quiz(
     llm = ChatOpenAI(model_name = "gpt-4o", streaming=True, callbacks=[StreamingStdOutCallbackHandler()],
                     temperature = 0,
                     openai_api_key= openai_api_key)
-    prompt = load_prompt(os.path.join('/app/src/quiz/utils//prompt', 'quiz_generator_pythonic.yaml'))
+    prompt = load_prompt(os.path.join('/app/src/quiz/utils/prompt', 'quiz_generator_pythonic.yaml'))
     topic = document.split('\n')[0]
     reference = '\n'.join(document.split('\n')[1:])
 
     input_data = {"topic": topic,"reference": reference,"quiz_content":quiz_content,"quiz_type":quiz_type,"number":number}
 
-    rag_chain = (
+    chain = (
         prompt
         | llm
         | StrOutputParser()
     )
 
-    results = rag_chain.invoke(input_data)
+    results = chain.invoke(input_data)
     return results
+
+async def translate_gpt4o_quiz(
+        openai_api_key,
+        quiz,
+        language
+):
+    llm = ChatOpenAI(model_name = "gpt-4o", streaming=True, callbacks=[StreamingStdOutCallbackHandler()],
+                    temperature = 0,
+                    openai_api_key= openai_api_key)
+    prompt = load_prompt(os.path.join('/app/src/quiz/utils/prompt', 'quiz_translator.yaml'))
+    input_data = {"quiz": quiz,"language":language}
+    chain = (
+        prompt
+        | llm
+        | StrOutputParser()
+    )
+
+    results=chain.invoke(input_data)
+    return results
+    
+
