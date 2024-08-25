@@ -35,10 +35,7 @@ make_sidebar(st.session_state["auth_status"], st.session_state["user_info"])
 style_global()
 
 #main
-col1, col2, col3 = st.columns((1,8,1), gap="small")
-with col2:
-    st.markdown("")
-    st.subheader("🏠 개요", anchor=False)
-    st.markdown("""<div style="height:0.5px;border:none;color:#D3D3D3;background-color:#D3D3D3;" /> """, unsafe_allow_html=True)
+st.markdown("""<div style="font-size:26px;font-weight:bold;font-family:'Gothic A1';"> 매뉴얼 </div>""", unsafe_allow_html=True)
+st.markdown("""<div style="height:0.5px;border:none;color:#D3D3D3;background-color:#D3D3D3;" /> """, unsafe_allow_html=True)
 
 
