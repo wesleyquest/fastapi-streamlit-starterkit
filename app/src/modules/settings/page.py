@@ -135,14 +135,14 @@ def profile_modal():
     st.markdown("""<div style="text-align:center;font-weight:bold;padding-bottom:5px;"> 나의 정보 </div>""", unsafe_allow_html=True)
     my_profile_form_placeholder = st.container()
     myprofile_info_placeholder = st.container()
-    with my_profile_form_placeholder.form("my_profile_form"):
+    with my_profile_form_placeholder.form("my_profile_form_modal"):
         email = st.text_input("이메일", value=st.session_state["user_info"]["email"], disabled=True)
         st.markdown(" ")
         username = st.text_input("사용자명", value=st.session_state["user_info"]["username"], max_chars=30)
         username_valid_placeholder = st.container()
         st.markdown(" ")
         st.markdown(" ")
-        password = st.text_input("*변경하시려면 비밀번호를 입력하세요", placeholder="비밀번호를 입력하세요 (4자리 이상)", type="password", max_chars=30)
+        password = st.text_input("*변경하시려면 비밀번호를 입력하세요", placeholder="password", type="password", max_chars=30)
         password_valid_placeholder = st.container()
         st.markdown(" ")
         submitted = st.form_submit_button("&nbsp;&nbsp;저&nbsp;&nbsp;장&nbsp;&nbsp;", type="primary", use_container_width=False)
