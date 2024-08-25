@@ -1,0 +1,102 @@
+/* Font Korean : https://googlefonts.github.io/korean/ 
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Gothic+A1:100,400');
+*/
+/* GLOBAL FONT CHANGE */
+
+
+/* CUSTOM MARKDOWN CLASSES */
+.header_text {
+    font-size: 18px; 
+    font-family: 'Gothic A1';
+    color: #31333F;
+    font-weight: bold;
+    text-align: center;
+    line-height: 1;
+    padding-top: 1px;
+}
+
+.number_up {
+    font-size: 30px; 
+    font-family: 'Space Grotesk';
+    color: #e91e63cb; /*#f6f6f6*/
+    font-weight: 900;
+    text-align: center;
+    line-height: 1;
+}
+
+.number_down {
+    font-size: 30px; 
+    font-family: 'Space Grotesk';
+    color: #2962ffcb; /*#f6f6f6*/
+    font-weight: 900;
+    text-align: center;
+    line-height: 1;
+}
+
+.symbol_up {
+    font-size: 22px; 
+    font-family: 'Space Grotesk';
+    color: #e91e63cb; /*#f6f6f6*/
+    font-weight: 900;
+}
+
+.symbol_down {
+    font-size: 22px; 
+    font-family: 'Space Grotesk';
+    color: #2962ffcb; /*#f6f6f6*/
+    font-weight: 900;
+}
+
+.btc_text {
+    font-size: 20px; 
+    font-family: 'Space Grotesk';
+    color: #f7931a;
+    font-weight: bold;
+    text-align: left;
+    line-height: 1;
+    padding-top: 1px;
+}
+
+.eth_text {
+    font-size: 20px; 
+    font-family: 'Space Grotesk';
+    color: #a1a1a1;
+    font-weight: bold;
+    text-align: left;
+    line-height: 1;
+    padding-top: 1px;
+}
+
+.xmr_text {
+    font-size: 20px; 
+    font-family: 'Space Grotesk';
+    color: #ff6b08;
+    font-weight: bold;
+    text-align: left;
+    line-height: 1;
+    padding-top: 1px;
+}
+
+.sol_text {
+    font-size: 20px; 
+    font-family: 'Space Grotesk';
+    color: #807af4;
+    font-weight: bold;
+    text-align: left;
+    line-height: 1;
+    padding-top: 1px;
+}
+
+.xrp_text {
+    font-size: 20px; 
+    font-family: 'Space Grotesk';
+    color: #01acf1;
+    font-weight: bold;
+    text-align: left;
+    line-height: 1;
+    padding-top: 1px;
+}
+
+
+

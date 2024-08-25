@@ -37,6 +37,10 @@ set_page_config(auth_status=st.session_state["auth_status"],
 make_sidebar(st.session_state["auth_status"], st.session_state["user_info"])
 #style
 style_global()
+##############################################################################
+#custom style
+with open('/app/src/modules/quiz/style.css') as f:
+    st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html = True)
 
 #modal
 @st.dialog(" ", width="small")
@@ -184,8 +188,10 @@ def reset_conversation():
   ##st.session_state.chat_history = None
 
 #main
+##title
+st.markdown("""<div style="font-size:26px;font-weight:bold;font-family:'Gothic A1';"> 한국어 퀴즈 생성 </div>""", unsafe_allow_html=True)
+st.markdown("""<div style="height:0.5px;border:none;color:#D3D3D3;background-color:#D3D3D3;" /> """, unsafe_allow_html=True)
 username = st.session_state["user_info"]["username"]
-st.markdown("")
 
 col1, col2 = st.columns((3,1), gap="small")
 

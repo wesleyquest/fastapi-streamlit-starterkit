@@ -46,9 +46,8 @@ style_global()
 #main
 col1, col2, col3 = st.columns((1,8,1), gap="small")
 with col2:
-    st.markdown("")
-    st.subheader("📑 로그인 API", anchor=False)
-    st.markdown("""<div style="height:0.5px;border:none;color:#D3D3D3;background-color:#D3D3D3;" /> """, unsafe_allow_html=True)
+    #st.markdown("로그인 API")
+    #st.markdown("""<div style="height:0.5px;border:none;color:#D3D3D3;background-color:#D3D3D3;" /> """, unsafe_allow_html=True)
     with st.container(border=True):
         st.markdown("<h4>토큰 받기</h4>", unsafe_allow_html=True)
         st.markdown("<h5>기본 정보</h5>", unsafe_allow_html=True)
