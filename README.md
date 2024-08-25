@@ -1,6 +1,6 @@
 # fastapi-streamlit-starterkit
 #### version
-v0.8.1
+v0.9.0
 #### api (FastAPI)
 python 3.11.9
 fastapi==0.111.1

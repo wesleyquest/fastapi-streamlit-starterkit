@@ -60,10 +60,25 @@ def open_change_myprofile_modal(token_type, access_token, email, username, passw
     if col2.button("취소", type="secondary", use_container_width=True):
         st.rerun()
 
-#main
+##############################################################################
+#custom style
 st.markdown("")
-st.subheader("🐱 나의 정보", anchor=False) #st.subheader("🐱 My Profile", anchor=False)
+#main
+##title
+col_1, col_2 = st.columns([1,1])
+with col_1:
+    st.markdown("""<div style="font-size:26px;font-weight:bold;font-family:'Gothic A1';"> 나의 정보 </div>""", unsafe_allow_html=True)
+with col_2:
+    col_2_1, col_2_2, col_2_3 = st.columns([6,2,2])
+    with col_2_2:
+        if st.button(":material/account_circle:",key="df", use_container_width=False):
+            st.switch_page("pages/my_profile.py")
+    with col_2_3:     
+        if st.button(":material/logout:",key="asdf", use_container_width=False):
+            st.session_state = {}
+            st.switch_page("main.py")
 st.markdown("""<div style="height:0.5px;border:none;color:#D3D3D3;background-color:#D3D3D3;" /> """, unsafe_allow_html=True)
+st.markdown("")
 with st.container(border=True):
     tab1, tab2 = st.tabs(["프로필 보기", "프로필 변경"])
     with tab1:
@@ -83,7 +98,7 @@ with st.container(border=True):
             username_valid_placeholder = st.container()
             st.markdown(" ")
             st.markdown(" ")
-            password = st.text_input("*변경하시려면 비밀번호를 입력하세요", placeholder="비밀번호를 입력하세요 (4자리 이상)", type="password", max_chars=30)
+            password = st.text_input("*변경하시려면 비밀번호를 입력하세요", placeholder="password", type="password", max_chars=30)
             password_valid_placeholder = st.container()
             st.markdown(" ")
             submitted = st.form_submit_button("변경", type="primary", use_container_width=True)

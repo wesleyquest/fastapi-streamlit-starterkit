@@ -32,12 +32,24 @@ set_page_config(auth_status=st.session_state["auth_status"],
 make_sidebar(st.session_state["auth_status"], st.session_state["user_info"])
 #style
 style_global()
-
+##############################################################################
+#custom style
+st.markdown("")
 #main
-col1, col2, col3 = st.columns((1,8,1), gap="small")
-with col2:
-    st.markdown("")
-    st.subheader("📑 사용자 관리 API (관리자용)", anchor=False)
-    st.markdown("""<div style="height:0.5px;border:none;color:#D3D3D3;background-color:#D3D3D3;" /> """, unsafe_allow_html=True)
+##title
+col_1, col_2 = st.columns([1,1])
+with col_1:
+    st.markdown("""<div style="font-size:26px;font-weight:bold;font-family:'Gothic A1';"> 사용자 관리 API </div>""", unsafe_allow_html=True)
+with col_2:
+    col_2_1, col_2_2, col_2_3 = st.columns([8,1,1])
+    with col_2_2:
+        if st.button(":material/account_circle:",key="df", use_container_width=False):
+            st.switch_page("pages/my_profile.py")
+    with col_2_3:     
+        if st.button(":material/logout:",key="asdf", use_container_width=False):
+            st.session_state = {}
+            st.switch_page("main.py")
+st.markdown("""<div style="height:0.5px;border:none;color:#D3D3D3;background-color:#D3D3D3;" /> """, unsafe_allow_html=True)
+st.markdown("")
 
 

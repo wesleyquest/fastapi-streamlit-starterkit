@@ -72,7 +72,8 @@ def style_global():
     st.markdown(f"""
     <nav class="navbar">
         <div class="box"> 
-            {APP_NAME} <span style="font-size: 15px;"> {APP_VERSION} </span>
+            <span style="font-family:'Space Grotesk'">{APP_NAME} </span>
+            <span style="font-size: 15px;font-family:'Space Grotesk'"> {APP_VERSION} </span>
         </div>
     </nav>
         """, unsafe_allow_html=True)

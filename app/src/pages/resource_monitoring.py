@@ -46,8 +46,21 @@ with open('/app/src/modules/resource_monitoring/style.css') as f:
 
 #main
 ##title
-st.markdown("""<div style="font-size:26px;font-weight:bold;font-family:'Gothic A1';"> 자원 모니터링 분석 </div>""", unsafe_allow_html=True)
+col_1, col_2 = st.columns([1,1])
+with col_1:
+    st.markdown("""<div style="font-size:26px;font-weight:bold;font-family:'Gothic A1';"> 자원 모니터링 분석 </div>""", unsafe_allow_html=True)
+with col_2:
+    col_2_1, col_2_2, col_2_3 = st.columns([8,1,1])
+    with col_2_2:
+        if st.button(":material/account_circle:",key="df", use_container_width=False):
+            st.switch_page("pages/my_profile.py")
+    with col_2_3:     
+        if st.button(":material/logout:",key="asdf", use_container_width=False):
+            st.session_state = {}
+            st.switch_page("main.py")
+#st.markdown("""<div style="font-size:26px;font-weight:bold;font-family:'Gothic A1';"> 자원 모니터링 분석 </div>""", unsafe_allow_html=True)
 st.markdown("""<div style="height:0.5px;border:none;color:#D3D3D3;background-color:#D3D3D3;" /> """, unsafe_allow_html=True)
+st.markdown("")
 
 ##widget
 col_widget_1, col_widget_2 = st.columns([1,1])
@@ -109,12 +122,19 @@ with col_5:
 
 #chart 1
 st.markdown("")
-col_1, col_2 = st.columns([1,1])
+col_1, col_2, col_3 = st.columns([1,1,1])
 with col_1:
     with st.container(border=True):
         chart_data = pd.DataFrame(np.random.randn(20, 3), columns=["a", "b", "c"])
-        st.line_chart(chart_data)
+        st.line_chart(chart_data, height=300)
 with col_2:
     with st.container(border=True):
         chart_data = pd.DataFrame(np.random.randn(20, 3), columns=["a", "b", "c"])
-        st.line_chart(chart_data)
+        st.line_chart(chart_data, height=300)
+with col_3:
+    with st.container(border=True):
+        chart_data = pd.DataFrame(np.random.randn(20, 3), columns=["a", "b", "c"])
+        st.line_chart(chart_data, height=300)
+
+
+
