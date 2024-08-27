@@ -12,5 +12,5 @@ emails
 openai
 langchain
 langchain_community
-
+asyncio
 
