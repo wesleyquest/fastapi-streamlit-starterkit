@@ -6,4 +6,3 @@ st-pages
 python-dotenv
 pyyaml
 streamlit-navigation-bar
-sseclient
