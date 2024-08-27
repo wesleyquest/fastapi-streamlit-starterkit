@@ -10,7 +10,21 @@ from dotenv import load_dotenv
 load_dotenv()
 
 APP_NAME = os.getenv("APP_NAME")
-PROJECT_VERSION = os.getenv("PROJECT_VERSION")
+APP_VERSION = os.getenv("APP_VERSION")
+
+
+import base64
+
+account_img_path = r'/app/src/images/account.png'
+logout_img_path = r'/app/src/images/logout.png'
+description_img_path = r'/app/src/images/description.png'
+with open(account_img_path, "rb") as image_file:
+    encoded_logo = base64.b64encode(image_file.read()).decode('utf-8')
+with open(logout_img_path, "rb") as image_file:
+    logout_img = base64.b64encode(image_file.read()).decode('utf-8')
+with open(description_img_path, "rb") as image_file:
+    description_img = base64.b64encode(image_file.read()).decode('utf-8')
+
 
 #page config
 #config
@@ -50,10 +64,11 @@ def make_sidebar(auth_status, user_info):
     with st.sidebar:
         #st.markdown("<div style='text-align: center;'> 회사 로고 </div>", unsafe_allow_html=True)
         st.logo("/app/src/images/logo_wesleyquest.png", link="http://wesleyquest.com")
-        #st.markdown(f"<div style='text-align:center;font-size:20px;'><b> {APP_NAME} </b></div>", unsafe_allow_html=True)
-        #st.markdown(f"<div style='text-align:center;font-size:16px;color:grey;'>{PROJECT_VERSION}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='text-align:center;font-size:20px;'><b> {APP_NAME} </b></div>", unsafe_allow_html=True)
+        st.markdown(f"<div style='text-align:center;font-size:16px;color:grey;'>{APP_VERSION}</div>", unsafe_allow_html=True)
+        st.markdown("")
         #st.markdown("")
-        #st.markdown("")
+        
         if auth_status == True:
             with stylable_container(
                 key="profile_popover",
@@ -61,20 +76,20 @@ def make_sidebar(auth_status, user_info):
                 button {
                     color:white;
                     background-color:none;
-                    border-style:none;
+                    border-color:#3D52A0;
                     text-align:left;
                 }
                 """
             ):
+
                 with st.popover(f""":gray[**{user_info["username"]}**]  
                             :gray[{user_info["email"]}]""", use_container_width=True):
                     if st.button(":material/account_circle:&nbsp;&nbsp;나의 정보 (My Profile)", use_container_width=True):
                         profile_modal()
                         #st.switch_page("pages/my_profile.py")     
                     if st.button(":material/logout:&nbsp;&nbsp;로그 아웃 (Log Out)", use_container_width=True):
-                        logout()               
+                        logout()    
             
-            #st.markdown("")
             #st.markdown("""<div style="height:0.5px;border:none;color:#D3D3D3;background-color:#D3D3D3;" /> """, unsafe_allow_html=True)
             with stylable_container(
                 key="menu_expander",
@@ -85,7 +100,7 @@ def make_sidebar(auth_status, user_info):
                 """
             ):
                 with st.expander("**HOME**", expanded=True):
-                    st.page_link("pages/hello.py", label="개요", icon=":material/home:")
+                    st.page_link("pages/hello.py", label="매뉴얼", icon=":material/home:")
                 with st.expander("**APP**", expanded=True):
                     st.page_link("pages/quiz_generator.py", label="한국어 퀴즈 생성", icon=":material/space_dashboard:")
                     st.page_link("pages/gjf.py", label="경기도 데이터 분석", icon=":material/space_dashboard:")
@@ -117,17 +132,17 @@ from modules.validation.form_validation import validate_username, validate_passw
 #modal
 @st.dialog(" ", width="small")
 def profile_modal():
-    st.markdown("""<div style="text-align:center;font-weight: bold;padding-bottom:5px;"> 나의 정보 </div>""", unsafe_allow_html=True)
+    st.markdown("""<div style="text-align:center;font-weight:bold;padding-bottom:5px;"> 나의 정보 </div>""", unsafe_allow_html=True)
     my_profile_form_placeholder = st.container()
     myprofile_info_placeholder = st.container()
-    with my_profile_form_placeholder.form("my_profile_form"):
+    with my_profile_form_placeholder.form("my_profile_form_modal"):
         email = st.text_input("이메일", value=st.session_state["user_info"]["email"], disabled=True)
         st.markdown(" ")
         username = st.text_input("사용자명", value=st.session_state["user_info"]["username"], max_chars=30)
         username_valid_placeholder = st.container()
         st.markdown(" ")
         st.markdown(" ")
-        password = st.text_input("*변경하시려면 비밀번호를 입력하세요", placeholder="비밀번호를 입력하세요 (4자리 이상)", type="password", max_chars=30)
+        password = st.text_input("*변경하시려면 비밀번호를 입력하세요", placeholder="password", type="password", max_chars=30)
         password_valid_placeholder = st.container()
         st.markdown(" ")
         submitted = st.form_submit_button("&nbsp;&nbsp;저&nbsp;&nbsp;장&nbsp;&nbsp;", type="primary", use_container_width=False)
