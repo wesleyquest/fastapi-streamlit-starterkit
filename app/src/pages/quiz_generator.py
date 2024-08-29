@@ -196,15 +196,21 @@ def reset_conversation():
 #main
 st.markdown("")
 
-if st.toggle("Activate Streaming"):
+if st.toggle("Activate Streaming", value=st.session_state["stream"]):
     st.session_state["stream"]=True
+else:
+    st.session_state["stream"] = False
+st.write("Stream status:", st.session_state["stream"])
 
 col1, col2 = st.tabs(['Quiz','Translate'])
 with col1:
     if st.session_state["rerun"]==True:
         st.session_state["rerun"]=False
         st.rerun()
-    stream_generation_interface()
+    if st.session_state['stream']:
+        stream_generation_interface()
+    else:
+        batch_generation_interface()
     but1, but2, but3 = st.columns((1,1,1), gap="small")
     with but1:
         key_placeholder = st.container()
@@ -229,7 +235,10 @@ with col1:
     st.markdown("")
 
 with col2:
-    stream_translation_interface()
+    if st.session_state['stream']:
+        stream_translation_interface()
+    else:
+        batch_translation_interface()
 
 ##title
 # col_1, col_2 = st.columns([1,1])

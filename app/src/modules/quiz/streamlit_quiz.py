@@ -19,21 +19,19 @@ def batch_generation_interface():
 
             messages = st.empty()
             assistant_message = messages.chat_message("assistant", avatar="/app/src/images/bot_icon_2.jpg").empty()
-
-            generated_text = get_batch_quiz(
-                token_type = st.session_state["token_type"], 
-                access_token = st.session_state["access_token"],
-                openai_api_key = st.session_state["openai_api_key"],
-                document = st.session_state["quiz"]["input"]["document"],
-                quiz_content = st.session_state["quiz"]["input"]["quiz_content"],
-                quiz_type = st.session_state["quiz"]["input"]["quiz_type"],
-                number = st.session_state["quiz"]["input"]["number"]
-            )
-            # 실시간으로 생성 결과 업데이트
-            assistant_message.markdown(generated_text)
-                
+            with st.spinner('퀴즈를 생성 중입니다...'):
+                generated_text = get_batch_quiz(
+                    token_type = st.session_state["token_type"], 
+                    access_token = st.session_state["access_token"],
+                    openai_api_key = st.session_state["openai_api_key"],
+                    document = st.session_state["quiz"]["input"]["document"],
+                    quiz_content = st.session_state["quiz"]["input"]["quiz_content"],
+                    quiz_type = st.session_state["quiz"]["input"]["quiz_type"],
+                    number = st.session_state["quiz"]["input"]["number"]
+                )
+            assistant_message.markdown(generated_text["results"]) 
             
-            st.session_state["quiz_messages"].append({"role": "assistant", "content": generated_text})
+            st.session_state["quiz_messages"].append({"role": "assistant", "content": generated_text["results"]})
 
             st.session_state['quiz_ready'] = False
 
@@ -88,13 +86,13 @@ def batch_translation_interface():
     if prompt := st.chat_input("번역할 문장을 입력해 주세요"):
         messages.chat_message("user").write(prompt)
         assistant_message = messages.chat_message("assistant").empty()
-            
-        translated_quiz = translate_batch_quiz(
-            token_type = st.session_state["token_type"], 
-            access_token = st.session_state["access_token"],
-            openai_api_key = st.session_state["openai_api_key"],
-            quiz = prompt,
-            language = language)
+        with st.spinner('번역 중입니다...'):
+            translated_quiz = translate_batch_quiz(
+                token_type = st.session_state["token_type"], 
+                access_token = st.session_state["access_token"],
+                openai_api_key = st.session_state["openai_api_key"],
+                quiz = prompt,
+                language = language)
         messages.chat_message("assistant").write(translated_quiz["results"])
 
 def stream_translation_interface():
