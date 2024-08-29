@@ -23,6 +23,8 @@ if "quiz_ready" not in st.session_state:
     st.session_state["quiz_ready"] = False
 if "rerun" not in st.session_state:
     st.session_state["rerun"] = False
+if "stream" not in st.session_state:
+    st.session_state["stream"] = False
 
 #redirect
 if not st.session_state["auth_status"]==True:
@@ -194,13 +196,21 @@ def reset_conversation():
 #main
 st.markdown("")
 
-#col1, col2 = st.columns((3,1), gap="small")
+if st.toggle("Activate Streaming", value=st.session_state["stream"]):
+    st.session_state["stream"]=True
+else:
+    st.session_state["stream"] = False
+st.write("Stream status:", st.session_state["stream"])
+
 col1, col2 = st.tabs(['Quiz','Translate'])
 with col1:
     if st.session_state["rerun"]==True:
         st.session_state["rerun"]=False
         st.rerun()
-    stream_generation_interface()
+    if st.session_state['stream']:
+        stream_generation_interface()
+    else:
+        batch_generation_interface()
     but1, but2, but3 = st.columns((1,1,1), gap="small")
     with but1:
         key_placeholder = st.container()
@@ -225,7 +235,11 @@ with col1:
     st.markdown("")
 
 with col2:
-    stream_translation_interface()
+    if st.session_state['stream']:
+        stream_translation_interface()
+    else:
+        batch_translation_interface()
+
 ##title
 # col_1, col_2 = st.columns([1,1])
 # with col_1:
@@ -296,8 +310,6 @@ with col2:
 #         quiz_del_placeholder = st.container()
 #         quiz_del_placeholder.button('대화 삭제', on_click=reset_conversation, use_container_width=True)
     
-      
-
 #     st.markdown("")
 
 # with col2:
