@@ -66,10 +66,10 @@ def get_stream_quiz(
             timeout=60
         )
         response.raise_for_status()
-
+        buffer = ""
         for line in response.iter_lines():
             if line:
-                yield line.decode('utf-8')
+                yield f"{line.decode('utf-8')}\n"
     except requests.exceptions.RequestException as e:
         yield f"Error: {str(e)}"
 

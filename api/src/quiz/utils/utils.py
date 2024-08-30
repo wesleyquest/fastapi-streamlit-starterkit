@@ -4,6 +4,7 @@ from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import load_prompt
 from src.quiz.utils.fewshot import sample_fewshot
+import json
 
 # batch 퀴즈 생성
 async def batch_generate_gpt4o_quiz(
@@ -57,8 +58,23 @@ async def stream_generate_gpt4o_quiz(
     )
 
     async def generate():
+        # async for chunk in chain.astream(input_data):
+        #     yield f"data: {chunk}\n\n"
+        buffer = ""
         async for chunk in chain.astream(input_data):
-            yield f"data: {chunk}\n\n"
+            buffer += chunk
+            lines = buffer.split('\n')
+            
+            # Process all complete lines
+            for line in lines[:-1]:
+                yield f"data: {json.dumps({'text': line})}\n\n"
+            
+            # Keep the last (possibly incomplete) line in the buffer
+            buffer = lines[-1]
+
+        # Yield any remaining content in the buffer
+        if buffer:
+            yield f"data: {json.dumps({'text': buffer})}\n\n"
     return generate
 
 # batch 번역
@@ -99,8 +115,19 @@ async def stream_translate_gpt4o_quiz(
     )
 
     async def generate():
+        buffer=""
         async for chunk in chain.astream(input_data):
-            yield f"data: {chunk}\n\n"
+            buffer +=chunk
+            lines = buffer.split("\n")
+
+            for line in lines[:-1]:
+                yield f"data: {json.dumps({'text': line})}\n\n"
+            buffer = lines[-1]
+
+        # Yield any remaining content in the buffer
+        if buffer:
+            yield f"data: {json.dumps({'text': buffer})}\n\n"
+
     return generate
     #########################################################################################################
     # fewshot prompt

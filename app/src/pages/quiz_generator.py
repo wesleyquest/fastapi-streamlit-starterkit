@@ -21,6 +21,10 @@ if st.session_state["auth_status"]==True:
     st.session_state["user_info"] = get_user_info(token_type=st.session_state["token_type"], access_token=st.session_state["access_token"])
 if "quiz_ready" not in st.session_state:
     st.session_state["quiz_ready"] = False
+if "translate_ready" not in st.session_state:
+    st.session_state["translate_ready"] = False 
+if "language" not in st.session_state:
+    st.session_state["language"] = None   
 if "rerun" not in st.session_state:
     st.session_state["rerun"] = False
 if "stream" not in st.session_state:
@@ -194,6 +198,7 @@ def reset_conversation():
   ##st.session_state.chat_history = None
 
 #main
+
 st.markdown("")
 
 if st.toggle("Activate Streaming", value=st.session_state["stream"]):
@@ -201,6 +206,12 @@ if st.toggle("Activate Streaming", value=st.session_state["stream"]):
 else:
     st.session_state["stream"] = False
 st.write("Stream status:", st.session_state["stream"])
+
+username = st.session_state["user_info"]["username"]
+if "quiz_messages" not in st.session_state:
+    st.session_state["quiz_messages"] = [{"role": "assistant", "content": f"안녕하세요 {username} 님 !  \n '퀴즈 생성' 버튼을 클릭하여 퀴즈를 생성해 주세요!"}]
+if "translated_messages" not in st.session_state:
+    st.session_state["translated_messages"] = [{"role": "assistant", "content": f"안녕하세요 {username} 님 !  \n 번역할 내용을 입력해 주세요!"}]
 
 col1, col2 = st.tabs(['Quiz','Translate'])
 with col1:
