@@ -5,6 +5,19 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import load_prompt
 from src.quiz.utils.fewshot import sample_fewshot
 import json
+import random
+# random content, type 세트 만들기
+async def make_set(quiz_content,quiz_type,number):
+    set_type = [(q_content,q_type) for q_content in quiz_content for q_type in quiz_type]
+    q_set = []
+    if len(set_type)>= number:
+        q_set = random.sample(set_type,k=number)
+    else:
+        for _ in range(number//len(set_type)):
+            q_set += set_type
+        q_set += random.sample(set_type,k=number%len(set_type))
+    random.shuffle(q_set)
+    return q_set
 
 # batch 퀴즈 생성
 async def batch_generate_gpt4o_quiz(
@@ -21,8 +34,8 @@ async def batch_generate_gpt4o_quiz(
     prompt = load_prompt(os.path.join('/app/src/quiz/utils/prompt', 'quiz_generator_pythonic.yaml'))
     topic = document.split('\n')[0]
     reference = '\n'.join(document.split('\n')[1:])
-
-    input_data = {"topic": topic,"reference": reference,"quiz_content":quiz_content,"quiz_type":quiz_type,"number":number}
+    q_set= await make_set(quiz_content,quiz_type,number)
+    input_data = {"topic": topic,"reference": reference,"quiz_content":quiz_content,"quiz_type":quiz_type,"number":number,"set":q_set}
 
     chain = (
         prompt
@@ -30,7 +43,7 @@ async def batch_generate_gpt4o_quiz(
         | StrOutputParser()
     )
 
-    results = chain.invoke(input_data)
+    results = chain.invoke(input_data).replace("A:", "\n    A:").replace("B:","\n    B:")
     return results
 
 # stream 퀴즈 생성
@@ -48,8 +61,8 @@ async def stream_generate_gpt4o_quiz(
     prompt = load_prompt(os.path.join('/app/src/quiz/utils/prompt', 'quiz_generator_pythonic.yaml'))
     topic = document.split('\n')[0]
     reference = '\n'.join(document.split('\n')[1:])
-
-    input_data = {"topic": topic,"reference": reference,"quiz_content":quiz_content,"quiz_type":quiz_type,"number":number}
+    q_set= await make_set(quiz_content,quiz_type,number)
+    input_data = {"topic": topic,"reference": reference,"quiz_content":quiz_content,"quiz_type":quiz_type,"number":number,"set":q_set}
 
     chain = (
         prompt
@@ -67,6 +80,7 @@ async def stream_generate_gpt4o_quiz(
             
             # Process all complete lines
             for line in lines[:-1]:
+                line = line.replace("A:", "\n    A:").replace("B:","\n    B:")
                 yield f"data: {json.dumps({'text': line})}\n\n"
             
             # Keep the last (possibly incomplete) line in the buffer
@@ -74,6 +88,7 @@ async def stream_generate_gpt4o_quiz(
 
         # Yield any remaining content in the buffer
         if buffer:
+            buffer = buffer.replace("A:", "\n    A:").replace("B:","\n    B:")
             yield f"data: {json.dumps({'text': buffer})}\n\n"
     return generate
 

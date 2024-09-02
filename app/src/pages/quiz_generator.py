@@ -80,7 +80,7 @@ if st.toggle("Activate Streaming", value=st.session_state["stream"]):
     st.session_state["stream"]=True
 else:
     st.session_state["stream"] = False
-st.write("Stream status:", st.session_state["stream"])
+#st.write("Stream status:", st.session_state["stream"])
 
 username = st.session_state["user_info"]["username"]
 if "quiz_messages" not in st.session_state:

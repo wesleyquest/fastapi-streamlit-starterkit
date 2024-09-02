@@ -4,16 +4,16 @@ from modules.validation.form_validation import validate_text
 from modules.quiz.api_quiz import get_batch_quiz,get_stream_quiz, translate_batch_quiz, translate_stream_quiz
 import json
 
-def popover():
-    with st.popover('번역 언어', use_container_width=True):
+def expander():
+    with st.expander('번역 옵션'):
         st.selectbox('From', ['English'])
         language = st.selectbox('To', ["Vietnamese", "Japanese", "Chinese"])
         st.session_state["language"] = language
         quiz_list = [msg['content'] for msg in st.session_state['quiz_messages'][1:]]
-        quiz_list.append('직접입력')
+        quiz_list.append("직접 입력")
         selected_quiz = st.selectbox("Quiz List", quiz_list)
-        if selected_quiz != "직접입력":    
-            if st.button('생성하기'):
+        if selected_quiz != "직접 입력":    
+            if st.button('번역하기',use_container_width=True):
                 st.session_state["translated_messages"].append({"role":"user","content":selected_quiz})
                 st.session_state["translate_ready"]=True
                 st.rerun()
@@ -235,7 +235,7 @@ def batch_translation_interface():
                     language = st.session_state["language"])
             assistant_message.markdown(translated_quiz["results"]) 
             st.session_state["translate_ready"]=False
-    popover()
+    expander()
 
 def stream_translation_interface():
     with st.container(height=450):        
@@ -269,4 +269,4 @@ def stream_translation_interface():
             except Exception as e:
                 assistant_message.error(f"An error occurred: {str(e)}")
             st.session_state["translate_ready"]=False
-    popover()
+    expander()
