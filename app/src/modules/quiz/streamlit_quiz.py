@@ -160,7 +160,7 @@ def batch_generation_interface():
                 with st.chat_message(name=msg["role"], avatar="/app/src/images/bot_icon_2.jpg"): #avatar="https://raw.githubusercontent.com/dataprofessor/streamlit-chat-avatar/master/bot-icon.png"
                     st.markdown(msg["content"])
                     if idx !=0:
-                        with st.expander("해설보기",expanded=False):
+                        with st.popover("해설보기",use_container_width=True):
                             st.markdown(msg["explain"])
         if st.session_state["quiz_ready"]==True:
 
@@ -273,8 +273,9 @@ def batch_translation_interface():
             with assistant_message:
                 with st.container():
                     st.markdown(translated_quiz)
-                    with st.popover("해설보기",use_container_width=True):
-                        st.markdown(translated_answer)
+                    if st.session_state["translated_messages"][-1]["typing"]==False:
+                        with st.popover("해설보기",use_container_width=True):
+                            st.markdown(translated_answer)
             
             if st.session_state["translated_messages"][-1]["typing"]:
                 st.session_state["translated_messages"].append({"role": "assistant", "content": translated_quiz, "answer":translated_answer,"typing":True})
@@ -300,7 +301,8 @@ def stream_translation_interface():
             with assistant_message:
                 with st.container():
                     messages = st.empty()
-                    explain_placeholder = st.empty()
+                    if st.session_state["translated_messages"][-1]["typing"]==False:
+                        explain_placeholder = st.empty()
                     translated_text = ""
                     translated_answer = ""
                     try:
@@ -332,8 +334,9 @@ def stream_translation_interface():
 
                                 # 실시간으로 번역 결과 업데이트
                                 messages.markdown(translated_text)
-                                explain = explain_placeholder.popover("해설보기",use_container_width=True)
-                                explain.markdown(translated_answer)
+                                if st.session_state["translated_messages"][-1]["typing"]==False:
+                                    explain = explain_placeholder.popover("해설보기",use_container_width=True)
+                                    explain.markdown(translated_answer)
                         if st.session_state["translated_messages"][-1]["typing"]:
                             st.session_state["translated_messages"].append({"role": "assistant", "content": translated_text, "answer":translated_answer,"typing":True})
                         else:
