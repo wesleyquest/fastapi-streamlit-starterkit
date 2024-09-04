@@ -84,9 +84,9 @@ else:
 
 username = st.session_state["user_info"]["username"]
 if "quiz_messages" not in st.session_state:
-    st.session_state["quiz_messages"] = [{"role": "assistant", "content": f"안녕하세요 {username} 님 !  \n '퀴즈 생성' 버튼을 클릭하여 퀴즈를 생성해 주세요!"}]
+    st.session_state["quiz_messages"] = [{"role": "assistant", "content": f"안녕하세요 {username} 님 !  \n '퀴즈 생성' 버튼을 클릭하여 퀴즈를 생성해 주세요!","explain":"안녕하세요"}]
 if "translated_messages" not in st.session_state:
-    st.session_state["translated_messages"] = [{"role": "assistant", "content": f"안녕하세요 {username} 님 !  \n 번역할 내용을 입력해 주세요!"}]
+    st.session_state["translated_messages"] = [{"role": "assistant", "content": f"안녕하세요 {username} 님 !  \n 번역할 내용을 입력해 주세요!","answer":"안녕하세요","typing":True}]
 
 col1, col2 = st.tabs(['Quiz','Translate'])
 with col1:

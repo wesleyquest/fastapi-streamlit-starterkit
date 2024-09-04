@@ -23,7 +23,7 @@ template: |
       number (int): number of quizzes to create
 
     Returns: 
-      str: A formatted string containing sets of quizzes. The format includes sections for Type, Quiz, Answer, Explain, Sentence, and Dialog, each prefixed with a rocket emoji (🚀).Individual quizzes within each section are numbered and prefixed with a sparkle emoji (🔆).
+      str: A formatted string containing sets of quizzes. The format includes sections for Quiz, Answer, Explain, Sentence, and Dialog, each prefixed with a rocket emoji (🚀).Individual quizzes within each section are numbered and prefixed with a sparkle emoji (🔆).
     """
     #define parameter
     def __init__(self, topic, reference, quiz_content, quiz_type, number, set):
@@ -50,7 +50,6 @@ template: |
 
     #make quiz format function
     def generate_quizzes(self):
-      type="🚀 Type" + "\n\n"
       quiz="🚀 Quiz" + "\n\n"
       answer="🚀 Answer" + "\n\n"
       explain="🚀 Explain" + "\n\n"
@@ -60,16 +59,13 @@ template: |
       quizzes_set = self.create_quizzes()
 
       for idx, quiz_set in enumerate(quizzes_set):
-        type += "🔆 Quiz idx+1. " + quiz_set['type'] + "\n\n"
         quiz += "🔆 Quiz idx+1. " + quiz_set['quiz'] + "\n\n"
         answer += "🔆 Quiz idx+1. " + quiz_set['answer'] + "\n\n"
         explain += "🔆 Quiz idx+1. " + quiz_set['explain'] + "\n\n"
         sentence += "🔆 Quiz idx+1. " + "\n\n" + quiz_set['sentence'] + "\n\n"
         dialog += "🔆 Quiz idx+1. " + quiz_set['dialog'] + "\n\n"
 
-        
-
-      quiz_set = type + "\n"+quiz + "\n"+answer + "\n"+explain + "\n"+sentence + "\n"+dialog
+      quiz_set = "+quiz + "\n"+answer + "\n"+explain + "\n"+sentence + "\n"+dialog
       return quiz_set
 
   Quizzes_Generator = QuizzesGenerator({topic}, {reference}, {quiz_content}, {quiz_type},{number},{set})

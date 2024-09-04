@@ -31,7 +31,8 @@ async def batch_generate_gpt4o_quiz(
     llm = ChatOpenAI(model_name = "gpt-4o", streaming=True, callbacks=[StreamingStdOutCallbackHandler()],
                     temperature = 0,
                     openai_api_key= openai_api_key)
-    prompt = load_prompt(os.path.join('/app/src/quiz/utils/prompt', 'quiz_generator_pythonic.yaml'))
+    #prompt = load_prompt(os.path.join('/app/src/quiz/utils/prompt', 'quiz_generator_pythonic.yaml'))
+    prompt = load_prompt(os.path.join('/app/src/quiz/utils/prompt', 'quiz_generator_pythonic_for_develop.yaml'))
     topic = document.split('\n')[0]
     reference = '\n'.join(document.split('\n')[1:])
     q_set= await make_set(quiz_content,quiz_type,number)
@@ -43,7 +44,7 @@ async def batch_generate_gpt4o_quiz(
         | StrOutputParser()
     )
 
-    results = chain.invoke(input_data).replace("A:", "\n    A:").replace("B:","\n    B:")
+    results = chain.invoke(input_data).replace("A:", "\n    A:").replace("B:","\n    B:").replace("①","\n    ①").replace("②","    ②").replace("③","    ③").replace("④","    ④")
     return results
 
 # stream 퀴즈 생성
@@ -58,7 +59,8 @@ async def stream_generate_gpt4o_quiz(
     llm = ChatOpenAI(model_name = "gpt-4o", streaming=True, callbacks=[StreamingStdOutCallbackHandler()],
                     temperature = 0,
                     openai_api_key= openai_api_key)
-    prompt = load_prompt(os.path.join('/app/src/quiz/utils/prompt', 'quiz_generator_pythonic.yaml'))
+    #prompt = load_prompt(os.path.join('/app/src/quiz/utils/prompt', 'quiz_generator_pythonic.yaml'))
+    prompt = load_prompt(os.path.join('/app/src/quiz/utils/prompt', 'quiz_generator_pythonic_for_develop.yaml'))
     topic = document.split('\n')[0]
     reference = '\n'.join(document.split('\n')[1:])
     q_set= await make_set(quiz_content,quiz_type,number)
@@ -71,8 +73,6 @@ async def stream_generate_gpt4o_quiz(
     )
 
     async def generate():
-        # async for chunk in chain.astream(input_data):
-        #     yield f"data: {chunk}\n\n"
         buffer = ""
         async for chunk in chain.astream(input_data):
             buffer += chunk
@@ -80,7 +80,7 @@ async def stream_generate_gpt4o_quiz(
             
             # Process all complete lines
             for line in lines[:-1]:
-                line = line.replace("A:", "\n    A:").replace("B:","\n    B:")
+                line = line.replace("🔆", "\n  🔆").replace("A:", "\n    A:").replace("B:","\n    B:").replace("①","\n    ①").replace("②","    ②").replace("③","    ③").replace("④","    ④")
                 yield f"data: {json.dumps({'text': line})}\n\n"
             
             # Keep the last (possibly incomplete) line in the buffer
@@ -88,7 +88,7 @@ async def stream_generate_gpt4o_quiz(
 
         # Yield any remaining content in the buffer
         if buffer:
-            buffer = buffer.replace("A:", "\n    A:").replace("B:","\n    B:")
+            buffer = buffer.replace("🔆", "\n  🔆").replace("A:", "\n    A:").replace("B:","\n    B:").replace("①","\n    ①").replace("②","    ②").replace("③","    ③").replace("④","    ④")
             yield f"data: {json.dumps({'text': buffer})}\n\n"
     return generate
 
@@ -96,13 +96,14 @@ async def stream_generate_gpt4o_quiz(
 async def batch_translate_gpt4o_quiz(
         openai_api_key,
         quiz,
+        answer,
         language
 ):
     llm = ChatOpenAI(model_name = "gpt-4o", streaming=True, callbacks=[StreamingStdOutCallbackHandler()],
                     temperature = 0,
                     openai_api_key= openai_api_key)
     prompt = load_prompt(os.path.join('/app/src/quiz/utils/prompt', 'quiz_translator.yaml'))
-    input_data = {"quiz": quiz,"language":language}
+    input_data = {"quiz": quiz,"answer":answer,"language":language}
     chain = (
         prompt
         | llm
@@ -116,13 +117,14 @@ async def batch_translate_gpt4o_quiz(
 async def stream_translate_gpt4o_quiz(
         openai_api_key,
         quiz,
+        answer,
         language
 ):
     llm = ChatOpenAI(model_name = "gpt-4o", streaming=True, callbacks=[StreamingStdOutCallbackHandler()],
                     temperature = 0,
                     openai_api_key= openai_api_key)
     prompt = load_prompt(os.path.join('/app/src/quiz/utils/prompt', 'quiz_translator.yaml'))
-    input_data = {"quiz": quiz,"language":language}
+    input_data = {"quiz": quiz,"answer":answer,"language":language}
     chain = (
         prompt
         | llm

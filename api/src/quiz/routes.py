@@ -67,6 +67,7 @@ async def batch_translate_quiz(
     *,
     openai_api_key: str = Body(...),
     quiz: str = Body(...),
+    answer: str = Body(...),
     language: str = Body(...),
     current_user: users_models.User = Depends(deps.get_current_active_user),
 ) -> Any:
@@ -77,6 +78,7 @@ async def batch_translate_quiz(
     data = await batch_translate_gpt4o_quiz(
         openai_api_key = openai_api_key,
         quiz = quiz,
+        answer = answer,
         language = language,
     )
 
@@ -90,6 +92,7 @@ async def stream_translate_quiz(
     *,
     openai_api_key: str = Body(...),
     quiz: str = Body(...),
+    answer: str = Body(...),
     language: str = Body(...),
     current_user: users_models.User = Depends(deps.get_current_active_user),
 ) -> Any:
@@ -100,6 +103,7 @@ async def stream_translate_quiz(
     data = await stream_translate_gpt4o_quiz(
         openai_api_key = openai_api_key,
         quiz = quiz,
+        answer = answer,
         language = language,
     )
 
