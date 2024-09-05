@@ -9,7 +9,7 @@ from modules.auth.api_auth import validate_token, get_user_info
 from modules.security.encryption import str_to_asterisk
 from modules.validation.key_validation import validate_openai_api_key
 from modules.validation.form_validation import validate_text
-from modules.quiz.api_quiz import get_quiz
+#from modules.quiz.api_quiz import get_quiz
 
 #var
 if "auth_status" not in st.session_state:

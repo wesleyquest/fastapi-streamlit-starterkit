@@ -2,131 +2,26 @@ import streamlit as st
 from modules.validation.key_validation import validate_openai_api_key
 from modules.validation.form_validation import validate_text
 from modules.quiz.api_quiz import get_batch_quiz,get_stream_quiz, translate_batch_quiz, translate_stream_quiz
+import json
 
-
-def batch_generation_interface():
-    username = st.session_state["user_info"]["username"]
-    with st.container(border=True, height=450):
-        if "quiz_messages" not in st.session_state:
-            st.session_state["quiz_messages"] = [{"role": "assistant", "content": f"안녕하세요 {username} 님 !  \n '퀴즈 생성' 버튼을 클릭하여 퀴즈를 생성해 주세요!"}]
-        
-        if st.session_state["quiz_messages"]:
-            for idx, msg in enumerate(st.session_state["quiz_messages"]):
-                with st.chat_message(name=msg["role"], avatar="/app/src/images/bot_icon_2.jpg"): #avatar="https://raw.githubusercontent.com/dataprofessor/streamlit-chat-avatar/master/bot-icon.png"
-                    st.markdown(msg["content"])
-        
-        if st.session_state["quiz_ready"]==True:
-
-            messages = st.empty()
-            assistant_message = messages.chat_message("assistant", avatar="/app/src/images/bot_icon_2.jpg").empty()
-            with st.spinner('퀴즈를 생성 중입니다...'):
-                generated_text = get_batch_quiz(
-                    token_type = st.session_state["token_type"], 
-                    access_token = st.session_state["access_token"],
-                    openai_api_key = st.session_state["openai_api_key"],
-                    document = st.session_state["quiz"]["input"]["document"],
-                    quiz_content = st.session_state["quiz"]["input"]["quiz_content"],
-                    quiz_type = st.session_state["quiz"]["input"]["quiz_type"],
-                    number = st.session_state["quiz"]["input"]["number"]
-                )
-            assistant_message.markdown(generated_text["results"]) 
-            
-            st.session_state["quiz_messages"].append({"role": "assistant", "content": generated_text["results"]})
-
-            st.session_state['quiz_ready'] = False
-
-def stream_generation_interface():
-    username = st.session_state["user_info"]["username"]
-    with st.container(border=True, height=450):
-        if "quiz_messages" not in st.session_state:
-            st.session_state["quiz_messages"] = [{"role": "assistant", "content": f"안녕하세요 {username} 님 !  \n '퀴즈 생성' 버튼을 클릭하여 퀴즈를 생성해 주세요!"}]
-        
-        if st.session_state["quiz_messages"]:
-            for idx, msg in enumerate(st.session_state["quiz_messages"]):
-                with st.chat_message(name=msg["role"], avatar="/app/src/images/bot_icon_2.jpg"): #avatar="https://raw.githubusercontent.com/dataprofessor/streamlit-chat-avatar/master/bot-icon.png"
-                    st.markdown(msg["content"])
-        if st.session_state["quiz_ready"]==True:
-
-            messages = st.empty()
-            assistant_message = messages.chat_message("assistant", avatar="/app/src/images/bot_icon_2.jpg").empty()
-
-            generated_text = ""    
-            try:
-                for chunk in get_stream_quiz(
-                    token_type = st.session_state["token_type"], 
-                    access_token = st.session_state["access_token"],
-                    openai_api_key = st.session_state["openai_api_key"],
-                    document = st.session_state["quiz"]["input"]["document"],
-                    quiz_content = st.session_state["quiz"]["input"]["quiz_content"],
-                    quiz_type = st.session_state["quiz"]["input"]["quiz_type"],
-                    number = st.session_state["quiz"]["input"]["number"]
-                ):
-                    if chunk.startswith("Error:"):
-                        assistant_message.error(chunk)
-                        break
-                    if chunk.startswith("data: "):  # SSE 형식에서 데이터 추출
-                        chunk = chunk[6:]  # "data: " 제거
-                    generated_text += chunk
-                    # 실시간으로 생성 결과 업데이트
-                    assistant_message.markdown(generated_text)
-                
-            except Exception as e:
-                assistant_message.error(f"An error occurred: {str(e)}")
-
-            st.session_state["quiz_messages"].append({"role": "assistant", "content": generated_text})
-
-            st.session_state['quiz_ready'] = False
-
-def batch_translation_interface():
-    with st.container(height=450):
-        with st.popover('번역 언어',use_container_width=True):
-            st.selectbox('From',['English'])
-            language = st.selectbox('To',["Vietnamese", "Japanese", "Chinese"])
-        messages = st.container(height=350)
-    if prompt := st.chat_input("번역할 문장을 입력해 주세요"):
-        messages.chat_message("user").write(prompt)
-        assistant_message = messages.chat_message("assistant").empty()
-        with st.spinner('번역 중입니다...'):
-            translated_quiz = translate_batch_quiz(
-                token_type = st.session_state["token_type"], 
-                access_token = st.session_state["access_token"],
-                openai_api_key = st.session_state["openai_api_key"],
-                quiz = prompt,
-                language = language)
-        messages.chat_message("assistant").write(translated_quiz["results"])
-
-def stream_translation_interface():
-    with st.container(height=450):
-        with st.popover('번역 언어', use_container_width=True):
-            st.selectbox('From', ['English'])
-            language = st.selectbox('To', ["Vietnamese", "Japanese", "Chinese"])
-        messages = st.container(height=350)
-
-    if prompt := st.chat_input("번역할 문장을 입력해 주세요"):
-        messages.chat_message("user").write(prompt)
-        
-        # 번역 결과를 위한 빈 메시지 생성
-        assistant_message = messages.chat_message("assistant").empty()
-        
-        translated_text = ""
-        try:
-            for chunk in translate_stream_quiz(
-                token_type=st.session_state["token_type"], 
-                access_token=st.session_state["access_token"],
-                openai_api_key=st.session_state["openai_api_key"],
-                quiz=prompt,
-                language=language
-            ):
-                if chunk.startswith("Error:"):
-                    assistant_message.error(chunk)
-                    break
-                if chunk.startswith("data: "):  # SSE 형식에서 데이터 추출
-                    chunk = chunk[6:]  # "data: " 제거
-                translated_text += chunk
-                # 실시간으로 번역 결과 업데이트
-                assistant_message.markdown(translated_text)
-        except Exception as e:
-            assistant_message.error(f"An error occurred: {str(e)}")
+def expander():
+    with st.expander('번역 옵션'):
+        st.selectbox('From', ['English'])
+        language = st.selectbox('To', ["Vietnamese", "Japanese", "Chinese"])
+        st.session_state["language"] = language
+        quiz_list = [[msg['content'],msg['explain']] for msg in st.session_state['quiz_messages'][1:]]
+        quiz_list.append("직접 입력")
+        selected_quiz = st.selectbox("Quiz List", quiz_list)
+        if selected_quiz != "직접 입력":
+            if st.button('번역하기',use_container_width=True):
+                st.session_state["translated_messages"].append({"role":"user","content":selected_quiz[0], "answer":selected_quiz[1],"typing":False})
+                st.session_state["translate_ready"]=True
+                st.rerun()
+        else:
+            if prompt := st.chat_input("번역할 문장을 입력해 주세요"):
+                st.session_state["translated_messages"].append({"role":"user","content":prompt,"answer":"","typing":True})
+                st.session_state['translate_ready'] = True
+                st.rerun()
 
 #modal
 @st.dialog(" ", width="small")
@@ -257,3 +152,196 @@ def open_settings_modal():
     with but2:
         if st.button("닫기",type="primary", use_container_width=True):
             st.rerun()    
+
+def batch_generation_interface():
+    with st.container(border=True, height=450):
+        if st.session_state["quiz_messages"]:
+            for idx, msg in enumerate(st.session_state["quiz_messages"]):
+                with st.chat_message(name=msg["role"], avatar="/app/src/images/bot_icon_2.jpg"): #avatar="https://raw.githubusercontent.com/dataprofessor/streamlit-chat-avatar/master/bot-icon.png"
+                    st.markdown(msg["content"])
+                    if idx !=0:
+                        with st.popover("해설보기",use_container_width=True):
+                            st.markdown(msg["explain"])
+        if st.session_state["quiz_ready"]==True:
+
+            assistant_message = st.chat_message("assistant", avatar="/app/src/images/bot_icon_2.jpg").empty()
+            with st.spinner('퀴즈를 생성 중입니다...'):
+                generated_text = get_batch_quiz(
+                    token_type = st.session_state["token_type"], 
+                    access_token = st.session_state["access_token"],
+                    openai_api_key = st.session_state["openai_api_key"],
+                    document = st.session_state["quiz"]["input"]["document"],
+                    quiz_content = st.session_state["quiz"]["input"]["quiz_content"],
+                    quiz_type = st.session_state["quiz"]["input"]["quiz_type"],
+                    number = st.session_state["quiz"]["input"]["number"]
+                )
+            generated_quiz = generated_text["results"].split("🚀 Answer")[0]
+            generated_answer = "🚀 Answer\n"+ generated_text["results"].split("🚀 Answer")[1]
+            
+            with assistant_message:
+                with st.container():
+                    st.markdown(generated_quiz)
+                    with st.popover("해설보기",use_container_width=True):
+                        st.markdown(generated_answer)
+
+            #st.session_state["quiz_messages"].append({"role": "assistant", "content": generated_text["results"]})
+            st.session_state["quiz_messages"].append({"role": "assistant", "content": generated_quiz,"explain":generated_answer})
+
+            st.session_state['quiz_ready'] = False
+
+def stream_generation_interface():
+    with st.container(border=True, height=450):
+        if st.session_state["quiz_messages"]:
+            for idx, msg in enumerate(st.session_state["quiz_messages"]):
+                with st.chat_message(name=msg["role"], avatar="/app/src/images/bot_icon_2.jpg"): #avatar="https://raw.githubusercontent.com/dataprofessor/streamlit-chat-avatar/master/bot-icon.png"
+                    st.markdown(msg["content"])
+                    if idx !=0:
+                        with st.popover("해설보기",use_container_width=True):
+                            st.markdown(msg["explain"])
+        if st.session_state["quiz_ready"]==True:
+            
+            assistant_message = st.chat_message("assistant", avatar="/app/src/images/bot_icon_2.jpg").empty()
+            answer=False
+            with assistant_message:
+                with st.container():
+                    messages = st.empty()
+                    explain_placeholder = st.empty()
+                    generated_text = ""
+                    generated_explain = "🚀 Answer \n"    
+                    try:
+                        for chunk in get_stream_quiz(
+                            token_type = st.session_state["token_type"], 
+                            access_token = st.session_state["access_token"],
+                            openai_api_key = st.session_state["openai_api_key"],
+                            document = st.session_state["quiz"]["input"]["document"],
+                            quiz_content = st.session_state["quiz"]["input"]["quiz_content"],
+                            quiz_type = st.session_state["quiz"]["input"]["quiz_type"],
+                            number = st.session_state["quiz"]["input"]["number"]
+                        ):
+                            if chunk.startswith("Error:"):
+                                assistant_message.error(chunk)
+                                break
+                            if chunk.startswith("data: "):  # SSE 형식에서 데이터 추출
+                                data = json.loads(chunk[6:]) # "data: " 제거
+                                text = data['text']
+                                if answer==False:
+                                    generated_text += text + "\n"
+                                    if "🚀 Answer" in generated_text:
+                                        answer=True
+                                        generated_text = generated_text[:-9]
+                                else:
+                                    generated_explain += text + "\n"
+
+                                messages.markdown(generated_text)
+                                explain = explain_placeholder.popover("해설보기",use_container_width=True)
+                                explain.markdown(generated_explain)
+                
+                    except Exception as e:
+                        assistant_message.error(f"An error occurred: {str(e)}")
+
+            #st.session_state["quiz_messages"].append({"role": "assistant", "content": generated_text})
+            st.session_state["quiz_messages"].append({"role": "assistant", "content": generated_text, "explain": generated_explain})
+
+            st.session_state['quiz_ready'] = False
+            #st.rerun()
+
+def batch_translation_interface():
+    with st.container(height=450):
+        if st.session_state["translated_messages"]:
+            for idx, msg in enumerate(st.session_state["translated_messages"]):
+                with st.chat_message(name=msg["role"], avatar="/app/src/images/bot_icon_2.jpg"): #avatar="https://raw.githubusercontent.com/dataprofessor/streamlit-chat-avatar/master/bot-icon.png"
+                    st.markdown(msg["content"])
+                    #if idx !=0:
+                    if msg["typing"]==False:
+                        with st.popover("해설보기",use_container_width=True):
+                            st.markdown(msg["answer"])
+        if st.session_state['translate_ready']:
+            assistant_message = st.chat_message("assistant", avatar="/app/src/images/bot_icon_2.jpg").empty()
+            
+            with st.spinner('번역 중입니다...'):
+                translated_text = translate_batch_quiz(
+                    token_type = st.session_state["token_type"], 
+                    access_token = st.session_state["access_token"],
+                    openai_api_key = st.session_state["openai_api_key"],
+                    quiz = st.session_state["translated_messages"][-1]["content"],
+                    answer = st.session_state["translated_messages"][-1]["answer"],
+                    language = st.session_state["language"])
+
+            translated_quiz = translated_text["results"][:translated_text["results"].find("🚀",2)]
+            translated_answer = translated_text["results"][translated_text["results"].find("🚀",2):]
+
+            with assistant_message:
+                with st.container():
+                    st.markdown(translated_quiz)
+                    if st.session_state["translated_messages"][-1]["typing"]==False:
+                        with st.popover("해설보기",use_container_width=True):
+                            st.markdown(translated_answer)
+            
+            if st.session_state["translated_messages"][-1]["typing"]:
+                st.session_state["translated_messages"].append({"role": "assistant", "content": translated_quiz, "answer":translated_answer,"typing":True})
+            else:
+                st.session_state["translated_messages"].append({"role": "assistant", "content": translated_quiz, "answer":translated_answer,"typing":False})
+            st.session_state["translate_ready"]=False
+    expander()
+
+def stream_translation_interface():
+    with st.container(height=450):        
+        if st.session_state["translated_messages"]:
+            for idx, msg in enumerate(st.session_state["translated_messages"]):
+                with st.chat_message(name=msg["role"], avatar="/app/src/images/bot_icon_2.jpg"): #avatar="https://raw.githubusercontent.com/dataprofessor/streamlit-chat-avatar/master/bot-icon.png"
+                    st.markdown(msg["content"])
+                    #if idx !=0:
+                    if msg["typing"]==False:
+                        with st.popover("해설보기",use_container_width=True):
+                            st.markdown(msg["answer"])
+        if st.session_state['translate_ready']:
+            assistant_message = st.chat_message("assistant", avatar="/app/src/images/bot_icon_2.jpg").empty()
+            
+            answer = False
+            with assistant_message:
+                with st.container():
+                    messages = st.empty()
+                    if st.session_state["translated_messages"][-1]["typing"]==False:
+                        explain_placeholder = st.empty()
+                    translated_text = ""
+                    translated_answer = ""
+                    try:
+                        for chunk in translate_stream_quiz(
+                            token_type=st.session_state["token_type"], 
+                            access_token=st.session_state["access_token"],
+                            openai_api_key=st.session_state["openai_api_key"],
+                            quiz=st.session_state["translated_messages"][-1]["content"],
+                            answer=st.session_state["translated_messages"][-1]["answer"],
+                            language=st.session_state["language"]
+                        ):
+                            if chunk.startswith("Error:"):
+                                assistant_message.error(chunk)
+                                break
+                            if chunk.startswith("data: "):  # SSE 형식에서 데이터 추출
+                                data = json.loads(chunk[6:])
+                                text = data['text'] # "data: " 제거
+                                #translated_text += text + "\n"
+
+                                if answer==False:
+                                    translated_text += text + "\n"
+                                    if translated_text.count("🚀")==2:
+                                        answer=True
+                                        translated_answer += translated_text[translated_text.find("🚀",2):] + "\n"
+                                        translated_text = translated_text[:translated_text.find("🚀",2)]
+                                        
+                                else:
+                                    translated_answer += text + "\n"
+
+                                # 실시간으로 번역 결과 업데이트
+                                messages.markdown(translated_text)
+                                if st.session_state["translated_messages"][-1]["typing"]==False:
+                                    explain = explain_placeholder.popover("해설보기",use_container_width=True)
+                                    explain.markdown(translated_answer)
+                        if st.session_state["translated_messages"][-1]["typing"]:
+                            st.session_state["translated_messages"].append({"role": "assistant", "content": translated_text, "answer":translated_answer,"typing":True})
+                        else:
+                            st.session_state["translated_messages"].append({"role": "assistant", "content": translated_text, "answer":translated_answer,"typing":False})
+                    except Exception as e:
+                        assistant_message.error(f"An error occurred: {str(e)}")
+                st.session_state["translate_ready"]=False
+    expander()

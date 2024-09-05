@@ -66,10 +66,10 @@ def get_stream_quiz(
             timeout=60
         )
         response.raise_for_status()
-
+        buffer = ""
         for line in response.iter_lines():
             if line:
-                yield line.decode('utf-8')
+                yield f"{line.decode('utf-8')}\n"
     except requests.exceptions.RequestException as e:
         yield f"Error: {str(e)}"
 
@@ -79,6 +79,7 @@ def translate_batch_quiz(
         access_token,
         openai_api_key,
         quiz,
+        answer,
         language
 ):
     response = requests.post(
@@ -87,6 +88,7 @@ def translate_batch_quiz(
         json={
             "openai_api_key": openai_api_key,
             "quiz": quiz,
+            "answer":answer,
             "language": language,
         },
         timeout=60
@@ -106,6 +108,7 @@ def translate_stream_quiz(
         access_token,
         openai_api_key,
         quiz,
+        answer,
         language
 ):
     url = f"http://{API_SERVER}:{API_PORT}{API_V1_STR}/quiz/stream_translation"
@@ -116,6 +119,7 @@ def translate_stream_quiz(
     data = {
         "openai_api_key": openai_api_key,
         "quiz": quiz,
+        "answer": answer,
         "language": language,
     }
 
