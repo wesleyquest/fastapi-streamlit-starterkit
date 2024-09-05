@@ -5,23 +5,50 @@ from modules.quiz.api_quiz import get_batch_quiz,get_stream_quiz, translate_batc
 import json
 
 def expander():
-    with st.expander('번역 옵션'):
-        st.selectbox('From', ['English'])
-        language = st.selectbox('To', ["Vietnamese", "Japanese", "Chinese"])
-        st.session_state["language"] = language
-        quiz_list = [[msg['content'],msg['explain']] for msg in st.session_state['quiz_messages'][1:]]
-        quiz_list.append("직접 입력")
-        selected_quiz = st.selectbox("Quiz List", quiz_list)
-        if selected_quiz != "직접 입력":
-            if st.button('번역하기',use_container_width=True):
-                st.session_state["translated_messages"].append({"role":"user","content":selected_quiz[0], "answer":selected_quiz[1],"typing":False})
-                st.session_state["translate_ready"]=True
-                st.rerun()
-        else:
-            if prompt := st.chat_input("번역할 문장을 입력해 주세요"):
-                st.session_state["translated_messages"].append({"role":"user","content":prompt,"answer":"","typing":True})
-                st.session_state['translate_ready'] = True
-                st.rerun()
+    col1,col2 = st.columns([4,1])
+    with col1:
+        if prompt := st.chat_input("번역할 문장을 입력해 주세요"):
+            st.session_state["translated_messages"].append({"role":"user","content":prompt,"answer":"","typing":True})
+            st.session_state['translate_ready'] = True
+            st.rerun()
+    with col2:
+        
+        with st.popover('번역 옵션',use_container_width=True):
+            st.selectbox('From', ['English'])
+            language = st.selectbox('To', ["Vietnamese", "Japanese", "Chinese"])
+            st.session_state["language"] = language
+            quiz_list = [[msg['content'],msg['explain']] for msg in st.session_state['quiz_messages'][1:]]
+            quiz_list.append("직접 입력")
+            selected_quiz = st.selectbox("Quiz List", quiz_list)
+            if selected_quiz != "직접 입력":
+                if st.button('번역하기',use_container_width=True):
+                    st.session_state["translated_messages"].append({"role":"user","content":selected_quiz[0], "answer":selected_quiz[1],"typing":False})
+                    st.session_state["translate_ready"]=True
+                    st.rerun()
+
+# def expander():
+#     with st.expander('번역 옵션'):
+#         st.selectbox('From', ['English'])
+#         language = st.selectbox('To', ["Vietnamese", "Japanese", "Chinese"])
+#         st.session_state["language"] = language
+#         quiz_list = [[msg['content'],msg['explain']] for msg in st.session_state['quiz_messages'][1:]]
+#         quiz_list.append("직접 입력")
+#         selected_quiz = st.selectbox("Quiz List", quiz_list)
+#         if selected_quiz != "직접 입력":
+#             if st.button('번역하기',use_container_width=True):
+#                 st.session_state["translated_messages"].append({"role":"user","content":selected_quiz[0], "answer":selected_quiz[1],"typing":False})
+#                 st.session_state["translate_ready"]=True
+#                 st.rerun()
+#         else:
+#             if prompt := st.chat_input("번역할 문장을 입력해 주세요"):
+#                 st.session_state["translated_messages"].append({"role":"user","content":prompt,"answer":"","typing":True})
+#                 st.session_state['translate_ready'] = True
+#                 st.rerun()
+
+@st.dialog(" ", width="large")
+def open_answer_modal(answer):
+    st.markdown("")
+    st.markdown(answer)
 
 #modal
 @st.dialog(" ", width="small")
@@ -160,8 +187,10 @@ def batch_generation_interface():
                 with st.chat_message(name=msg["role"], avatar="/app/src/images/bot_icon_2.jpg"): #avatar="https://raw.githubusercontent.com/dataprofessor/streamlit-chat-avatar/master/bot-icon.png"
                     st.markdown(msg["content"])
                     if idx !=0:
-                        with st.popover("해설보기",use_container_width=True):
-                            st.markdown(msg["explain"])
+                        if st.button("해설보기",key=f"explanation_button_{idx}",use_container_width=True):
+                            open_answer_modal(msg["explain"])
+                        # with st.popover("해설보기",use_container_width=True):
+                        #     st.markdown(msg["explain"])
         if st.session_state["quiz_ready"]==True:
 
             assistant_message = st.chat_message("assistant", avatar="/app/src/images/bot_icon_2.jpg").empty()
@@ -181,13 +210,16 @@ def batch_generation_interface():
             with assistant_message:
                 with st.container():
                     st.markdown(generated_quiz)
-                    with st.popover("해설보기",use_container_width=True):
-                        st.markdown(generated_answer)
+                    if st.button("해설보기", key = "generate_tmp",use_container_width=True):
+                        open_answer_modal(generated_answer)
+                    #with st.popover("해설보기",use_container_width=True):
+                    #    st.markdown(generated_answer)
 
             #st.session_state["quiz_messages"].append({"role": "assistant", "content": generated_text["results"]})
             st.session_state["quiz_messages"].append({"role": "assistant", "content": generated_quiz,"explain":generated_answer})
 
             st.session_state['quiz_ready'] = False
+            st.rerun()
 
 def stream_generation_interface():
     with st.container(border=True, height=450):
@@ -196,8 +228,10 @@ def stream_generation_interface():
                 with st.chat_message(name=msg["role"], avatar="/app/src/images/bot_icon_2.jpg"): #avatar="https://raw.githubusercontent.com/dataprofessor/streamlit-chat-avatar/master/bot-icon.png"
                     st.markdown(msg["content"])
                     if idx !=0:
-                        with st.popover("해설보기",use_container_width=True):
-                            st.markdown(msg["explain"])
+                        if st.button("해설보기",key=f"explanation_button_{idx}",use_container_width=True):
+                            open_answer_modal(msg["explain"])
+                        # with st.popover("해설보기",use_container_width=True):
+                        #     st.markdown(msg["explain"])
         if st.session_state["quiz_ready"]==True:
             
             assistant_message = st.chat_message("assistant", avatar="/app/src/images/bot_icon_2.jpg").empty()
@@ -205,7 +239,9 @@ def stream_generation_interface():
             with assistant_message:
                 with st.container():
                     messages = st.empty()
-                    explain_placeholder = st.empty()
+                    #explain_placeholder = st.empty()
+                    # explain = st.button("해설보기",key="generate_tmp",use_container_width=True)
+
                     generated_text = ""
                     generated_explain = "🚀 Answer \n"    
                     try:
@@ -233,17 +269,25 @@ def stream_generation_interface():
                                     generated_explain += text + "\n"
 
                                 messages.markdown(generated_text)
-                                explain = explain_placeholder.popover("해설보기",use_container_width=True)
-                                explain.markdown(generated_explain)
+                                #explain = explain_placeholder.button("해설보기",key="generate_tmp")
+                                # if explain:
+                                #     open_answer_modal(generated_explain)
+                                #explain = explain_placeholder.popover("해설보기",use_container_width=True)
+                                #explain.markdown(generated_explain)
                 
                     except Exception as e:
                         assistant_message.error(f"An error occurred: {str(e)}")
+                    
+                    explain = st.button("해설보기",key="generate_tmp",use_container_width=True)
+                    if explain:
+                        open_answer_modal(generated_explain)
+
 
             #st.session_state["quiz_messages"].append({"role": "assistant", "content": generated_text})
             st.session_state["quiz_messages"].append({"role": "assistant", "content": generated_text, "explain": generated_explain})
 
             st.session_state['quiz_ready'] = False
-            #st.rerun()
+            st.rerun()
 
 def batch_translation_interface():
     with st.container(height=450):
@@ -253,8 +297,10 @@ def batch_translation_interface():
                     st.markdown(msg["content"])
                     #if idx !=0:
                     if msg["typing"]==False:
-                        with st.popover("해설보기",use_container_width=True):
-                            st.markdown(msg["answer"])
+                        if st.button("해설보기",key=f"batch_explanation_button_{idx}",use_container_width=True):
+                            open_answer_modal(msg["answer"])
+                        # with st.popover("해설보기",use_container_width=True):
+                        #     st.markdown(msg["answer"])
         if st.session_state['translate_ready']:
             assistant_message = st.chat_message("assistant", avatar="/app/src/images/bot_icon_2.jpg").empty()
             
@@ -274,14 +320,17 @@ def batch_translation_interface():
                 with st.container():
                     st.markdown(translated_quiz)
                     if st.session_state["translated_messages"][-1]["typing"]==False:
-                        with st.popover("해설보기",use_container_width=True):
-                            st.markdown(translated_answer)
+                        if st.button("해설보기",key="translate_tmp",use_container_width=True):
+                            open_answer_modal(translated_answer)
+                        # with st.popover("해설보기",use_container_width=True):
+                        #     st.markdown(translated_answer)
             
             if st.session_state["translated_messages"][-1]["typing"]:
                 st.session_state["translated_messages"].append({"role": "assistant", "content": translated_quiz, "answer":translated_answer,"typing":True})
             else:
                 st.session_state["translated_messages"].append({"role": "assistant", "content": translated_quiz, "answer":translated_answer,"typing":False})
             st.session_state["translate_ready"]=False
+            st.rerun()
     expander()
 
 def stream_translation_interface():
@@ -292,8 +341,10 @@ def stream_translation_interface():
                     st.markdown(msg["content"])
                     #if idx !=0:
                     if msg["typing"]==False:
-                        with st.popover("해설보기",use_container_width=True):
-                            st.markdown(msg["answer"])
+                        if st.button("해설보기",key=f"stream_explanation_button_{idx}",use_container_width=True):
+                            open_answer_modal(msg["answer"])
+                        # with st.popover("해설보기",use_container_width=True):
+                        #     st.markdown(msg["answer"])
         if st.session_state['translate_ready']:
             assistant_message = st.chat_message("assistant", avatar="/app/src/images/bot_icon_2.jpg").empty()
             
@@ -301,8 +352,9 @@ def stream_translation_interface():
             with assistant_message:
                 with st.container():
                     messages = st.empty()
-                    if st.session_state["translated_messages"][-1]["typing"]==False:
-                        explain_placeholder = st.empty()
+                    # if st.session_state["translated_messages"][-1]["typing"]==False:
+                    #     explain = st.button("해설보기",key="translate_tmp",use_container_width=True)
+                        #explain_placeholder = st.empty()
                     translated_text = ""
                     translated_answer = ""
                     try:
@@ -334,9 +386,18 @@ def stream_translation_interface():
 
                                 # 실시간으로 번역 결과 업데이트
                                 messages.markdown(translated_text)
-                                if st.session_state["translated_messages"][-1]["typing"]==False:
-                                    explain = explain_placeholder.popover("해설보기",use_container_width=True)
-                                    explain.markdown(translated_answer)
+                                # if st.session_state["translated_messages"][-1]["typing"]==False:
+                                #     #explain = explain_placeholder.button("해설보기",key="translate_tmp")
+                                #     if explain:
+                                #         open_answer_modal(translated_answer)
+                                    # explain = explain_placeholder.popover("해설보기",use_container_width=True)
+                                    # explain.markdown(translated_answer)
+                        
+                        if st.session_state["translated_messages"][-1]["typing"]==False:
+                            explain = st.button("해설보기",key="translate_tmp",use_container_width=True)
+                            if explain:
+                                open_answer_modal(translated_answer)
+
                         if st.session_state["translated_messages"][-1]["typing"]:
                             st.session_state["translated_messages"].append({"role": "assistant", "content": translated_text, "answer":translated_answer,"typing":True})
                         else:
@@ -344,4 +405,5 @@ def stream_translation_interface():
                     except Exception as e:
                         assistant_message.error(f"An error occurred: {str(e)}")
                 st.session_state["translate_ready"]=False
+                st.rerun()
     expander()
