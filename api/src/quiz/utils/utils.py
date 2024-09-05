@@ -7,17 +7,42 @@ from src.quiz.utils.fewshot import sample_fewshot
 import json
 import random
 # random content, type 세트 만들기
+
 async def make_set(quiz_content,quiz_type,number):
     set_type = [(q_content,q_type) for q_content in quiz_content for q_type in quiz_type]
     q_set = []
     if len(set_type)>= number:
-        q_set = random.sample(set_type,k=number)
+        # 각 quiz_type을 최대한 골고루 선택하기 위한 알고리즘
+        quiz_type_cycle = iter(random.sample(quiz_type, len(quiz_type)))  # quiz_type을 섞어서 순환
+        while len(q_set) < number:
+            q_content = random.choice(quiz_content)  # 랜덤하게 quiz_content 선택
+            q_type = next(quiz_type_cycle, None)  # quiz_type을 순차적으로 선택
+            
+            if q_type is None:  # quiz_type을 모두 순환했으면 다시 섞어서 순환
+                quiz_type_cycle = iter(random.sample(quiz_type, len(quiz_type)))
+                q_type = next(quiz_type_cycle)
+            
+            # 중복되지 않게 조합을 추가
+            if (q_content, q_type) not in q_set:
+                q_set.append((q_content, q_type))
     else:
         for _ in range(number//len(set_type)):
             q_set += set_type
         q_set += random.sample(set_type,k=number%len(set_type))
     random.shuffle(q_set)
     return q_set
+
+# async def make_set(quiz_content,quiz_type,number):
+#     set_type = [(q_content,q_type) for q_content in quiz_content for q_type in quiz_type]
+#     q_set = []
+#     if len(set_type)>= number:
+#         q_set = random.sample(set_type,k=number)
+#     else:
+#         for _ in range(number//len(set_type)):
+#             q_set += set_type
+#         q_set += random.sample(set_type,k=number%len(set_type))
+#     random.shuffle(q_set)
+#     return q_set
 
 # batch 퀴즈 생성
 async def batch_generate_gpt4o_quiz(
