@@ -8,22 +8,72 @@ template: |
     Return the result as if the class `QuizzesGenerator` was executed to produce the quizzes.
     You only return the result.
 
-    Parameters:
-      topic (str): topic of quizzes to create
-      reference (str): quizzes should be based on references
-      quiz_content (list): list of possible content types for the quizzes
-        vocabulary_focused: create quizzes focusing on individual words, their meanings, usage, and nuances
-        sentence_example: create quizzes based using complete sentences to test grammar, context, and comprehension
-        cultural_information:create quizzes incorporating cultural aspects related to the topic, testing cultural knowledge and understanding
-        word_order:create quizzes specifically testing the correct order of words in sentences or phrases
-      quiz_type (list): list of possible types for the quizzes
-        multiple_choice:create multiple choice quizzes with 4 answer options(\n①, ②, ③, ④), where only on option is correct
-        true_or_false:create true/false quizzes where the statement is either correct or incorrect
-        fill_in_the_blank:create fill-in-the-blank quizzes where one key word or phrase is missing from the sentence
-      number (int): number of quizzes to create
+    [Parameters]
+    - topic (str): topic of quizzes to create
+    - reference (str): quizzes should be based on references
+    - quiz_content (list): list of possible content types for the quizzes
+      *vocabulary_focused: create quizzes focusing on individual words, their meanings, usage, and nuances
+      *sentence_example: create quizzes based using complete sentences to test grammar, context, and comprehension
+      *cultural_information:create quizzes incorporating cultural aspects related to the topic, testing cultural knowledge and understanding
+      *word_order:create quizzes specifically testing the correct order of words in sentences or phrases
+    - quiz_type (list): list of possible types for the quizzes
+      *multiple_choice:create multiple choice quizzes with 4 answer options(\n①, ②, ③, ④), where only on option is correct
+      *true_or_false:create true/false quizzes where the statement is either correct or incorrect
+      *fill_in_the_blank:create fill-in-the-blank quizzes where one key word or phrase is missing from the sentence
+    - number (int): number of quizzes to create
 
-    Returns: 
-      str: A formatted string containing sets of quizzes. The format includes sections for Quiz, Answer, Explain, Sentence, and Dialog, each prefixed with a rocket emoji (🚀).Individual quizzes within each section are numbered and prefixed with a sparkle emoji (🔆).
+    [Returns] 
+    A formatted string containing sets of quizzes. The format includes sections for Quiz, Answer, Explain, Sentence, and Dialog.
+    Each quiz is numbered and uses the format:
+
+    🚀 Quiz 
+    
+      🔆 Quiz 1. [Insert your quiz question here in this format, based on the provided reference, content type and quiz type]
+
+      🔆 Quiz 2. [Insert your quiz question here in this format, based on the provided reference, content type and quiz type]
+      ...
+      
+    🚀 Answer
+
+      🔆 Quiz 1. [Insert the correct answer here]
+
+      🔆 Quiz 2. [Insert the correct answer here]
+      ...
+    
+    🚀 Explain
+
+      🔆 Quiz 1. [Insert an explanation of why the answer is correct, referencing details from the topic and reference]
+
+      🔆 Quiz 2. [Insert an explanation of why the answer is correct, referencing details from the topic and reference]
+      ...
+    
+    🚀 Sentence
+
+      🔆 Quiz 1.
+
+        Example 1. [Insert an example sentence]
+        Example 2. [Insert an example sentence]
+        Example 3. [Insert an example sentence]
+
+      🔆 Quiz 2.
+
+        Example 1. [Insert an example sentence]
+        Example 2. [Insert an example sentence]
+        Example 3. [Insert an example sentence]
+      ...
+    
+    🚀 Dialog
+
+      🔆 Quiz 1.
+
+        A:[Insert first part of the dialog]
+        B:[Insert response showing correct usage of the topic]
+
+      🔆 Quiz 2.
+
+        A:[Insert first part of the dialog]
+        B:[Insert response showing correct usage of the topic]
+      ...
     """
     #define parameter
     def __init__(self, topic, reference, quiz_content, quiz_type, number, set):
@@ -38,35 +88,16 @@ template: |
     def create_quizzes(self):
       quizzes = []
       for content, type in self.set:
-          quiz:
+          quiz= {{
             'type': [content, type],
             'quiz': create_quiz_with_llm(Create a quiz about the topic self.topic, with reference to self.reference, focusing on content, and formatted as type),
             'answer': create_answer_with_llm(Provide the correct answer based on self.topic and self.reference for the quiz created),
             'explain': create_explain_with_llm(Explain why the answer is correct using details from self.reference and the topic self.topic),
-            'sentence': create_sentence_with_llm(Provide three sample sentences related to the topic self.topic focusing on content),
+            'sentence': create_sentence_with_llm(Provide THREE sample sentences related to the topic self.topic focusing on content),
             'dialog': create_dialog_with_llm(Create a short dialog that illustrates the correct usage of self.topic in the context of content)      
+          }}
           quizzes.append(quiz)
       return quizzes
-
-    #make quiz format function
-    def generate_quizzes(self):
-      quiz="🚀 Quiz" + "\n\n"
-      answer="🚀 Answer" + "\n\n"
-      explain="🚀 Explain" + "\n\n"
-      sentence="🚀 Sentence" + "\n\n"
-      dialog="🚀 Dialog" + "\n\n"
-
-      quizzes_set = self.create_quizzes()
-
-      for idx, quiz_set in enumerate(quizzes_set):
-        quiz += "🔆 Quiz idx+1. " + quiz_set['quiz'] + "\n\n"
-        answer += "🔆 Quiz idx+1. " + quiz_set['answer'] + "\n\n"
-        explain += "🔆 Quiz idx+1. " + quiz_set['explain'] + "\n\n"
-        sentence += "🔆 Quiz idx+1. " + "\n\n" + quiz_set['sentence'] + "\n\n"
-        dialog += "🔆 Quiz idx+1. " + quiz_set['dialog'] + "\n\n"
-
-      quiz_set = "+quiz + "\n"+answer + "\n"+explain + "\n"+sentence + "\n"+dialog
-      return quiz_set
 
   Quizzes_Generator = QuizzesGenerator({topic}, {reference}, {quiz_content}, {quiz_type},{number},{set})
   result = Quizzes_Generator.generate_quizzes()

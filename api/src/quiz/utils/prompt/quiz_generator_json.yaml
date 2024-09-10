@@ -1,0 +1,68 @@
+_type: prompt
+input_variables:
+  ["topic","reference","set","number"]
+template: |
+  """Your goal is to create a well crafted set of quizzes about the "topic" in the format of "quiz_content" and "quiz_type" with "reference".
+  The purpose of the quiz is to assess learners' understanding of how to use "topic".
+  
+  [Parameters]
+    - topic (str): topic of quizzes to create
+    - reference (str): quizzes should be based on references
+    - quiz_content (str): list of possible content types for the quizzes
+      *vocabulary_focused: create quizzes focusing on individual words, their meanings, usage, and nuances
+      *sentence_example: create quizzes based using complete sentences to test grammar, context, and comprehension
+      *cultural_information:create quizzes incorporating cultural aspects related to the topic, testing cultural knowledge and understanding
+      *word_order:create quizzes specifically testing the correct order of words in sentences or phrases
+    - quiz_type (str): list of possible types for the quizzes
+      *multiple_choice:create multiple choice quizzes with 4 answer options, where only on option is correct
+      *true_or_false:create true/false quizzes where the statement is either correct or incorrect
+      *fill_in_the_blank:create fill-in-the-blank quizzes where one key word or phrase is missing from the sentence
+    - set (list): combination of quiz_content and quiz_type (e.g., ["vocabulary_focused", "multiple_choice"],["sentence_example","fill_in_the_blank"])
+    - number (int): number of quizzes to create
+  
+  [Return]
+  Please return exactly {number} quizzes based on the provided "set" in the following JSON format:
+  for each (content, type) in "set":
+    if the number of quizzes is reached, stop generating more.
+
+  database = []
+  for i in range({number}):
+    quiz_content = set[i][0]
+    quiz_type = set[i][1]
+    if quiz_type == "multiple_choice":
+      choices = ["① [Insert choice 1 here]", "② [Insert choice 2 here]", "③ [Insert choice 3 here]", "④ [Insert choice 4 here]"]
+    elif quiz_type == "true_false":
+      choices = ["① True","② False"]
+    else:
+      choices = []
+
+    data: {{
+      "quiz": "[Insert quiz question about the topic, reference and focusing on content, and formatted as type]",
+      "choice": choices,
+      "type": quiz_type,
+      "content": quiz_content,
+      "answer": [Insert the correct answer based on topic and reference for the quiz created with number(①, ②, ③, ④) if you need (e.g., ① True)],
+      "explain": "[Insert the Explain why the answer is correct using details from reference and the topic]"
+      "sentence": ["[Insert First example sentence related to the quiz, answer and explain]", "[Insert Second example sentence related to the quiz, answer and explain]", "[Insert Third example sentence related to the quiz, answer and explain]"],
+      "dialog": ["[Insert dialog part A related to the quiz, answer and explain]", "[Insert dialog part B related to the quiz, answer and explain]"]
+    }}
+    database.append(data)
+
+  The structure should strictly follow the above format, filling in the placeholders with the appropriate values based on the topic, reference, quiz_content and quiz_type provided.
+  The generated quiz should be based on the topic and reference.
+
+  [topic]
+  {topic}
+
+  [reference]
+  {reference}
+
+  [set]
+  {set}
+
+  [number]
+  {number}
+  """
+
+
+

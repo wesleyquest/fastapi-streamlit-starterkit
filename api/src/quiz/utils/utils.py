@@ -32,6 +32,50 @@ async def make_set(quiz_content,quiz_type,number):
     random.shuffle(q_set)
     return q_set
 
+async def quiz_format(text):
+    start = text.find('[')  # '['로 시작하는 부분을 찾음
+    end = text.rfind(']')   # ']'로 끝나는 부분을 찾음
+    if start != -1 and end != -1:
+        json_data = text[start:end+1]  # JSON 부분만 추출
+        try:
+            parsed_data = json.loads(json_data)
+        
+        except json.JSONDecodeError as e:
+            print("Failed to parse JSON:", e)
+            return None
+    else:
+        print("No valid JSON found in the result.")
+        return None
+
+    quiz = "🚀 **Quiz**\n\n"
+    answer = "🚀 **Answer**\n\n"
+    explain = "🚀 **Explain**\n\n"
+    sentence = "🚀 **Sentence**\n\n"
+    dialog = "🚀 **Dialog**\n\n"
+
+    for idx, data in enumerate(parsed_data,start=1):
+        quiz += f"🔆 Quiz {idx}. " + data["quiz"] + "\n\n"
+        if data["type"] !="fill_in_the_blank":
+            for choice in data["choice"]:
+                quiz += choice + "\n\n"
+        answer += f"🔆 Quiz {idx}. " + data["answer"]  + "\n\n"
+        explain += f"🔆 Quiz {idx}. " + data["explain"] + "\n\n"
+        sentence += f"🔆 Quiz {idx}. " + "\n\n"
+        for i, sen in enumerate(data["sentence"],start=1):
+            sentence += f"Example {i}. "  + sen + "\n\n"
+        dialog += f"🔆 Quiz {idx}. " +"\n\n"
+        for i, dia in enumerate(data["dialog"],start=1):
+            dialog += dia + "\n\n"
+    # output = quiz + answer + explain + sentence + dialog
+    # print(output)
+    # return output
+    output_quiz = quiz 
+    output_answer = answer + explain + sentence + dialog
+    output = [output_quiz, output_answer]
+    return output
+
+
+    
 # async def make_set(quiz_content,quiz_type,number):
 #     set_type = [(q_content,q_type) for q_content in quiz_content for q_type in quiz_type]
 #     q_set = []
@@ -45,6 +89,7 @@ async def make_set(quiz_content,quiz_type,number):
 #     return q_set
 
 # batch 퀴즈 생성
+
 async def batch_generate_gpt4o_quiz(
         openai_api_key,
         document,
@@ -53,15 +98,17 @@ async def batch_generate_gpt4o_quiz(
         number
 ):
 
-    llm = ChatOpenAI(model_name = "gpt-4o", streaming=True, callbacks=[StreamingStdOutCallbackHandler()],
-                    temperature = 0,
+    llm = ChatOpenAI(model_name = "gpt-4o",streaming=True, callbacks=[StreamingStdOutCallbackHandler()],
+                    temperature = 0.56,
                     openai_api_key= openai_api_key)
     #prompt = load_prompt(os.path.join('/app/src/quiz/utils/prompt', 'quiz_generator_pythonic.yaml'))
-    prompt = load_prompt(os.path.join('/app/src/quiz/utils/prompt', 'quiz_generator_pythonic_for_develop.yaml'))
+    prompt = load_prompt(os.path.join('/app/src/quiz/utils/prompt', 'quiz_generator_json.yaml'))
     topic = document.split('\n')[0]
     reference = '\n'.join(document.split('\n')[1:])
     q_set= await make_set(quiz_content,quiz_type,number)
-    input_data = {"topic": topic,"reference": reference,"quiz_content":quiz_content,"quiz_type":quiz_type,"number":number,"set":q_set}
+    print(q_set)
+    #input_data = {"topic": topic,"reference": reference,"quiz_content":quiz_content,"quiz_type":quiz_type,"number":number,"set":q_set}
+    input_data = {"topic": topic,"reference": reference,"number":number,"set":q_set}
 
     chain = (
         prompt
@@ -69,53 +116,83 @@ async def batch_generate_gpt4o_quiz(
         | StrOutputParser()
     )
 
-    results = chain.invoke(input_data).replace("A:", "\n    A:").replace("B:","\n    B:").replace("①","\n    ①").replace("②","    ②").replace("③","    ③").replace("④","    ④")
+    #results = chain.invoke(input_data).replace("A:", "\n    A:").replace("B:","\n    B:").replace("①","\n    ①").replace("②","    ②").replace("③","    ③").replace("④","    ④")
+    response = chain.invoke(input_data)
+    results = await quiz_format(response)
     return results
 
+# async def batch_generate_gpt4o_quiz(
+#         openai_api_key,
+#         document,
+#         quiz_content,
+#         quiz_type,
+#         number
+# ):
+
+#     llm = ChatOpenAI(model_name = "gpt-4o", streaming=True, callbacks=[StreamingStdOutCallbackHandler()],
+#                     temperature = 0,
+#                     openai_api_key= openai_api_key)
+#     #prompt = load_prompt(os.path.join('/app/src/quiz/utils/prompt', 'quiz_generator_pythonic.yaml'))
+#     prompt = load_prompt(os.path.join('/app/src/quiz/utils/prompt', 'quiz_generator_pythonic_for_develop.yaml'))
+#     topic = document.split('\n')[0]
+#     reference = '\n'.join(document.split('\n')[1:])
+#     q_set= await make_set(quiz_content,quiz_type,number)
+#     input_data = {"topic": topic,"reference": reference,"quiz_content":quiz_content,"quiz_type":quiz_type,"number":number,"set":q_set}
+
+#     chain = (
+#         prompt
+#         | llm
+#         | StrOutputParser()
+#     )
+
+#     #results = chain.invoke(input_data).replace("A:", "\n    A:").replace("B:","\n    B:").replace("①","\n    ①").replace("②","    ②").replace("③","    ③").replace("④","    ④")
+#     results = chain.invoke(input_data)
+#     return results
+
 # stream 퀴즈 생성
-async def stream_generate_gpt4o_quiz(
-        openai_api_key,
-        document,
-        quiz_content,
-        quiz_type,
-        number
-):
+# async def stream_generate_gpt4o_quiz(
+#         openai_api_key,
+#         document,
+#         quiz_content,
+#         quiz_type,
+#         number
+# ):
 
-    llm = ChatOpenAI(model_name = "gpt-4o", streaming=True, callbacks=[StreamingStdOutCallbackHandler()],
-                    temperature = 0,
-                    openai_api_key= openai_api_key)
-    #prompt = load_prompt(os.path.join('/app/src/quiz/utils/prompt', 'quiz_generator_pythonic.yaml'))
-    prompt = load_prompt(os.path.join('/app/src/quiz/utils/prompt', 'quiz_generator_pythonic_for_develop.yaml'))
-    topic = document.split('\n')[0]
-    reference = '\n'.join(document.split('\n')[1:])
-    q_set= await make_set(quiz_content,quiz_type,number)
-    input_data = {"topic": topic,"reference": reference,"quiz_content":quiz_content,"quiz_type":quiz_type,"number":number,"set":q_set}
+#     llm = ChatOpenAI(model_name = "gpt-4o", streaming=True, callbacks=[StreamingStdOutCallbackHandler()],
+#                     temperature = 0,
+#                     openai_api_key= openai_api_key)
+#     #prompt = load_prompt(os.path.join('/app/src/quiz/utils/prompt', 'quiz_generator_pythonic.yaml'))
+#     prompt = load_prompt(os.path.join('/app/src/quiz/utils/prompt', 'quiz_generator_pythonic_for_develop.yaml'))
+#     topic = document.split('\n')[0]
+#     reference = '\n'.join(document.split('\n')[1:])
+#     q_set= await make_set(quiz_content,quiz_type,number)
+#     input_data = {"topic": topic,"reference": reference,"quiz_content":quiz_content,"quiz_type":quiz_type,"number":number,"set":q_set}
 
-    chain = (
-        prompt
-        | llm
-        | StrOutputParser()
-    )
+#     chain = (
+#         prompt
+#         | llm
+#         | StrOutputParser()
+#     )
 
-    async def generate():
-        buffer = ""
-        async for chunk in chain.astream(input_data):
-            buffer += chunk
-            lines = buffer.split('\n')
+#     async def generate():
+#         buffer = ""
+#         async for chunk in chain.astream(input_data):
+#             buffer += chunk
+#             lines = buffer.split('\n')
             
-            # Process all complete lines
-            for line in lines[:-1]:
-                line = line.replace("🔆", "\n  🔆").replace("A:", "\n    A:").replace("B:","\n    B:").replace("①","\n    ①").replace("②","    ②").replace("③","    ③").replace("④","    ④")
-                yield f"data: {json.dumps({'text': line})}\n\n"
+#             # Process all complete lines
+#             for line in lines[:-1]:
+#                 #line = line.replace("🔆", "\n  🔆").replace("A:", "\n    A:").replace("B:","\n    B:").replace("①","\n    ①").replace("②","    ②").replace("③","    ③").replace("④","    ④")
+#                 yield f"data: {json.dumps({'text': line})}\n\n"
             
-            # Keep the last (possibly incomplete) line in the buffer
-            buffer = lines[-1]
+#             # Keep the last (possibly incomplete) line in the buffer
+#             buffer = lines[-1]
 
-        # Yield any remaining content in the buffer
-        if buffer:
-            buffer = buffer.replace("🔆", "\n  🔆").replace("A:", "\n    A:").replace("B:","\n    B:").replace("①","\n    ①").replace("②","    ②").replace("③","    ③").replace("④","    ④")
-            yield f"data: {json.dumps({'text': buffer})}\n\n"
-    return generate
+#         # Yield any remaining content in the buffer
+#         if buffer:
+#             #buffer = buffer.replace("🔆", "\n  🔆").replace("A:", "\n    A:").replace("B:","\n    B:").replace("①","\n    ①").replace("②","    ②").replace("③","    ③").replace("④","    ④")
+#             yield f"data: {json.dumps({'text': buffer})}\n\n"
+#     return generate
 
 # batch 번역
 async def batch_translate_gpt4o_quiz(

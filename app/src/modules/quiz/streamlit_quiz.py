@@ -1,7 +1,8 @@
 import streamlit as st
 from modules.validation.key_validation import validate_openai_api_key
 from modules.validation.form_validation import validate_text
-from modules.quiz.api_quiz import get_batch_quiz,get_stream_quiz, translate_batch_quiz, translate_stream_quiz
+#from modules.quiz.api_quiz import get_batch_quiz,get_stream_quiz, translate_batch_quiz, translate_stream_quiz
+from modules.quiz.api_quiz import get_batch_quiz, translate_batch_quiz, translate_stream_quiz
 import json
 
 def expander():
@@ -20,11 +21,18 @@ def expander():
             quiz_list = [[msg['content'],msg['explain']] for msg in st.session_state['quiz_messages'][1:]]
             quiz_list.append("직접 입력")
             selected_quiz = st.selectbox("Quiz List", quiz_list)
-            if selected_quiz != "직접 입력":
-                if st.button('번역하기',use_container_width=True):
-                    st.session_state["translated_messages"].append({"role":"user","content":selected_quiz[0], "answer":selected_quiz[1],"typing":False})
-                    st.session_state["translate_ready"]=True
-                    st.rerun()
+            but1, but2 = st.columns([1,1])
+            with but1:
+                if st.toggle("Activate Streaming", value=st.session_state["stream"]):
+                    st.session_state["stream"]=True
+                else:
+                    st.session_state["stream"] = False
+            with but2:
+                if selected_quiz != "직접 입력":
+                    if st.button('번역하기',use_container_width=True):
+                        st.session_state["translated_messages"].append({"role":"user","content":selected_quiz[0], "answer":selected_quiz[1],"typing":False})
+                        st.session_state["translate_ready"]=True
+                        st.rerun()
 
 # def expander():
 #     with st.expander('번역 옵션'):
@@ -181,7 +189,7 @@ def open_settings_modal():
             st.rerun()    
 
 def batch_generation_interface():
-    with st.container(border=True, height=450):
+    with st.container(border=True, height=500):
         if st.session_state["quiz_messages"]:
             for idx, msg in enumerate(st.session_state["quiz_messages"]):
                 with st.chat_message(name=msg["role"], avatar="/app/src/images/bot_icon_2.jpg"): #avatar="https://raw.githubusercontent.com/dataprofessor/streamlit-chat-avatar/master/bot-icon.png"
@@ -204,9 +212,11 @@ def batch_generation_interface():
                     quiz_type = st.session_state["quiz"]["input"]["quiz_type"],
                     number = st.session_state["quiz"]["input"]["number"]
                 )
-            generated_quiz = generated_text["results"].split("🚀 Answer")[0]
-            generated_answer = "🚀 Answer\n"+ generated_text["results"].split("🚀 Answer")[1]
-            
+            # generated_quiz = generated_text["results"].split("🚀 Answer")[0]
+            # generated_answer = "🚀 Answer\n"+ generated_text["results"].split("🚀 Answer")[1]
+            generated_quiz = generated_text["results"][0]
+            generated_answer = generated_text["results"][1]
+
             with assistant_message:
                 with st.container():
                     st.markdown(generated_quiz)
@@ -221,66 +231,66 @@ def batch_generation_interface():
             st.session_state['quiz_ready'] = False
             st.rerun()
 
-def stream_generation_interface():
-    with st.container(border=True, height=450):
-        if st.session_state["quiz_messages"]:
-            for idx, msg in enumerate(st.session_state["quiz_messages"]):
-                with st.chat_message(name=msg["role"], avatar="/app/src/images/bot_icon_2.jpg"): #avatar="https://raw.githubusercontent.com/dataprofessor/streamlit-chat-avatar/master/bot-icon.png"
-                    st.markdown(msg["content"])
-                    if idx !=0:
-                        if st.button("해설보기",key=f"explanation_button_{idx}",use_container_width=True):
-                            open_answer_modal(msg["explain"])
-                        # with st.popover("해설보기",use_container_width=True):
-                        #     st.markdown(msg["explain"])
-        if st.session_state["quiz_ready"]==True:
+# def stream_generation_interface():
+#     with st.container(border=True, height=450):
+#         if st.session_state["quiz_messages"]:
+#             for idx, msg in enumerate(st.session_state["quiz_messages"]):
+#                 with st.chat_message(name=msg["role"], avatar="/app/src/images/bot_icon_2.jpg"): #avatar="https://raw.githubusercontent.com/dataprofessor/streamlit-chat-avatar/master/bot-icon.png"
+#                     st.markdown(msg["content"])
+#                     if idx !=0:
+#                         if st.button("해설보기",key=f"explanation_button_{idx}",use_container_width=True):
+#                             open_answer_modal(msg["explain"])
+#                         # with st.popover("해설보기",use_container_width=True):
+#                         #     st.markdown(msg["explain"])
+#         if st.session_state["quiz_ready"]==True:
             
-            assistant_message = st.chat_message("assistant", avatar="/app/src/images/bot_icon_2.jpg").empty()
-            answer=False
-            with assistant_message:
-                with st.container():
-                    messages = st.empty()
-                    #explain_placeholder = st.empty()
-                    # explain = st.button("해설보기",key="generate_tmp",use_container_width=True)
+#             assistant_message = st.chat_message("assistant", avatar="/app/src/images/bot_icon_2.jpg").empty()
+#             answer=False
+#             with assistant_message:
+#                 with st.container():
+#                     messages = st.empty()
+#                     #explain_placeholder = st.empty()
+#                     # explain = st.button("해설보기",key="generate_tmp",use_container_width=True)
 
-                    generated_text = ""
-                    generated_explain = "🚀 Answer \n"    
-                    try:
-                        for chunk in get_stream_quiz(
-                            token_type = st.session_state["token_type"], 
-                            access_token = st.session_state["access_token"],
-                            openai_api_key = st.session_state["openai_api_key"],
-                            document = st.session_state["quiz"]["input"]["document"],
-                            quiz_content = st.session_state["quiz"]["input"]["quiz_content"],
-                            quiz_type = st.session_state["quiz"]["input"]["quiz_type"],
-                            number = st.session_state["quiz"]["input"]["number"]
-                        ):
-                            if chunk.startswith("Error:"):
-                                assistant_message.error(chunk)
-                                break
-                            if chunk.startswith("data: "):  # SSE 형식에서 데이터 추출
-                                data = json.loads(chunk[6:]) # "data: " 제거
-                                text = data['text']
-                                if answer==False:
-                                    generated_text += text + "\n"
-                                    if "🚀 Answer" in generated_text:
-                                        answer=True
-                                        generated_text = generated_text[:-9]
-                                else:
-                                    generated_explain += text + "\n"
+#                     generated_text = ""
+#                     generated_explain = "🚀 Answer \n"    
+#                     try:
+#                         for chunk in get_stream_quiz(
+#                             token_type = st.session_state["token_type"], 
+#                             access_token = st.session_state["access_token"],
+#                             openai_api_key = st.session_state["openai_api_key"],
+#                             document = st.session_state["quiz"]["input"]["document"],
+#                             quiz_content = st.session_state["quiz"]["input"]["quiz_content"],
+#                             quiz_type = st.session_state["quiz"]["input"]["quiz_type"],
+#                             number = st.session_state["quiz"]["input"]["number"]
+#                         ):
+#                             if chunk.startswith("Error:"):
+#                                 assistant_message.error(chunk)
+#                                 break
+#                             if chunk.startswith("data: "):  # SSE 형식에서 데이터 추출
+#                                 data = json.loads(chunk[6:]) # "data: " 제거
+#                                 text = data['text']
+#                                 if answer==False:
+#                                     generated_text += text + "\n"
+#                                     if "🚀 Answer" in generated_text:
+#                                         answer=True
+#                                         generated_text = generated_text[:-9]
+#                                 else:
+#                                     generated_explain += text + "\n"
 
-                                messages.markdown(generated_text)
-                                #explain = explain_placeholder.button("해설보기",key="generate_tmp")
-                                # if explain:
-                                #     open_answer_modal(generated_explain)
-                                #explain = explain_placeholder.popover("해설보기",use_container_width=True)
-                                #explain.markdown(generated_explain)
+#                                 messages.markdown(generated_text)
+#                                 #explain = explain_placeholder.button("해설보기",key="generate_tmp")
+#                                 # if explain:
+#                                 #     open_answer_modal(generated_explain)
+#                                 #explain = explain_placeholder.popover("해설보기",use_container_width=True)
+#                                 #explain.markdown(generated_explain)
                 
-                    except Exception as e:
-                        assistant_message.error(f"An error occurred: {str(e)}")
+#                     except Exception as e:
+#                         assistant_message.error(f"An error occurred: {str(e)}")
                     
-                    explain = st.button("해설보기",key="generate_tmp",use_container_width=True)
-                    if explain:
-                        open_answer_modal(generated_explain)
+#                     explain = st.button("해설보기",key="generate_tmp",use_container_width=True)
+#                     if explain:
+#                         open_answer_modal(generated_explain)
 
 
             #st.session_state["quiz_messages"].append({"role": "assistant", "content": generated_text})
@@ -290,7 +300,7 @@ def stream_generation_interface():
             st.rerun()
 
 def batch_translation_interface():
-    with st.container(height=450):
+    with st.container(height=500):
         if st.session_state["translated_messages"]:
             for idx, msg in enumerate(st.session_state["translated_messages"]):
                 with st.chat_message(name=msg["role"], avatar="/app/src/images/bot_icon_2.jpg"): #avatar="https://raw.githubusercontent.com/dataprofessor/streamlit-chat-avatar/master/bot-icon.png"
@@ -334,7 +344,7 @@ def batch_translation_interface():
     expander()
 
 def stream_translation_interface():
-    with st.container(height=450):        
+    with st.container(height=500):        
         if st.session_state["translated_messages"]:
             for idx, msg in enumerate(st.session_state["translated_messages"]):
                 with st.chat_message(name=msg["role"], avatar="/app/src/images/bot_icon_2.jpg"): #avatar="https://raw.githubusercontent.com/dataprofessor/streamlit-chat-avatar/master/bot-icon.png"

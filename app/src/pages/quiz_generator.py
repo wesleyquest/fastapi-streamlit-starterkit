@@ -6,8 +6,10 @@ from modules.auth.api_auth import validate_token, get_user_info
 from modules.security.encryption import str_to_asterisk
 from modules.validation.key_validation import validate_openai_api_key
 from modules.validation.form_validation import validate_text
-from modules.quiz.api_quiz import get_batch_quiz, get_stream_quiz, translate_batch_quiz,translate_stream_quiz
-from modules.quiz.streamlit_quiz import batch_generation_interface, stream_generation_interface, batch_translation_interface, stream_translation_interface, open_openaiapikey_modal, open_settings_modal
+#from modules.quiz.api_quiz import get_batch_quiz, get_stream_quiz, translate_batch_quiz,translate_stream_quiz
+from modules.quiz.api_quiz import get_batch_quiz, translate_batch_quiz,translate_stream_quiz
+#from modules.quiz.streamlit_quiz import batch_generation_interface, stream_generation_interface, batch_translation_interface, stream_translation_interface, open_openaiapikey_modal, open_settings_modal
+from modules.quiz.streamlit_quiz import batch_generation_interface, batch_translation_interface, stream_translation_interface, open_openaiapikey_modal, open_settings_modal
 #var
 if "auth_status" not in st.session_state:
     st.session_state["auth_status"] = None
@@ -73,13 +75,8 @@ with col_2:
             st.session_state = {}
             st.switch_page("main.py")
 st.markdown("""<div style="height:0.5px;border:none;color:#D3D3D3;background-color:#D3D3D3;" /> """, unsafe_allow_html=True)
-st.markdown("")
 #main
 
-if st.toggle("Activate Streaming", value=st.session_state["stream"]):
-    st.session_state["stream"]=True
-else:
-    st.session_state["stream"] = False
 #st.write("Stream status:", st.session_state["stream"])
 
 username = st.session_state["user_info"]["username"]
@@ -93,10 +90,10 @@ with col1:
     if st.session_state["rerun"]==True:
         st.session_state["rerun"]=False
         st.rerun()
-    if st.session_state['stream']:
-        stream_generation_interface()
-    else:
-        batch_generation_interface()
+    # if st.session_state['stream']:
+    #     stream_generation_interface()
+    # else:
+    batch_generation_interface()
     but1, but2, but3 = st.columns((1,1,1), gap="small")
     with but1:
         key_placeholder = st.container()
