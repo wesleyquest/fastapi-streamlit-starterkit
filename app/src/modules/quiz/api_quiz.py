@@ -39,39 +39,39 @@ def get_batch_quiz(
         data["results"] = "요청을 처리할 수 없습니다. 다시 시도해 주세요."
     return data
 
-# streaming 퀴즈 생성 API 호출 함수
-def get_stream_quiz(
-        token_type,
-        access_token,
-        openai_api_key,
-        document,
-        quiz_content,
-        quiz_type,
-        number
-):
-    try: 
-        response = requests.post(
-            url=f"http://{API_SERVER}:{API_PORT}{API_V1_STR}/quiz/stream_generation",
-            headers = {'Authorization': f'{token_type} {access_token}',
-                        #'Accept': 'text/event-stream'
-            },
-            json={
-                "openai_api_key": openai_api_key,
-                "document": document,
-                "quiz_content": quiz_content,
-                "quiz_type": quiz_type,
-                "number": number
-            },
-            stream = True,
-            timeout=60
-        )
-        response.raise_for_status()
-        buffer = ""
-        for line in response.iter_lines():
-            if line:
-                yield f"{line.decode('utf-8')}\n"
-    except requests.exceptions.RequestException as e:
-        yield f"Error: {str(e)}"
+# # streaming 퀴즈 생성 API 호출 함수
+# def get_stream_quiz(
+#         token_type,
+#         access_token,
+#         openai_api_key,
+#         document,
+#         quiz_content,
+#         quiz_type,
+#         number
+# ):
+#     try: 
+#         response = requests.post(
+#             url=f"http://{API_SERVER}:{API_PORT}{API_V1_STR}/quiz/stream_generation",
+#             headers = {'Authorization': f'{token_type} {access_token}',
+#                         #'Accept': 'text/event-stream'
+#             },
+#             json={
+#                 "openai_api_key": openai_api_key,
+#                 "document": document,
+#                 "quiz_content": quiz_content,
+#                 "quiz_type": quiz_type,
+#                 "number": number
+#             },
+#             stream = True,
+#             timeout=60
+#         )
+#         response.raise_for_status()
+#         buffer = ""
+#         for line in response.iter_lines():
+#             if line:
+#                 yield f"{line.decode('utf-8')}\n"
+#     except requests.exceptions.RequestException as e:
+#         yield f"Error: {str(e)}"
 
 # batch 번역 API 호출 함수
 def translate_batch_quiz(
