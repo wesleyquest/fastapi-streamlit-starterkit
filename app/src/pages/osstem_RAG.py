@@ -70,7 +70,7 @@ st.markdown("""<div style="height:0.5px;border:none;color:#D3D3D3;background-col
 
 username = st.session_state["user_info"]["username"]
 if "rag_messages" not in st.session_state:
-    st.session_state["rag_messages"] = [{"role": "assistant", "content": f"안녕하세요 {username} 님 !  \n '퀴즈 생성' 버튼을 클릭하여 퀴즈를 생성해 주세요!","ref1":"1","ref2":"2","ref3":"3"}]
+    st.session_state["rag_messages"] = [{"role": "assistant", "content": f"안녕하세요 {username} 님 !  \n 질문할 문장을 입력해 주세요!","ref1":"1","ref2":"2","ref3":"3"}]
 
 if "rag_ready" not in st.session_state:
     st.session_state["rag_ready"] = False
@@ -94,12 +94,7 @@ with st.container(height=500):
                         with col3:
                             with st.popover("Reference3",use_container_width=True):
                                 st.markdown(msg["ref1"])
-                        # with st.expander("Reference1"):
-                        #     st.markdown(msg["ref1"])
-                        # with st.expander("Reference2"):
-                        #     st.markdown(msg["ref2"])
-                        # with st.expander("Reference3"):
-                        #     st.markdown(msg["ref3"])
+
         question = st.empty()
         answer = st.empty()
         if st.session_state["rag_ready"]:
@@ -128,13 +123,11 @@ with st.container(height=500):
                             st.markdown(generated_text[3])
                 st.session_state["rag_messages"].append({"role": "assistant", "content": generated_text[0],"ref1":generated_text[1],"ref2":generated_text[2],"ref3":generated_text[3]})
             st.session_state["rag_ready"]=False
-            
-if prompt := st.chat_input("번역할 문장을 입력해 주세요"):
+
+if prompt := st.chat_input("질문할 문장을 입력해 주세요"):
     with question.chat_message(name="user", avatar="/app/src/images/bot_icon_2.jpg"):
         st.markdown(prompt)
     st.session_state["rag_messages"].append({"role":"user","content":prompt, "ref1":"1", "ref2":"2","ref3":"3"})
     st.session_state["rag_ready"] = True
     st.rerun()
 
-    
-        
