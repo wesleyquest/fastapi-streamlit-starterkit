@@ -8,6 +8,8 @@ from src import config
 from src.quiz.routes import router as quiz_router
 from src.users.routes import router as users_router
 from src.auth.routes import router as auth_router
+from src.rag.routes import router as rag_router
+
 @lru_cache
 def get_settings():
     return config.Settings()
@@ -45,6 +47,7 @@ app.include_router(router)
 app.include_router(auth_router, prefix=f"{settings.API_V1_STR}/auth", tags=["auth"])
 app.include_router(users_router, prefix=f"{settings.API_V1_STR}/users", tags=["users"])
 app.include_router(quiz_router, prefix=f"{settings.API_V1_STR}/quiz", tags=["quiz"])
+app.include_router(rag_router, prefix=f"{settings.API_V1_STR}/rag", tags=["rag"])
 
 
 '''
