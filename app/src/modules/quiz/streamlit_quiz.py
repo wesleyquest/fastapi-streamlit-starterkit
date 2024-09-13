@@ -19,7 +19,6 @@ def expander():
             language = st.selectbox('To', ["Vietnamese", "Japanese", "Chinese"])
             st.session_state["language"] = language
             quiz_list = [[msg['content'],msg['explain']] for msg in st.session_state['quiz_messages'][1:]]
-            quiz_list.append("직접 입력")
             selected_quiz = st.selectbox("Quiz List", quiz_list)
             but1, but2 = st.columns([1,1])
             with but1:
@@ -28,11 +27,10 @@ def expander():
                 else:
                     st.session_state["stream"] = False
             with but2:
-                if selected_quiz != "직접 입력":
-                    if st.button('번역하기',use_container_width=True):
-                        st.session_state["translated_messages"].append({"role":"user","content":selected_quiz[0], "answer":selected_quiz[1],"typing":False})
-                        st.session_state["translate_ready"]=True
-                        st.rerun()
+                if st.button('번역하기',use_container_width=True):
+                    st.session_state["translated_messages"].append({"role":"user","content":selected_quiz[0], "answer":selected_quiz[1],"typing":False})
+                    st.session_state["translate_ready"]=True
+                    st.rerun()
 
 # def expander():
 #     with st.expander('번역 옵션'):
@@ -192,13 +190,19 @@ def batch_generation_interface():
     with st.container(border=True, height=500):
         if st.session_state["quiz_messages"]:
             for idx, msg in enumerate(st.session_state["quiz_messages"]):
-                with st.chat_message(name=msg["role"], avatar="/app/src/images/bot_icon_2.jpg"): #avatar="https://raw.githubusercontent.com/dataprofessor/streamlit-chat-avatar/master/bot-icon.png"
-                    st.markdown(msg["content"])
-                    if idx !=0:
-                        if st.button("해설보기",key=f"explanation_button_{idx}",use_container_width=True):
-                            open_answer_modal(msg["explain"])
-                        # with st.popover("해설보기",use_container_width=True):
-                        #     st.markdown(msg["explain"])
+                if msg["role"]=="user":
+                    with st.chat_message(name=msg["role"], avatar="/app/src/images/user_icon_1.png"): #avatar="https://raw.githubusercontent.com/dataprofessor/streamlit-chat-avatar/master/bot-icon.png"
+                        st.markdown(msg["content"])
+                        if idx !=0:
+                            if st.button("해설보기",key=f"explanation_button_{idx}",use_container_width=True):
+                                open_answer_modal(msg["explain"])
+                else:
+                    with st.chat_message(name=msg["role"], avatar="/app/src/images/bot_icon_2.jpg"): #avatar="https://raw.githubusercontent.com/dataprofessor/streamlit-chat-avatar/master/bot-icon.png"
+                        st.markdown(msg["content"])
+                        if idx !=0:
+                            if st.button("해설보기",key=f"explanation_button_{idx}",use_container_width=True):
+                                open_answer_modal(msg["explain"])
+                        
         if st.session_state["quiz_ready"]==True:
 
             assistant_message = st.chat_message("assistant", avatar="/app/src/images/bot_icon_2.jpg").empty()
@@ -214,8 +218,8 @@ def batch_generation_interface():
                 )
             # generated_quiz = generated_text["results"].split("🚀 Answer")[0]
             # generated_answer = "🚀 Answer\n"+ generated_text["results"].split("🚀 Answer")[1]
-            generated_quiz = generated_text["results"][0]
-            generated_answer = generated_text["results"][1]
+            generated_quiz = generated_text["results"]
+            generated_answer = generated_text["answer"]
 
             with assistant_message:
                 with st.container():
@@ -303,14 +307,21 @@ def batch_translation_interface():
     with st.container(height=500):
         if st.session_state["translated_messages"]:
             for idx, msg in enumerate(st.session_state["translated_messages"]):
-                with st.chat_message(name=msg["role"], avatar="/app/src/images/bot_icon_2.jpg"): #avatar="https://raw.githubusercontent.com/dataprofessor/streamlit-chat-avatar/master/bot-icon.png"
-                    st.markdown(msg["content"])
-                    #if idx !=0:
-                    if msg["typing"]==False:
-                        if st.button("해설보기",key=f"batch_explanation_button_{idx}",use_container_width=True):
-                            open_answer_modal(msg["answer"])
-                        # with st.popover("해설보기",use_container_width=True):
-                        #     st.markdown(msg["answer"])
+                if msg["role"]=="user":
+                    with st.chat_message(name=msg["role"], avatar="/app/src/images/user_icon_1.png"): #avatar="https://raw.githubusercontent.com/dataprofessor/streamlit-chat-avatar/master/bot-icon.png"
+                        st.markdown(msg["content"])
+                        #if idx !=0:
+                        if msg["typing"]==False:
+                            if st.button("해설보기",key=f"batch_explanation_button_{idx}",use_container_width=True):
+                                open_answer_modal(msg["answer"])
+                else:
+                    with st.chat_message(name=msg["role"], avatar="/app/src/images/bot_icon_2.jpg"): #avatar="https://raw.githubusercontent.com/dataprofessor/streamlit-chat-avatar/master/bot-icon.png"
+                        st.markdown(msg["content"])
+                        #if idx !=0:
+                        if msg["typing"]==False:
+                            if st.button("해설보기",key=f"batch_explanation_button_{idx}",use_container_width=True):
+                                open_answer_modal(msg["answer"])
+                            
         if st.session_state['translate_ready']:
             assistant_message = st.chat_message("assistant", avatar="/app/src/images/bot_icon_2.jpg").empty()
             
@@ -347,14 +358,21 @@ def stream_translation_interface():
     with st.container(height=500):        
         if st.session_state["translated_messages"]:
             for idx, msg in enumerate(st.session_state["translated_messages"]):
-                with st.chat_message(name=msg["role"], avatar="/app/src/images/bot_icon_2.jpg"): #avatar="https://raw.githubusercontent.com/dataprofessor/streamlit-chat-avatar/master/bot-icon.png"
-                    st.markdown(msg["content"])
-                    #if idx !=0:
-                    if msg["typing"]==False:
-                        if st.button("해설보기",key=f"stream_explanation_button_{idx}",use_container_width=True):
-                            open_answer_modal(msg["answer"])
-                        # with st.popover("해설보기",use_container_width=True):
-                        #     st.markdown(msg["answer"])
+                if msg["role"]=="user":
+                    with st.chat_message(name=msg["role"], avatar="/app/src/images/user_icon_1.png"): #avatar="https://raw.githubusercontent.com/dataprofessor/streamlit-chat-avatar/master/bot-icon.png"
+                        st.markdown(msg["content"])
+                        #if idx !=0:
+                        if msg["typing"]==False:
+                            if st.button("해설보기",key=f"batch_explanation_button_{idx}",use_container_width=True):
+                                open_answer_modal(msg["answer"])
+                else:    
+                    with st.chat_message(name=msg["role"], avatar="/app/src/images/bot_icon_2.jpg"): #avatar="https://raw.githubusercontent.com/dataprofessor/streamlit-chat-avatar/master/bot-icon.png"
+                        st.markdown(msg["content"])
+                        #if idx !=0:
+                        if msg["typing"]==False:
+                            if st.button("해설보기",key=f"stream_explanation_button_{idx}",use_container_width=True):
+                                open_answer_modal(msg["answer"])
+                        
         if st.session_state['translate_ready']:
             assistant_message = st.chat_message("assistant", avatar="/app/src/images/bot_icon_2.jpg").empty()
             
