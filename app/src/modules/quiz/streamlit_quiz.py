@@ -16,21 +16,25 @@ def expander():
         
         with st.popover('번역 옵션',use_container_width=True):
             st.selectbox('From', ['English'])
-            language = st.selectbox('To', ["Vietnamese", "Japanese", "Chinese"])
+            language_list = {"Vietnamese":0,"Japanese":1,"Chinese":2}
+            index = language_list[st.session_state["language"]]
+            language = st.selectbox('To', ["Vietnamese", "Japanese", "Chinese"],index=index)
             st.session_state["language"] = language
             quiz_list = [[msg['content'],msg['explain']] for msg in st.session_state['quiz_messages'][1:]]
             selected_quiz = st.selectbox("Quiz List", quiz_list)
-            but1, but2 = st.columns([1,1])
+            but1, but2,but3 = st.columns([1,1,1])
             with but1:
                 if st.toggle("Activate Streaming", value=st.session_state["stream"]):
                     st.session_state["stream"]=True
                 else:
                     st.session_state["stream"] = False
             with but2:
-                if st.button('번역하기',use_container_width=True):
-                    st.session_state["translated_messages"].append({"role":"user","content":selected_quiz[0], "answer":selected_quiz[1],"typing":False})
-                    st.session_state["translate_ready"]=True
-                    st.rerun()
+                if st.toggle("Quiz translate", value=False):
+                    with but3:    
+                        if st.button('번역하기',use_container_width=True):
+                            st.session_state["translated_messages"].append({"role":"user","content":selected_quiz[0], "answer":selected_quiz[1],"typing":False})
+                            st.session_state["translate_ready"]=True
+                            st.rerun()
 
 # def expander():
 #     with st.expander('번역 옵션'):
