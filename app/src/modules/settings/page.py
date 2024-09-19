@@ -106,6 +106,9 @@ def make_sidebar(auth_status, user_info):
                     st.page_link("pages/gjf.py", label="경기도 데이터 분석", icon=":material/space_dashboard:")
                     st.page_link("pages/resource_monitoring.py", label="자원 모니터링 분석", icon=":material/space_dashboard:")
                     st.page_link("pages/osstem_RAG.py", label="RAG 기반 답변", icon=":material/space_dashboard:")
+                    st.page_link("pages/glossary_htc.py", label="용어사전 (POCHTC)", icon=":material/space_dashboard:")
+                    st.page_link("pages/production_plan_htc.py", label="생산계획 분석 (POCHTC)", icon=":material/space_dashboard:")
+                    st.page_link("pages/data_extraction_htc.py", label="데이터 추출 (POCHTC)", icon=":material/space_dashboard:")
                 with st.expander("**API Docs**", expanded=True):
                     st.page_link("pages/api_docs_auth.py", label="로그인 API", icon=":material/description:")
                     st.page_link("pages/api_docs_quiz.py", label="한국어 퀴즈 생성 API", icon=":material/description:")
