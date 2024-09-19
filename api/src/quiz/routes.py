@@ -33,7 +33,8 @@ async def batch_generate_quiz(
     )
 
     return {
-        "results": data
+        "results": data[0],
+        "answer": data[1]
     }
 
 # #stream 퀴즈 생성 API

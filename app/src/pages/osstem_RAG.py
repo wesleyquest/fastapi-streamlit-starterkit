@@ -6,7 +6,7 @@ from modules.auth.api_auth import validate_token, get_user_info
 from modules.security.encryption import str_to_asterisk
 from modules.validation.key_validation import validate_openai_api_key
 from modules.validation.form_validation import validate_text
-
+from modules.osstem.streamlit_rag import open_openaiapikey_modal
 from modules.osstem.api_rag import get_batch_rag
 
 #var
@@ -80,20 +80,26 @@ if "rag_ready" not in st.session_state:
 with st.container(height=500):
     if st.session_state["rag_messages"]:
         for idx, msg in enumerate(st.session_state["rag_messages"]):
-            with st.chat_message(name=msg["role"], avatar="/app/src/images/bot_icon_2.jpg"): #avatar="https://raw.githubusercontent.com/dataprofessor/streamlit-chat-avatar/master/bot-icon.png"
-                with st.container():
-                    st.markdown(msg["content"])
-                    if (idx !=0) and (msg["role"]=="assistant"):
-                        col1,col2,col3 = st.columns([1,1,1])
-                        with col1:
-                            with st.popover("Reference1",use_container_width=True):
-                                st.markdown(msg["ref1"])
-                        with col2:
-                            with st.popover("Reference2",use_container_width=True):
-                                st.markdown(msg["ref2"])
-                        with col3:
-                            with st.popover("Reference3",use_container_width=True):
-                                st.markdown(msg["ref1"])
+            if msg["role"]=="user":
+                with st.chat_message(name=msg["role"], avatar="/app/src/images/user_icon_1.png"): #avatar="https://raw.githubusercontent.com/dataprofessor/streamlit-chat-avatar/master/bot-icon.png"
+                    with st.container():
+                        st.markdown(msg["content"])
+            else:
+                with st.chat_message(name=msg["role"], avatar="/app/src/images/bot_icon_2.jpg"): #avatar="https://raw.githubusercontent.com/dataprofessor/streamlit-chat-avatar/master/bot-icon.png"
+                    with st.container():
+                        st.markdown(msg["content"])
+                        if idx !=0:
+                            col1,col2,col3 = st.columns([1,1,1])
+                            with col1:
+                                with st.popover("Reference1",use_container_width=True):
+                                    st.markdown(msg["ref1"])
+                            with col2:
+                                with st.popover("Reference2",use_container_width=True):
+                                    st.markdown(msg["ref2"])
+                            with col3:
+                                with st.popover("Reference3",use_container_width=True):
+                                    st.markdown(msg["ref1"])
+
 
         question = st.empty()
         answer = st.empty()
@@ -106,28 +112,37 @@ with st.container(height=500):
                     query = st.session_state["rag_messages"][-1]["content"]
                 )
 
-            generated_text = generated_text["results"]
 
             with answer.chat_message(name="assistant", avatar="/app/src/images/bot_icon_2.jpg"):
                 with st.container():
-                    st.markdown(generated_text[0])
+                    st.markdown(generated_text["results"])
                     col1,col2,col3 = st.columns([1,1,1])
                     with col1:
                         with st.popover("Reference1",use_container_width=True):
-                            st.markdown(generated_text[1])
+                            st.markdown(generated_text["reference"][0])
                     with col2:
                         with st.popover("Reference2",use_container_width=True):
-                            st.markdown(generated_text[2])
+                            st.markdown(generated_text["reference"][1])
                     with col3:
                         with st.popover("Reference3",use_container_width=True):
-                            st.markdown(generated_text[3])
-                st.session_state["rag_messages"].append({"role": "assistant", "content": generated_text[0],"ref1":generated_text[1],"ref2":generated_text[2],"ref3":generated_text[3]})
+                            st.markdown(generated_text["reference"][2])
+                st.session_state["rag_messages"].append({"role": "assistant", "content": generated_text["results"],"ref1":generated_text["reference"][0],"ref2":generated_text["reference"][1],"ref3":generated_text["reference"][2]})
             st.session_state["rag_ready"]=False
 
-if prompt := st.chat_input("질문할 문장을 입력해 주세요"):
-    with question.chat_message(name="user", avatar="/app/src/images/bot_icon_2.jpg"):
-        st.markdown(prompt)
-    st.session_state["rag_messages"].append({"role":"user","content":prompt, "ref1":"1", "ref2":"2","ref3":"3"})
-    st.session_state["rag_ready"] = True
-    st.rerun()
+col1, col2 = st.columns([1,3])
+with col1:
+    key_placeholder = st.container()
+    if not st.session_state["key_status"]==True:
+        if key_placeholder.button("OpenAI API KEY", type="primary", use_container_width=True, key="openai_api_key_button"):
+            open_openaiapikey_modal()
+    else:
+        if key_placeholder.button("OpenAI API KEY", type="secondary", use_container_width=True, key="openai_api_key_2_button"):
+            open_openaiapikey_modal(old_key=st.session_state["openai_api_key"])
+with col2:
+    if prompt := st.chat_input("질문할 문장을 입력해 주세요"):
+        with question.chat_message(name="user", avatar="/app/src/images/bot_icon_2.jpg"):
+            st.markdown(prompt)
+        st.session_state["rag_messages"].append({"role":"user","content":prompt, "ref1":"1", "ref2":"2","ref3":"3"})
+        st.session_state["rag_ready"] = True
+        st.rerun()
 

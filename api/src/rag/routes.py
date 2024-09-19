@@ -27,5 +27,6 @@ async def batch_generate_quiz(
     )
 
     return {
-        "results": data
+        "results": data[0],
+        "reference": data[1:]
     }

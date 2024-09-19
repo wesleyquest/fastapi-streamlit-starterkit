@@ -26,7 +26,7 @@ if "quiz_ready" not in st.session_state:
 if "translate_ready" not in st.session_state:
     st.session_state["translate_ready"] = False 
 if "language" not in st.session_state:
-    st.session_state["language"] = None   
+    st.session_state["language"] = "Vietnamese"
 if "rerun" not in st.session_state:
     st.session_state["rerun"] = False
 if "stream" not in st.session_state:

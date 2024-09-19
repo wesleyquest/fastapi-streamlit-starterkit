@@ -3,7 +3,8 @@ from pydantic import BaseModel
 
 # Shared properties
 class Quiz(BaseModel):
-    results : list  #[quiz,answer]
+    results : str  #[quiz,answer]
+    answer : str
 
 class Translate_Quiz(BaseModel):
     results : str
