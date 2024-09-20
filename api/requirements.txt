@@ -13,5 +13,5 @@ openai
 langchain
 langchain_community
 pypdf
-faiss-cpu
 tiktoken
+chromadb

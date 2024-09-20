@@ -1,0 +1,7 @@
+#python 3.11.9
+openai
+langchain
+langchain_community
+pypdf
+tiktoken
+chromadb
