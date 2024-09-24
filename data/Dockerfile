@@ -14,7 +14,9 @@ COPY . /app
 RUN pip install -U pip &&\
     pip install --no-cache-dir -r requirements.txt
 
-ENTRYPOINT ["python","./src/chroma_data.py"]
+ENTRYPOINT ["sh", "-c", "python ./src/chroma_law_data.py && python ./src/postgreSQL_gjf_data.py"]
 
+# ENTRYPOINT ["python", "./src/chroma_law_data.py"]
+# ENTRYPOINT ["python", "./src/postgreSQL_gjf_data.py"]
 #ENTRYPOINT ["streamlit", "run"]
 #CMD ["main.py", "--server.port=$FRONTEND_SERVER_PORT"] --> DB 데이터 체크 만들기 

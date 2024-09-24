@@ -5,3 +5,6 @@ langchain_community
 pypdf
 tiktoken
 chromadb
+pandas
+openpyxl
+psycopg2-binary

@@ -9,7 +9,7 @@ from modules.settings.page import set_page_config, make_sidebar
 from modules.settings.style import style_global
 from modules.auth.api_auth import validate_token, get_user_info
 
-from modules.gjf import make_graph
+from modules.gjf import make_graph_new as make_graph
 import pandas as pd
 import plotly.express as px
 import datetime as dt

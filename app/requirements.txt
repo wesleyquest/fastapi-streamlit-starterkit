@@ -7,3 +7,4 @@ python-dotenv
 pyyaml
 streamlit-navigation-bar
 openpyxl
+psycopg2-binary
