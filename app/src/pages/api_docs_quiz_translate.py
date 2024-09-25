@@ -173,11 +173,11 @@ with col2:
             -H "Authorization: ${{TOKEN_TYPE}} ${{ACCESS_TOKEN}}" \\
             -H "Content-Type: application/json" \\
             --data '{{
-                "openai_api_key":${{OPENAI_API_KEY}}, \\
-                "quiz": ${{QUIZ}}, \\
-                "answer": ${{ANSWER}}, \\
-                "quiz_type": ${{QUIZ_TYPE}}, \\
-                "language": ${{LANGUAGE}} \\
+                "openai_api_key":${{OPENAI_API_KEY}}, 
+                "quiz": ${{QUIZ}}, 
+                "answer": ${{ANSWER}}, 
+                "quiz_type": ${{QUIZ_TYPE}}, 
+                "language": ${{LANGUAGE}} 
                 }}'
         """
         code_python = f"""
@@ -192,11 +192,11 @@ with col2:
                     "Authorization": "bearer eyJh...XYOw" 
                 }},
                 json={{
-                    "openai_api_key":${{OPENAI_API_KEY}}, \\
-                    "quiz": ${{QUIZ}}, \\
-                    "answer": ${{ANSWER}}, \\
-                    "quiz_type": ${{QUIZ_TYPE}}, \\
-                    "language": ${{LANGUAGE}} \\
+                    "openai_api_key":${{OPENAI_API_KEY}}, 
+                    "quiz": ${{QUIZ}}, 
+                    "answer": ${{ANSWER}}, 
+                    "quiz_type": ${{QUIZ_TYPE}}, 
+                    "language": ${{LANGUAGE}} 
                 }}
             )
             print(response.status_code)

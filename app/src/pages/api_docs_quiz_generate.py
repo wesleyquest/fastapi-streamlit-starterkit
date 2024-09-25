@@ -178,11 +178,10 @@ with col2:
             -H "Authorization: ${{TOKEN_TYPE}} ${{ACCESS_TOKEN}}" \\
             -H "Content-Type: application/json" \\
             --data '{{
-                "openai_api_key":${{OPENAI_API_KEY}}, \\
-                "document": ${{DOCUMENT}}, \\
-                "quiz_content": ${{QUIZ_CONTENT}}, \\
-                "quiz_type": ${{QUIZ_TYPE}}, \\
-                "number": ${{NUMBER}} \\
+                "openai_api_key":${{OPENAI_API_KEY}}, 
+                "document": ${{DOCUMENT}}, 
+                "quiz_content": ${{QUIZ_CONTENT}}, 
+                "number": ${{NUMBER}} 
                 }}'
         """
         code_python = f"""
@@ -200,7 +199,6 @@ with col2:
                     "openai_api_key": ${{OPENAI_API_KEY}},
                     "document": ${{DOCUMENT}},
                     "quiz_content": ${{QUIZ_CONTENT}},
-                    "quiz_type": ${{QUIZ_TYPE}},
                     "number": ${{NUMBER}}
                 }}
             )
