@@ -111,7 +111,8 @@ def make_sidebar(auth_status, user_info):
                     st.page_link("pages/data_extraction_htc.py", label="데이터 추출 (POCHTC)", icon=":material/space_dashboard:")
                 with st.expander("**API Docs**", expanded=True):
                     st.page_link("pages/api_docs_auth.py", label="로그인 API", icon=":material/description:")
-                    st.page_link("pages/api_docs_quiz.py", label="한국어 퀴즈 생성 API", icon=":material/description:")
+                    st.page_link("pages/api_docs_quiz_generate.py", label="한국어 퀴즈 생성 API", icon=":material/description:")
+                    st.page_link("pages/api_docs_quiz_translate.py", label="한국어 퀴즈 번역 API", icon=":material/description:")
                     st.page_link("pages/api_docs_user.py", label="사용자 관리 API (관리자용)", icon=":material/description:")
 
         elif not auth_status == True:

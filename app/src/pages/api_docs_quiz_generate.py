@@ -160,6 +160,12 @@ with col2:
                         <td> {docs["response"]["body"]["key_1"]["desc"]} </td>
                         <td> {docs["response"]["body"]["key_1"]["required"]} </td>
                     </tr>
+                    <tr>
+                        <td> {docs["response"]["body"]["key_2"]["name"]} </td>
+                        <td> {docs["response"]["body"]["key_2"]["type"]} </td>
+                        <td> {docs["response"]["body"]["key_2"]["desc"]} </td>
+                        <td> {docs["response"]["body"]["key_2"]["required"]} </td>
+                    </tr>
                     </table>
                     """
                     , unsafe_allow_html=True)
@@ -167,27 +173,36 @@ with col2:
         st.markdown("<h5>예제</h5>", unsafe_allow_html=True)
         st.markdown("**요청**")
         tab1, tab2 = st.tabs(["Shell", "Python"])
-        code_shellSession = """
-        (수정)
+        code_shellSession = f"""
+        curl -v -X POST {SERVER_HOST}/api/v1/quiz/generation \\
+            -H "Authorization: ${{TOKEN_TYPE}} ${{ACCESS_TOKEN}}" \\
+            -H "Content-Type: application/json" \\
+            --data '{{
+                "openai_api_key":${{OPENAI_API_KEY}}, \\
+                "document": ${{DOCUMENT}}, \\
+                "quiz_content": ${{QUIZ_CONTENT}}, \\
+                "quiz_type": ${{QUIZ_TYPE}}, \\
+                "number": ${{NUMBER}} \\
+                }}'
         """
-        code_python = """
+        code_python = f"""
         import requests
 
         try:
             response = requests.request(
                 method="post",
-                url= "http://211.218.17.10/api/v1/quiz/generation",
-                headers = {
+                url= "{SERVER_HOST}/api/v1/quiz/generation",
+                headers = {{
                     "Content-type": "application/json",
                     "Authorization": "bearer eyJh...XYOw" 
-                },
-                json={
-                    "openai_api_key": ${OPENAI_API_KEY},
-                    "document": ${DOCUMENT},
-                    "quiz_content": ${QUIZ_CONTENT},
-                    "quiz_type": ${QUIZ_TYPE},
-                    "number": ${NUMBER}
-                }
+                }},
+                json={{
+                    "openai_api_key": ${{OPENAI_API_KEY}},
+                    "document": ${{DOCUMENT}},
+                    "quiz_content": ${{QUIZ_CONTENT}},
+                    "quiz_type": ${{QUIZ_TYPE}},
+                    "number": ${{NUMBER}}
+                }}
             )
             print(response.status_code)
             print(response.json())
@@ -204,7 +219,8 @@ with col2:
         tab1, tab2 = st.tabs(["성공", "실패"])
         code_success="""
         {
-            "results": "아래와 같이 퀴즈를 생성했어요. ..."
+            "results": "아래와 같이 퀴즈를 생성했어요. ...",
+            "answer": "생성된 퀴즈의 정답입니다. ..."
         }
         """
         code_fail="""

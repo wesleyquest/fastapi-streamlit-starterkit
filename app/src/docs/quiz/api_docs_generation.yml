@@ -46,7 +46,8 @@ response:
       type: String
       desc: 생성된 퀴즈
       required: O
-
-
-
-
+    key_2:
+      name: answer
+      type: String
+      desc: 생성된 퀴즈의 답변
+      required: O
