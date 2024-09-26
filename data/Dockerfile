@@ -14,7 +14,7 @@ COPY . /app
 RUN pip install -U pip &&\
     pip install --no-cache-dir -r requirements.txt
 
-ENTRYPOINT ["sh", "-c", "python ./src/chroma_law_data.py && python ./src/postgreSQL_gjf_data.py"]
+ENTRYPOINT ["sh", "-c", "python ./src/rag/chroma_law_data.py && python ./src/gjf/main.py && python ./src/data_extraction_htc/main.py && python ./src/glossary_htc/main.py && python ./src/production_plan_htc/main.py"]
 
 # ENTRYPOINT ["python", "./src/chroma_law_data.py"]
 # ENTRYPOINT ["python", "./src/postgreSQL_gjf_data.py"]

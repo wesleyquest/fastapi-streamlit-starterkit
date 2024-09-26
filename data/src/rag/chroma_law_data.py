@@ -30,7 +30,7 @@ existing_collections = [col.name for col in chroma_client.list_collections()]
 if "law20240209" not in existing_collections:
     collection = chroma_client.create_collection(name="law20240209")
 
-    loader = PyPDFLoader("/app/volumes/file_volumes/pdf/law20240209.pdf")
+    loader = PyPDFLoader("/app/volumes/file_volumes/rag/law20240209.pdf")
     docs = loader.load_and_split()
 
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)

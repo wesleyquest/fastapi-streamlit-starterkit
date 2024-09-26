@@ -214,17 +214,17 @@ with col2:
         tab1, tab2 = st.tabs(["성공", "실패"])
         code_success="""
         {
-            "results": "아래와 같이 퀴즈를 번역했어요. ..."
+            "results": "'クイズ\n答え'."
         }
         """
         code_fail="""
         {
             'detail': [
                 {
-                    'type': 'list_type',
-                    'loc': ['body', 'quiz_type'],
-                    'msg': 'Input should be a valid list',
-                    'input': 'adsf'
+                    'type': 'missing',
+                    'loc': ['body', 'language'],
+                    'msg': 'Field required',
+                    'input': 'None'
                 }
             ]
         }

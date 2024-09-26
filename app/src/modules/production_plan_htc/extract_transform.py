@@ -3,14 +3,28 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 import plotly.express as px
-
+import psycopg2
+import pandas.io.sql as psql
 
 @st.cache_data(show_spinner=False)
 def load_data():
-    fmf_schedule_file_path = "/app/src/data/production_plan_htc/production_plan_htc_202406.csv" 
-    grade_info_file_path = "/app/src/data/production_plan_htc/grade_info.csv"
-    fmf_schedule = pd.read_csv(fmf_schedule_file_path)
-    grade_info = pd.read_csv(grade_info_file_path)
+    # postgres에서 가져오기
+    # fmf_schedule_file_path = "/app/src/data/production_plan_htc/production_plan_htc_202406.csv" 
+    # grade_info_file_path = "/app/src/data/production_plan_htc/grade_info.csv"
+    # fmf_schedule = pd.read_csv(fmf_schedule_file_path)
+    # grade_info = pd.read_csv(grade_info_file_path)
+
+    db_connect = psycopg2.connect(
+        user="postgres_user",
+        password="postgres_password",
+        host="postgres_server",
+        port=5432,
+        database="postgres_db"
+    )
+
+    fmf_schedule = psql.read_sql_query("SELECT * FROM production_plan_htc_202406_data",db_connect)
+    grade_info = psql.read_sql_query("SELECT * FROM grade_info_data",db_connect)
+    db_connect.close()
     return fmf_schedule, grade_info
 
 #create df_fmf_main
