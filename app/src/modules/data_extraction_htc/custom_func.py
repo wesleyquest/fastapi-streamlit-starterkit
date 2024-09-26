@@ -8,7 +8,7 @@ def read_ois_table(start_date, end_date, target_tag):
     start_date = start_date + "000000"
     end_date = end_date + "000000"
     # postgres에서 가져오기
-    #df = pd.read_csv("/app/src/data/data_extraction_htc/ois_table.csv", dtype={"EVENT_TIME":object})
+    # df = pd.read_csv("/app/src/data/data_extraction_htc/ois_table.csv", dtype={"EVENT_TIME":object})
     db_connect = psycopg2.connect(
             user="postgres_user",
             password="postgres_password",
@@ -19,7 +19,7 @@ def read_ois_table(start_date, end_date, target_tag):
 
     df = psql.read_sql_query("SELECT * FROM ois_data",db_connect)
     db_connect.close()
-    df["EVENT_TIME"] = pd.to_datetime(df["EVENT_TIME"])
+    df["EVENT_TIME"] = df["EVENT_TIME"].astype(str)
     df = df[(df["EVENT_TIME"] >= start_date) & (df["EVENT_TIME"] <= end_date)]
     df = df[df["TAG_NAME"].isin(target_tag)]
     return df
@@ -40,7 +40,7 @@ def read_lims_table(start_date, end_date, sample_point, item_name):
 
     df = psql.read_sql_query("SELECT * FROM limbs_data",db_connect)
     db_connect.close()
-    df["SAMPLING_DATE"] = pd.to_datetime(df["SAMPLING_DATE"])
+    df["SAMPLING_DATE"] = df["SAMPLING_DATE"].astype(str)
     df = df[(df["SAMPLING_DATE"] >= start_date) & (df["SAMPLING_DATE"] <= end_date)]
     df = df[df["SAMPLE_POINT"]==sample_point]
     df = df[df["ITEM_NAME"].isin(item_name)]
