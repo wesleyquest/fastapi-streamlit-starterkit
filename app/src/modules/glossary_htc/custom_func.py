@@ -2,11 +2,25 @@
 import numpy as np
 import pandas as pd
 import streamlit as st
+import psycopg2
+import pandas.io.sql as psql
 
 @st.cache_data(show_spinner=False)
 def load_data():
-    file_path = "/app/src/data/glossary_htc/glossary_htc.csv"
-    df = pd.read_csv(file_path)
+    # postgres에서 가져오기
+    #file_path = "/app/src/data/glossary_htc/glossary_htc.csv"
+    #df = pd.read_csv(file_path)
+
+    db_connect = psycopg2.connect(
+            user="postgres_user",
+            password="postgres_password",
+            host="postgres_server",
+            port=5432,
+            database="postgres_db"
+        )
+
+    df = psql.read_sql_query("SELECT * FROM glossary_htc_data",db_connect)
+    db_connect.close()
     return df
 
 def make_glossary_terms(df):

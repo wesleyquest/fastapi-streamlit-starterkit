@@ -10,7 +10,7 @@ from src.quiz.utils.utils import batch_generate_gpt4o_quiz, batch_translate_gpt4
 router = APIRouter()
 
 #batch 퀴즈 생성 API
-@router.post("/batch_generation", response_model=schemas.Quiz)
+@router.post("/generation", response_model=schemas.Quiz)
 async def batch_generate_quiz(
     *,
     openai_api_key: str = Body(...),
@@ -21,7 +21,7 @@ async def batch_generate_quiz(
     current_user: users_models.User = Depends(deps.get_current_active_user),
 ) -> Any:
     """
-    Generate batch quiz
+    Generate quiz
     """
 
     data = await batch_generate_gpt4o_quiz(
@@ -63,7 +63,7 @@ async def batch_generate_quiz(
 #     return StreamingResponse(data(), media_type="text/event-stream")
 
 #batch 번역 API
-@router.post("/batch_translation", response_model=schemas.Translate_Quiz)
+@router.post("/translation_batch", response_model=schemas.Translate_Quiz)
 async def batch_translate_quiz(
     *,
     openai_api_key: str = Body(...),
@@ -88,7 +88,7 @@ async def batch_translate_quiz(
     }
 
 #stream 번역 API
-@router.post("/stream_translation", response_model=schemas.Translate_Quiz)
+@router.post("/translation_stream", response_model=schemas.Translate_Quiz)
 async def stream_translate_quiz(
     *,
     openai_api_key: str = Body(...),

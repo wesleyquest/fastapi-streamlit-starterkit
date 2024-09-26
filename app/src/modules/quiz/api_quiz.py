@@ -19,7 +19,7 @@ def get_batch_quiz(
         number
 ):
     response = requests.post(
-        url=f"http://{API_SERVER}:{API_PORT}{API_V1_STR}/quiz/batch_generation",
+        url=f"http://{API_SERVER}:{API_PORT}{API_V1_STR}/quiz/generation",
         headers = {'Authorization': f'{token_type} {access_token}'},
         json={
             "openai_api_key": openai_api_key,
@@ -83,7 +83,7 @@ def translate_batch_quiz(
         language
 ):
     response = requests.post(
-        url=f"http://{API_SERVER}:{API_PORT}{API_V1_STR}/quiz/batch_translation",
+        url=f"http://{API_SERVER}:{API_PORT}{API_V1_STR}/quiz/translation_batch",
         headers = {'Authorization': f'{token_type} {access_token}'},
         json={
             "openai_api_key": openai_api_key,
@@ -111,7 +111,7 @@ def translate_stream_quiz(
         answer,
         language
 ):
-    url = f"http://{API_SERVER}:{API_PORT}{API_V1_STR}/quiz/stream_translation"
+    url = f"http://{API_SERVER}:{API_PORT}{API_V1_STR}/quiz/translation_stream"
     headers = {
         'Authorization': f'{token_type} {access_token}',
         #'Accept': 'text/event-stream'

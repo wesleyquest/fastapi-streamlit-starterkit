@@ -8,10 +8,12 @@ services:
       - .env
     volumes:
       - ./api:/app
+      - ./volumes/file_volumes/cache:/app/cache
     ports:
       - 8000:${API_PORT}
     depends_on:
       - db
+      - chroma
     #command: /bin/bash -c "/app/pre-start.sh && uvicorn app.main:app --host 0.0.0.0 --port 80 --reload" 
     #prod: gunicorn src.main:app --bind 0:8000 --workers 2 --worker-class uvicorn.workers.UvicornWorker --reload
     #dev: fastapi dev ./src/main.py --host 0.0.0.0
@@ -45,12 +47,34 @@ services:
     env_file:
       - .env
     volumes:
-      - ./api/volumes/${POSTGRES_SERVER}_volumes:/var/lib/postgresql/data
+      - ./volumes/${POSTGRES_SERVER}_volumes:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD", "pg_isready", "-q", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
+
+  chroma:
+    container_name: ${CHROMA_SERVER}
+    image: chromadb/chroma:0.5.7
+    # ports:
+    #   - "8001:8000"
+    env_file:
+      - .env
+    volumes:
+      - ./volumes/${CHROMA_SERVER}_volumes:/chroma/chroma/
+    environment:
+      - IS_PERSISTENT=TRUE
+      - PERSIST_DIRECTORY=/chroma/chroma
+      - CHROMA_HOST_PORT=8000
+    healthcheck:
+      test: ["CMD", "/bin/bash", "-c", "cat < /dev/null > /dev/tcp/localhost/8000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    # command:
+    #   - /bin/bash
+    #   - python ./chroma_db.py
 
   nginx:
     container_name: ${NGINX_SERVER}
@@ -66,6 +90,23 @@ services:
       - api
       - app
 
+  data:
+    container_name: ${DATA_SERVER}
+    build: ./data
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app
+      - ./volumes:/app/volumes
+    depends_on:
+      - db
+      - chroma
+    # command:
+    #   - /bin/bash
+    #   - -c
+      # - |
+      #   chmod +x ./src/pre-start.sh && ./src/pre-start.sh
+      #   fastapi dev ./src/main.py --host 0.0.0.0 --port ${API_PORT}
 
 networks:
   default:

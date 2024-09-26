@@ -1,0 +1,48 @@
+#access-token
+summary: 한국어 퀴즈를 번역합니다. <br> ※ 엑세스 토큰 필요 - 토큰 받기 API 참고
+method: POST
+url: /api/v1/quiz/translation
+auth_method: "엑세스 토큰"
+request:
+  headers:
+    key_1:
+      name: Content-type
+      desc: application/json
+      required: O
+    key_2:
+      name: Authorization
+      desc: 토큰 타입과 엑세트 토큰 <br> (예시) <br> "bearer eyJh...XYOw"
+      required: O
+  body:
+    key_1:
+      name: openai_api_key
+      type: String
+      desc: OpenAI API 키
+      required: O
+    key_2:
+      name: quiz
+      type: String
+      desc: 퀴즈번역용 문서
+      required: O
+    key_3:
+      name: answer
+      type: String
+      desc: 정답번역용 문서
+      required: O
+    key_4:
+      name: language
+      type: String
+      desc: 번역할 언어
+      required: O
+
+response:
+  body:
+    key_1:
+      name: results
+      type: String
+      desc: 번역된 퀴즈
+      required: O
+
+
+
+

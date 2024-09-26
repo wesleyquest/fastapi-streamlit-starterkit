@@ -34,14 +34,14 @@ if not st.session_state["token_status"]==True:
 if "analyzer_data_1_options" not in st.session_state:
     st.session_state["analyzer_data_1_options"] = {}
     st.session_state["analyzer_data_1_options"]["tag"] = ['BTI215', 'BPIC211', 'BFFC204', 'BFIC471', 'BTI210', 'BPI207', 'BTI234', 'BPIC238']
-    st.session_state["analyzer_data_1_options"]["gigan_date_input"] = (datetime.date(2024, 9, 1), datetime.date(2024, 9, 8))
+    st.session_state["analyzer_data_1_options"]["gigan_date_input"] = (datetime.date(2024, 5, 1), datetime.date(2024, 6, 30))
     st.session_state["analyzer_data_1_options"]["time_unit_radio"] = "시간 단위"
     st.session_state["analyzer_data_1_options"]["time_unit_number_slider"] = 1
 if "analyzer_data_2_options" not in st.session_state:
     st.session_state["analyzer_data_2_options"] = {}
     st.session_state["analyzer_data_2_options"]["sample_point"] = 'SC201'
     st.session_state["analyzer_data_2_options"]["item_name"] = ['N-Aro8', 'Ethylbenzene', 'p&m-Xylene', 'o-Xylene']
-    st.session_state["analyzer_data_2_options"]["gigan_date_input"] = (datetime.date(2024, 9, 1), datetime.date(2024, 9, 8))
+    st.session_state["analyzer_data_2_options"]["gigan_date_input"] = (datetime.date(2024, 5, 1), datetime.date(2024, 6, 30))
     st.session_state["analyzer_data_2_options"]["time_unit_radio"] = "시간 단위"
     st.session_state["analyzer_data_2_options"]["time_unit_number_slider"] = 1
 
