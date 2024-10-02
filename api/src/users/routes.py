@@ -16,6 +16,7 @@ from src.users import models
 from src.users.models import user as crud_user #object
 from src.users import dependencies as deps
 from src.auth.utils import send_new_account_email
+import openai
 
 router = APIRouter()
 
@@ -178,3 +179,32 @@ async def delete_user_by_id(
     user = await crud_user.remove(db, id=user_id)
     return user
 
+#OPENAI API KEY 확인
+@router.post("/api_key_check", response_model=schemas.Api_Key_Check)
+async def api_key_check(
+    *,
+    openai_api_key: str = Body(..., embed=True),
+    current_user: models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Check API KEY
+    """
+    try:
+        # OpenAI API 키를 설정
+        openai.api_key = openai_api_key
+        # 간단한 요청을 보내서 키가 유효한지 확인 (예: 모델 리스트 가져오기)
+        openai.models.list()
+        # 요청이 성공하면 True 반환
+        return {
+            "results": "OPENAI_API_KEY is valid"
+        }
+    except openai.AuthenticationError:
+        # API 키가 유효하지 않은 경우
+        return {
+            "results": "OPENAI_API_KEY is invalid"
+        }
+    except Exception as e:
+        # 기타 오류 처리
+        return {
+            "results": f"API error occurred: {str(e)}"
+        }

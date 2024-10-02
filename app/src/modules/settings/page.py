@@ -87,6 +87,11 @@ def make_sidebar(auth_status, user_info):
                     if st.button(":material/account_circle:&nbsp;&nbsp;나의 정보 (My Profile)", use_container_width=True):
                         profile_modal()
                         #st.switch_page("pages/my_profile.py")     
+                    if st.button(":material/account_circle:&nbsp;&nbsp;나의 API KEY 정보 (My API Key)", use_container_width=True):
+                        if not st.session_state["key_status"]==True:
+                            open_openaiapikey_modal()
+                        else:
+                            open_openaiapikey_modal(old_key=st.session_state["openai_api_key"])
                     if st.button(":material/logout:&nbsp;&nbsp;로그 아웃 (Log Out)", use_container_width=True):
                         logout()    
             
@@ -134,6 +139,8 @@ def logout():
 
 from modules.auth.api_auth import get_access_token, validate_token, update_my_profile, get_user_info
 from modules.validation.form_validation import validate_username, validate_password
+from modules.validation.key_validation import get_api_key_check
+
 #modal
 @st.dialog(" ", width="small")
 def profile_modal():
@@ -190,3 +197,40 @@ def profile_modal():
     if st.button("&nbsp;&nbsp;닫&nbsp;&nbsp;기&nbsp;&nbsp;", type="secondary", use_container_width=False):
         st.rerun()
                         
+#modal
+@st.dialog(" ", width="small")
+def open_openaiapikey_modal(old_key=None):
+    if old_key:
+        value = old_key
+    else:
+        value = None
+    openai_api_key = st.text_input("OpenAI API KEY", value=value, key="chatbot_api_key", type="password")
+    "[OpenAI API key 알아보기] (https://platform.openai.com/account/api-keys)"
+    key_message_placeholder = st.container()
+    st.markdown(" ")
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("적용", type="primary", use_container_width=True, key="modal_openaiapikey_button"):
+            api_key_value = get_api_key_check(
+                token_type = st.session_state["token_type"], 
+                access_token = st.session_state["access_token"],
+                openai_api_key = openai_api_key
+            )
+            # key_message_placeholder.markdown(api_key_value)
+            
+            if api_key_value['results'] == "OPENAI_API_KEY is valid":
+                st.session_state["key_status"] = True
+                st.session_state["openai_api_key"] = openai_api_key
+                st.rerun()
+            else:
+                key_message_placeholder.error(api_key_value["results"])
+
+            # if validate_openai_api_key(openai_api_key):
+            #     st.session_state["key_status"] = True
+            #     st.session_state["openai_api_key"] = openai_api_key
+            #     st.rerun()
+            # else:
+            #     key_message_placeholder.error("OpenAI API KEY를 정확히 입력하세요")
+    with col2:
+        if st.button("닫기", type="secondary", use_container_width=True):
+            st.rerun()

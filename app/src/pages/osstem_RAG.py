@@ -4,9 +4,8 @@ from modules.settings.page import set_page_config, make_sidebar
 from modules.settings.style import style_global
 from modules.auth.api_auth import validate_token, get_user_info
 from modules.security.encryption import str_to_asterisk
-from modules.validation.key_validation import validate_openai_api_key
 from modules.validation.form_validation import validate_text
-from modules.osstem.streamlit_rag import open_openaiapikey_modal
+#from modules.osstem.streamlit_rag import open_openaiapikey_modal
 from modules.osstem.api_rag import get_batch_rag
 
 #var
@@ -16,8 +15,8 @@ if "token_status" not in st.session_state:
     st.session_state["token_status"] = None
 if "user_info" not in st.session_state:
     st.session_state["user_info"] = None
-if "key_status" not in st.session_state:
-    st.session_state["key_status"] = None
+# if "key_status" not in st.session_state:
+#     st.session_state["key_status"] = None
 if st.session_state["auth_status"]==True:
     st.session_state["user_info"] = get_user_info(token_type=st.session_state["token_type"], access_token=st.session_state["access_token"])
 
@@ -129,16 +128,17 @@ with st.container(height=500):
                 st.session_state["rag_messages"].append({"role": "assistant", "content": generated_text["results"],"ref1":generated_text["reference"][0],"ref2":generated_text["reference"][1],"ref3":generated_text["reference"][2]})
             st.session_state["rag_ready"]=False
 
-col1, col2 = st.columns([1,3])
-with col1:
-    key_placeholder = st.container()
-    if not st.session_state["key_status"]==True:
-        if key_placeholder.button("OpenAI API KEY", type="primary", use_container_width=True, key="openai_api_key_button"):
-            open_openaiapikey_modal()
-    else:
-        if key_placeholder.button("OpenAI API KEY", type="secondary", use_container_width=True, key="openai_api_key_2_button"):
-            open_openaiapikey_modal(old_key=st.session_state["openai_api_key"])
-with col2:
+# col1, col2 = st.columns([1,3])
+# with col1:
+#     key_placeholder = st.container()
+#     if not st.session_state["key_status"]==True:
+#         if key_placeholder.button("OpenAI API KEY", type="primary", use_container_width=True, key="openai_api_key_button"):
+#             open_openaiapikey_modal()
+#     else:
+#         if key_placeholder.button("OpenAI API KEY", type="secondary", use_container_width=True, key="openai_api_key_2_button"):
+#             open_openaiapikey_modal(old_key=st.session_state["openai_api_key"])
+# with col2:
+with st.container():
     if prompt := st.chat_input("질문할 문장을 입력해 주세요"):
         with question.chat_message(name="user", avatar="/app/src/images/bot_icon_2.jpg"):
             st.markdown(prompt)

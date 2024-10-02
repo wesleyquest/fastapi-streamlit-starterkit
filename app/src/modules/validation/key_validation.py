@@ -29,7 +29,7 @@ def get_api_key_check(
         openai_api_key,
 ):
     response = requests.post(
-        url=f"http://{API_SERVER}:{API_PORT}{API_V1_STR}/auth/api_key_check",
+        url=f"http://{API_SERVER}:{API_PORT}{API_V1_STR}/users/api_key_check",
         headers = {'Authorization': f'{token_type} {access_token}'},
         json={
             "openai_api_key": openai_api_key,

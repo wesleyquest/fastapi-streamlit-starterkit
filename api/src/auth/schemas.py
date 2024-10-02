@@ -13,7 +13,3 @@ class TokenPayload(BaseModel):
 
 class Msg(BaseModel):
     detail: str
-
-class Api_Key_Check(BaseModel):
-    results : str
-
