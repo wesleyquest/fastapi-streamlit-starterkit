@@ -4,7 +4,7 @@ from modules.settings.page import set_page_config, make_sidebar
 from modules.settings.style import style_global
 from modules.auth.api_auth import validate_token, get_user_info
 from modules.security.encryption import str_to_asterisk
-from modules.validation.key_validation import validate_openai_api_key
+#from modules.validation.key_validation import validate_openai_api_key
 from modules.validation.form_validation import validate_text
 #from modules.quiz.api_quiz import get_batch_quiz, get_stream_quiz, translate_batch_quiz,translate_stream_quiz
 from modules.quiz.api_quiz import get_batch_quiz, translate_batch_quiz,translate_stream_quiz

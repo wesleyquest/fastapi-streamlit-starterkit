@@ -1,5 +1,6 @@
 import streamlit as st
-from modules.validation.key_validation import validate_openai_api_key
+#from modules.validation.key_validation import validate_openai_api_key
+from modules.validation.key_validation import get_api_key_check
 from modules.validation.form_validation import validate_text
 #from modules.quiz.api_quiz import get_batch_quiz,get_stream_quiz, translate_batch_quiz, translate_stream_quiz
 from modules.quiz.api_quiz import get_batch_quiz, translate_batch_quiz, translate_stream_quiz
@@ -58,7 +59,9 @@ def expander():
 @st.dialog(" ", width="large")
 def open_answer_modal(answer):
     st.markdown("")
-    st.markdown(answer)
+    for i in range(len(answer)):
+        with st.container(border=True):
+            st.markdown(answer[i])
 
 #modal
 @st.dialog(" ", width="small")
@@ -74,12 +77,26 @@ def open_openaiapikey_modal(old_key=None):
     col1, col2 = st.columns(2)
     with col1:
         if st.button("적용", type="primary", use_container_width=True, key="modal_openaiapikey_button"):
-            if validate_openai_api_key(openai_api_key):
+            api_key_value = get_api_key_check(
+                token_type = st.session_state["token_type"], 
+                access_token = st.session_state["access_token"],
+                openai_api_key = openai_api_key
+            )
+            # key_message_placeholder.markdown(api_key_value)
+            
+            if api_key_value['results'] == "OPENAI_API_KEY is valid":
                 st.session_state["key_status"] = True
                 st.session_state["openai_api_key"] = openai_api_key
                 st.rerun()
             else:
-                key_message_placeholder.error("OpenAI API KEY를 정확히 입력하세요")
+                key_message_placeholder.error(api_key_value["results"])
+
+            # if validate_openai_api_key(openai_api_key):
+            #     st.session_state["key_status"] = True
+            #     st.session_state["openai_api_key"] = openai_api_key
+            #     st.rerun()
+            # else:
+            #     key_message_placeholder.error("OpenAI API KEY를 정확히 입력하세요")
     with col2:
         if st.button("닫기", type="secondary", use_container_width=True):
             st.rerun()
@@ -335,12 +352,12 @@ def batch_translation_interface():
                     access_token = st.session_state["access_token"],
                     openai_api_key = st.session_state["openai_api_key"],
                     quiz = st.session_state["translated_messages"][-1]["content"],
-                    answer = st.session_state["translated_messages"][-1]["answer"],
+                    answer = "\n".join(st.session_state["translated_messages"][-1]["answer"]),
                     language = st.session_state["language"])
 
-            translated_quiz = translated_text["results"][:translated_text["results"].find("🚀",2)]
-            translated_answer = translated_text["results"][translated_text["results"].find("🚀",2):]
-
+            translated_quiz = "🚀" + translated_text["results"].split("🚀")[1]
+            #translated_answer = translated_text["results"][translated_text["results"].find("🚀",2):] # 여기를 퀴즈단위 리스트로 바꿔야함
+            translated_answer = ["🚀" + text for text in translated_text["results"].split("🚀")[2:]]
             with assistant_message:
                 with st.container():
                     st.markdown(translated_quiz)
@@ -395,7 +412,7 @@ def stream_translation_interface():
                             access_token=st.session_state["access_token"],
                             openai_api_key=st.session_state["openai_api_key"],
                             quiz=st.session_state["translated_messages"][-1]["content"],
-                            answer=st.session_state["translated_messages"][-1]["answer"],
+                            answer="\n".join(st.session_state["translated_messages"][-1]["answer"]),
                             language=st.session_state["language"]
                         ):
                             if chunk.startswith("Error:"):
@@ -424,14 +441,14 @@ def stream_translation_interface():
                                 #         open_answer_modal(translated_answer)
                                     # explain = explain_placeholder.popover("해설보기",use_container_width=True)
                                     # explain.markdown(translated_answer)
-                        
+                        translated_answer = ["🚀" + txt for txt in translated_answer.split("🚀")][1:]
                         if st.session_state["translated_messages"][-1]["typing"]==False:
                             explain = st.button("해설보기",key="translate_tmp",use_container_width=True)
                             if explain:
                                 open_answer_modal(translated_answer)
 
                         if st.session_state["translated_messages"][-1]["typing"]:
-                            st.session_state["translated_messages"].append({"role": "assistant", "content": translated_text, "answer":translated_answer,"typing":True})
+                            st.session_state["translated_messages"].append({"role": "assistant", "content": translated_text, "answer":"","typing":True})
                         else:
                             st.session_state["translated_messages"].append({"role": "assistant", "content": translated_text, "answer":translated_answer,"typing":False})
                     except Exception as e:

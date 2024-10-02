@@ -17,6 +17,8 @@ from src.auth import dependencies as deps
 from src.auth import utils
 from functools import lru_cache
 from src import config
+import openai
+
 @lru_cache
 def get_settings():
     return config.Settings()
@@ -104,7 +106,35 @@ async def reset_password(
     await db.commit()
     return {"detail": "패스워드를 변경하였습니다."} #return {"msg": "Password updated successfully"}
 
-
+#OPENAI API KEY 확인
+@router.post("/api_key_check", response_model=auth_schemas.Api_Key_Check)
+async def api_key_check(
+    *,
+    openai_api_key: str = Body(..., embed=True),
+    current_user: users_models.User = Depends(deps.get_current_active_user),
+) -> Any:
+    """
+    Check API KEY
+    """
+    try:
+        # OpenAI API 키를 설정
+        openai.api_key = openai_api_key
+        # 간단한 요청을 보내서 키가 유효한지 확인 (예: 모델 리스트 가져오기)
+        openai.models.list()
+        # 요청이 성공하면 True 반환
+        return {
+            "results": "OPENAI_API_KEY is valid"
+        }
+    except openai.AuthenticationError:
+        # API 키가 유효하지 않은 경우
+        return {
+            "results": "OPENAI_API_KEY is invalid"
+        }
+    except Exception as e:
+        # 기타 오류 처리
+        return {
+            "results": f"API error occurred: {str(e)}"
+        }
 
 
 

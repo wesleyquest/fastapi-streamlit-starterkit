@@ -32,6 +32,48 @@ async def make_set(quiz_content,quiz_type,number):
     random.shuffle(q_set)
     return q_set
 
+# async def quiz_format(text):
+#     start = text.find('[')  # '['로 시작하는 부분을 찾음
+#     end = text.rfind(']')   # ']'로 끝나는 부분을 찾음
+#     if start != -1 and end != -1:
+#         json_data = text[start:end+1]  # JSON 부분만 추출
+#         try:
+#             parsed_data = json.loads(json_data)
+        
+#         except json.JSONDecodeError as e:
+#             print("Failed to parse JSON:", e)
+#             return None
+#     else:
+#         print("No valid JSON found in the result.")
+#         return None
+
+#     quiz = "🚀 **Quiz**\n\n"
+#     answer = "🚀 **Answer**\n\n"
+#     explain = "🚀 **Explain**\n\n"
+#     sentence = "🚀 **Sentence**\n\n"
+#     dialog = "🚀 **Dialog**\n\n"
+
+#     for idx, data in enumerate(parsed_data,start=1):
+#         quiz += f"🔆 Quiz {idx}. " + data["quiz"] + "\n\n"
+#         if data["type"] !="fill_in_the_blank":
+#             for choice in data["choice"]:
+#                 quiz += choice + "\n\n"
+#         answer += f"🔆 Quiz {idx}. " + data["answer"]  + "\n\n"
+#         explain += f"🔆 Quiz {idx}. " + data["explain"] + "\n\n"
+#         sentence += f"🔆 Quiz {idx}. " + "\n\n"
+#         for i, sen in enumerate(data["sentence"],start=1):
+#             sentence += f"Example {i}. "  + sen + "\n\n"
+#         dialog += f"🔆 Quiz {idx}. " +"\n\n"
+#         for i, dia in enumerate(data["dialog"],start=1):
+#             dialog += dia + "\n\n"
+#     # output = quiz + answer + explain + sentence + dialog
+#     # print(output)
+#     # return output
+#     output_quiz = quiz 
+#     output_answer = answer + explain + sentence + dialog
+#     output = [output_quiz, output_answer]
+#     return output
+
 async def quiz_format(text):
     start = text.find('[')  # '['로 시작하는 부분을 찾음
     end = text.rfind(']')   # ']'로 끝나는 부분을 찾음
@@ -48,33 +90,29 @@ async def quiz_format(text):
         return None
 
     quiz = "🚀 **Quiz**\n\n"
-    answer = "🚀 **Answer**\n\n"
-    explain = "🚀 **Explain**\n\n"
-    sentence = "🚀 **Sentence**\n\n"
-    dialog = "🚀 **Dialog**\n\n"
+    answer_list = []
 
     for idx, data in enumerate(parsed_data,start=1):
         quiz += f"🔆 Quiz {idx}. " + data["quiz"] + "\n\n"
         if data["type"] !="fill_in_the_blank":
             for choice in data["choice"]:
                 quiz += choice + "\n\n"
-        answer += f"🔆 Quiz {idx}. " + data["answer"]  + "\n\n"
-        explain += f"🔆 Quiz {idx}. " + data["explain"] + "\n\n"
-        sentence += f"🔆 Quiz {idx}. " + "\n\n"
+
+        text = f"🚀 **Quiz {idx}**\n\n"
+        text += "🔆 **Answer:** " + data["answer"] + "\n\n"
+        text += "🔆 **Explain:** " + data["explain"] + "\n\n"
+        text += "🔆 **Sentence:** " + "\n\n"
         for i, sen in enumerate(data["sentence"],start=1):
-            sentence += f"Example {i}. "  + sen + "\n\n"
-        dialog += f"🔆 Quiz {idx}. " +"\n\n"
+            text += f"Example {i}. "  + sen + "\n\n"
+        text += "🔆 **Dialog:** " + "\n\n"
         for i, dia in enumerate(data["dialog"],start=1):
-            dialog += dia + "\n\n"
-    # output = quiz + answer + explain + sentence + dialog
-    # print(output)
-    # return output
-    output_quiz = quiz 
-    output_answer = answer + explain + sentence + dialog
+            text += dia + "\n\n"
+        answer_list.append(text)
+    output_quiz = quiz
+    output_answer = answer_list
     output = [output_quiz, output_answer]
+
     return output
-
-
     
 # async def make_set(quiz_content,quiz_type,number):
 #     set_type = [(q_content,q_type) for q_content in quiz_content for q_type in quiz_type]
