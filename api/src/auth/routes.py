@@ -17,6 +17,8 @@ from src.auth import dependencies as deps
 from src.auth import utils
 from functools import lru_cache
 from src import config
+import openai
+
 @lru_cache
 def get_settings():
     return config.Settings()
@@ -103,11 +105,4 @@ async def reset_password(
     db.add(user)
     await db.commit()
     return {"detail": "패스워드를 변경하였습니다."} #return {"msg": "Password updated successfully"}
-
-
-
-
-
-
-
 

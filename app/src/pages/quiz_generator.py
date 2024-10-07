@@ -4,12 +4,13 @@ from modules.settings.page import set_page_config, make_sidebar
 from modules.settings.style import style_global
 from modules.auth.api_auth import validate_token, get_user_info
 from modules.security.encryption import str_to_asterisk
-from modules.validation.key_validation import validate_openai_api_key
+#from modules.validation.key_validation import validate_openai_api_key
 from modules.validation.form_validation import validate_text
 #from modules.quiz.api_quiz import get_batch_quiz, get_stream_quiz, translate_batch_quiz,translate_stream_quiz
 from modules.quiz.api_quiz import get_batch_quiz, translate_batch_quiz,translate_stream_quiz
 #from modules.quiz.streamlit_quiz import batch_generation_interface, stream_generation_interface, batch_translation_interface, stream_translation_interface, open_openaiapikey_modal, open_settings_modal
-from modules.quiz.streamlit_quiz import batch_generation_interface, batch_translation_interface, stream_translation_interface, open_openaiapikey_modal, open_settings_modal
+# from modules.quiz.streamlit_quiz import batch_generation_interface, batch_translation_interface, stream_translation_interface, open_openaiapikey_modal, open_settings_modal
+from modules.quiz.streamlit_quiz import batch_generation_interface, batch_translation_interface, stream_translation_interface, open_settings_modal
 #var
 if "auth_status" not in st.session_state:
     st.session_state["auth_status"] = None
@@ -94,16 +95,17 @@ with col1:
     #     stream_generation_interface()
     # else:
     batch_generation_interface()
-    but1, but2, but3 = st.columns((1,1,1), gap="small")
+    #but1, but2, but3 = st.columns((1,1,1), gap="small")
+    but1, but2 = st.columns((1,1), gap="small")
+    # with but1:
+    #     key_placeholder = st.container()
+    #     if not st.session_state["key_status"]==True:
+    #         if key_placeholder.button("OpenAI API KEY", type="primary", use_container_width=True, key="openai_api_key_button"):
+    #             open_openaiapikey_modal()
+    #     else:
+    #         if key_placeholder.button("OpenAI API KEY", type="secondary", use_container_width=True, key="openai_api_key_2_button"):
+    #             open_openaiapikey_modal(old_key=st.session_state["openai_api_key"])
     with but1:
-        key_placeholder = st.container()
-        if not st.session_state["key_status"]==True:
-            if key_placeholder.button("OpenAI API KEY", type="primary", use_container_width=True, key="openai_api_key_button"):
-                open_openaiapikey_modal()
-        else:
-            if key_placeholder.button("OpenAI API KEY", type="secondary", use_container_width=True, key="openai_api_key_2_button"):
-                open_openaiapikey_modal(old_key=st.session_state["openai_api_key"])
-    with but2:
         quiz_gen_placeholder = st.container()
         if not st.session_state["key_status"]==True:
             quiz_gen_placeholder.button("퀴즈 생성", type="primary", disabled=True, use_container_width=True)
@@ -111,7 +113,7 @@ with col1:
             if quiz_gen_placeholder.button("퀴즈 생성", type="primary", use_container_width=True):
                 open_settings_modal()
 
-    with but3:
+    with but2:
         quiz_del_placeholder = st.container()
         quiz_del_placeholder.button('대화 삭제', on_click=reset_conversation, use_container_width=True)   
 

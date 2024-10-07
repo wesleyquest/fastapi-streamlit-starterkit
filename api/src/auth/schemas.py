@@ -13,4 +13,3 @@ class TokenPayload(BaseModel):
 
 class Msg(BaseModel):
     detail: str
-
