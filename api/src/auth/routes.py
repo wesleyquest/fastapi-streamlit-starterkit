@@ -17,7 +17,6 @@ from src.auth import dependencies as deps
 from src.auth import utils
 from functools import lru_cache
 from src import config
-import openai
 
 @lru_cache
 def get_settings():
