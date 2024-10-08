@@ -32,6 +32,8 @@ if "rerun" not in st.session_state:
     st.session_state["rerun"] = False
 if "stream" not in st.session_state:
     st.session_state["stream"] = False
+if "translated_modal" not in st.session_state:
+    st.session_state["translated_modal"] = False    
 
 #redirect
 if not st.session_state["auth_status"]==True:
@@ -82,9 +84,15 @@ st.markdown("""<div style="height:0.5px;border:none;color:#D3D3D3;background-col
 
 username = st.session_state["user_info"]["username"]
 if "quiz_messages" not in st.session_state:
-    st.session_state["quiz_messages"] = [{"role": "assistant", "content": f"안녕하세요 {username} 님 !  \n '퀴즈 생성' 버튼을 클릭하여 퀴즈를 생성해 주세요!","explain":"안녕하세요"}]
+    st.session_state["quiz_messages"] = [{"role": "assistant", "content": f"안녕하세요 {username} 님 !  \n 좌측 상단의 내정보를 클릭하여 '나의 API KEY 정보'를 입력해주세요!","explain":"안녕하세요"}]
+if (len(st.session_state["quiz_messages"])==1) and (st.session_state["key_status"] ==True):
+    st.session_state["quiz_messages"].append({"role": "assistant", "content": f"'퀴즈 생성' 버튼을 클릭하여 퀴즈를 생성해 주세요!","explain":"안녕하세요"})
+    #st.session_state["quiz_messages"] = [{"role": "assistant", "content": f"안녕하세요 {username} 님 !  \n '퀴즈 생성' 버튼을 클릭하여 퀴즈를 생성해 주세요!","explain":"안녕하세요"}]
 if "translated_messages" not in st.session_state:
-    st.session_state["translated_messages"] = [{"role": "assistant", "content": f"안녕하세요 {username} 님 !  \n 번역할 내용을 입력해 주세요!","answer":"안녕하세요","typing":True}]
+    st.session_state["translated_messages"] = [{"role": "assistant", "content": f"안녕하세요 {username} 님 !  \n 좌측 상단의 내정보를 클릭하여 '나의 API KEY 정보'를 입력해주세요!","answer":"안녕하세요","typing":True}]
+if (len(st.session_state["translated_messages"])==1) and (st.session_state["key_status"] ==True):
+    st.session_state["translated_messages"].append({"role": "assistant", "content": f"번역할 내용을 입력해 주세요!","answer":"안녕하세요","typing":True})
+    #st.session_state["translated_messages"] = [{"role": "assistant", "content": f"안녕하세요 {username} 님 !  \n 번역할 내용을 입력해 주세요!","answer":"안녕하세요","typing":True}]
 
 col1, col2 = st.tabs(['Quiz','Translate'])
 with col1:
@@ -120,6 +128,9 @@ with col1:
     st.markdown("")
 
 with col2:
+    # if st.session_state["rerun"]==True:
+    #     st.session_state["rerun"]=False
+    #     st.rerun()
     if st.session_state['stream']:
         stream_translation_interface()
     else:
