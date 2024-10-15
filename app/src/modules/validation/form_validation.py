@@ -47,7 +47,7 @@ def validate_text(data):
     exp = re.compile('.{10,}')
 
     #validation
-    val = exp.match(data)
+    val = exp.match(data.replace("\n", ""))
 
     if val:
         return True
